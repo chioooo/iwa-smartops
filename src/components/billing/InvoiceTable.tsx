@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { sendEmail, getEmailProviders } from '../../services/azure';
+import type { EmailProvider, EmailProviderInfo } from '../../services/azure';
 import { Search, Download, Mail, Eye, XCircle, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import type {Invoice} from './BillingScreen';
 
@@ -98,9 +100,72 @@ export function InvoiceTable({ invoices, onSelectInvoice, onCancelInvoice, selec
     alert(`Descargando XML de factura ${invoice.folio}`);
   };
 
-  const handleSendEmail = (invoice: Invoice, e: React.MouseEvent) => {
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
+  const [emailProviders, setEmailProviders] = useState<EmailProviderInfo[]>([]);
+  const [showEmailModal, setShowEmailModal] = useState<Invoice | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<EmailProvider | ''>('');
+  const [destinatario, setDestinatario] = useState('');
+
+  // Cargar proveedores de correo al montar
+  useEffect(() => {
+    getEmailProviders().then(providers => {
+      setEmailProviders(providers);
+      if (providers.length > 0) {
+        setSelectedProvider(providers[0].id);
+      }
+    });
+  }, []);
+
+  const openEmailModal = (invoice: Invoice, e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Enviando factura ${invoice.folio} por correo`);
+    setShowEmailModal(invoice);
+    setDestinatario('');
+  };
+
+  const closeEmailModal = () => {
+    setShowEmailModal(null);
+    setDestinatario('');
+  };
+
+  const handleSendEmail = async () => {
+    if (!showEmailModal || !destinatario || !selectedProvider) return;
+
+    const invoice = showEmailModal;
+    setSendingEmail(invoice.id);
+    closeEmailModal();
+
+    try {
+      const result = await sendEmail({
+        to: destinatario,
+        subject: `Factura ${invoice.folio} - ${invoice.cliente}`,
+        provider: selectedProvider,
+        body: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #D0323A;">Factura Electrónica</h2>
+            <p>Estimado cliente,</p>
+            <p>Adjunto encontrará su factura con los siguientes datos:</p>
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Folio:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${invoice.folio}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>UUID:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${invoice.uuid || 'N/A'}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Fecha:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${invoice.fechaEmision}</td></tr>
+              <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Total:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">$${invoice.total.toFixed(2)} ${invoice.moneda}</td></tr>
+            </table>
+            <p style="color: #666; font-size: 12px;">Este correo fue generado automáticamente.</p>
+          </div>
+        `,
+      });
+
+      if (result.success) {
+        alert(`✅ Factura enviada exitosamente a ${destinatario}`);
+      } else {
+        alert(`❌ Error al enviar: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`❌ Error inesperado al enviar el correo`);
+      console.error(error);
+    } finally {
+      setSendingEmail(null);
+    }
   };
 
   return (
@@ -253,11 +318,16 @@ export function InvoiceTable({ invoices, onSelectInvoice, onCancelInvoice, selec
                         <FileText className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={(e) => handleSendEmail(invoice, e)}
-                        className="p-2 text-gray-600 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        onClick={(e) => openEmailModal(invoice, e)}
+                        disabled={sendingEmail === invoice.id}
+                        className={`p-2 rounded-lg transition-colors ${
+                          sendingEmail === invoice.id 
+                            ? 'text-purple-400 bg-purple-50 cursor-wait' 
+                            : 'text-gray-600 hover:text-purple-600 hover:bg-gray-100'
+                        }`}
                         title="Enviar por correo"
                       >
-                        <Mail className="w-4 h-4" />
+                        <Mail className={`w-4 h-4 ${sendingEmail === invoice.id ? 'animate-pulse' : ''}`} />
                       </button>
                       {invoice.estado === 'vigente' && (
                         <button
@@ -332,6 +402,77 @@ export function InvoiceTable({ invoices, onSelectInvoice, onCancelInvoice, selec
           </div>
         )}
       </div>
+
+      {/* Modal para enviar correo */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={closeEmailModal}>
+          <div 
+            className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Enviar Factura {showEmailModal.folio}
+            </h3>
+            
+            {/* Selector de proveedor */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Enviar desde:
+              </label>
+              <div className="flex gap-2">
+                {emailProviders.map((provider) => (
+                  <button
+                    key={provider.id}
+                    onClick={() => setSelectedProvider(provider.id)}
+                    className={`flex-1 p-3 rounded-lg border-2 transition-colors ${
+                      selectedProvider === provider.id
+                        ? 'border-[#D0323A] bg-red-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="font-medium text-gray-900">{provider.name}</div>
+                  </button>
+                ))}
+              </div>
+              {emailProviders.length === 0 && (
+                <p className="text-sm text-red-500">No hay proveedores configurados. Verifica que el servidor esté corriendo.</p>
+              )}
+            </div>
+
+            {/* Campo de destinatario */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Correo del destinatario:
+              </label>
+              <input
+                type="email"
+                value={destinatario}
+                onChange={(e) => setDestinatario(e.target.value)}
+                placeholder="cliente@ejemplo.com"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
+                autoFocus
+              />
+            </div>
+
+            {/* Botones */}
+            <div className="flex gap-3">
+              <button
+                onClick={closeEmailModal}
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSendEmail}
+                disabled={!destinatario || !selectedProvider}
+                className="flex-1 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#b02a31] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

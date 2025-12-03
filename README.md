@@ -26,3 +26,9 @@ npm run build
 
 # Vista previa del build
 npm run preview
+
+
+# Inicializar el server para correos:
+cd server
+npm install
+npm run dev
