@@ -9,7 +9,6 @@ Aplicación de demostración construida con **React + TypeScript + Vite**, usand
 - **Vite**
 - **TailwindCSS**
 - **Lucide-react Icons**
-- **Chart.js**
 
 ---
 
