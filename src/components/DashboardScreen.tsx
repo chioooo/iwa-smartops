@@ -9,6 +9,7 @@ import { UsersScreen } from "./users/UsersScreen";
 import { InventoryScreen } from "./inventory/InventoryScreen";
 import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
+import { FinancesScreen } from "./finances/FinancesScreen";
 
 export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -72,12 +73,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
 
         {activeSection === 'reports' && <ReportsScreen />}
 
-        {activeSection === 'finances' && (
-          <div className="p-8">
-            <h1 className="text-gray-900 text-3xl mb-2">Finanzas</h1>
-            <p className="text-gray-600">Módulo en desarrollo...</p>
-          </div>
-        )}
+        {activeSection === 'finances' && <FinancesScreen />}
 
         {activeSection === 'settings' && (
           <div className="p-8">
