@@ -16,7 +16,8 @@ export default function App() {
             ) : currentScreen === "register" ? (
                 <RegisterScreen onBackToLogin={() => setCurrentScreen("login")} />
             ) : (
-                <DashboardScreen />
+                <DashboardScreen onLogout={() => setCurrentScreen("login")} />
+
             )}
         </>
     );

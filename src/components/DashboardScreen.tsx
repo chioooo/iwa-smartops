@@ -10,7 +10,7 @@ import { InventoryScreen } from "./inventory/InventoryScreen";
 import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
 
-export function DashboardScreen() {
+export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chatbotOpen, setChatbotOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -18,8 +18,8 @@ export function DashboardScreen() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
-      <Sidebar 
-        isOpen={sidebarOpen} 
+      <Sidebar
+        isOpen={sidebarOpen}
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         activeSection={activeSection}
         onNavigate={setActiveSection}
@@ -31,9 +31,9 @@ export function DashboardScreen() {
         {activeSection === 'dashboard' && (
           <>
             {/* Header */}
-            <DashboardHeader />
+              <DashboardHeader onLogout={onLogout} />
 
-            {/* Dashboard Content */}
+              {/* Dashboard Content */}
             <main className="p-8">
               {/* Welcome Section */}
               <div className="mb-8">
