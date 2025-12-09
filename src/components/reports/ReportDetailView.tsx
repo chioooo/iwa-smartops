@@ -200,24 +200,13 @@ export function ReportDetailView({report, onClose}: Props) {
                 {/* Actions */}
                 <div className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
                     {report.estado === 'disponible' && (
-                        <div className="space-y-2">
-                            <button
-                                onClick={() => alert('Descargando reporte...')}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
-                            >
-                                <Download className="w-4 h-4"/>
-                                Descargar {report.formato.toUpperCase()}
-                            </button>
-                            {report.formato === 'pdf' && (
-                                <button
-                                    onClick={() => alert('Abriendo vista previa...')}
-                                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                                >
-                                    <Eye className="w-4 h-4"/>
-                                    Vista Previa
-                                </button>
-                            )}
-                        </div>
+                        <button
+                            onClick={() => alert(`Descargando reporte: ${report.nombre} (${report.formato.toUpperCase()})`)}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                        >
+                            <Download className="w-4 h-4"/>
+                            Descargar {report.formato.toUpperCase()}
+                        </button>
                     )}
                     {report.estado === 'proceso' && (
                         <button

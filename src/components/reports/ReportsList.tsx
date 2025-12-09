@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Search, Download, Eye, FileText, FileSpreadsheet, File, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Search, Download, Eye, FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle, Filter } from 'lucide-react';
 import type {Report} from './ReportsScreen';
 
 type Props = {
   reports: Report[];
   onSelectReport: (report: Report) => void;
   selectedReportId?: string;
+  onOpenFilters: () => void;
 };
 
-export function ReportsList({ reports, onSelectReport, selectedReportId }: Props) {
+export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenFilters }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTipo, setFilterTipo] = useState('all');
   const [filterEstado, setFilterEstado] = useState('all');
@@ -78,8 +79,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
   const getFormatoIcon = (formato: Report['formato']) => {
     const icons = {
       pdf: FileText,
-      excel: FileSpreadsheet,
-      csv: File
+      excel: FileSpreadsheet
     };
     return icons[formato];
   };
@@ -93,7 +93,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
     <div className="space-y-6">
       {/* Filters Bar */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -132,6 +132,15 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
             <option value="proceso">En proceso</option>
             <option value="error">Error</option>
           </select>
+
+          {/* Botón Filtros Avanzados */}
+          <button
+            onClick={onOpenFilters}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Filter className="w-5 h-5"/>
+            Filtros Avanzados
+          </button>
         </div>
       </div>
 
@@ -213,18 +222,20 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
                     {/* Acciones */}
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectReport(report);
-                          }}
-                          className="p-2 text-gray-600 hover:text-[#D0323A] hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Ver detalles"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
                         {report.estado === 'disponible' && (
                           <>
+                            {/* Botón de vista de detalles - para PDF y Excel */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectReport(report);
+                              }}
+                              className="p-2 text-gray-600 hover:text-[#D0323A] hover:bg-gray-100 rounded-lg transition-colors"
+                              title="Ver detalles"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            {/* Botón de descarga */}
                             <button
                               onClick={(e) => handleDownload(report, e)}
                               className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -232,19 +243,12 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
                             >
                               <Download className="w-4 h-4" />
                             </button>
-                            {report.formato === 'pdf' && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  alert('Abriendo vista previa...');
-                                }}
-                                className="p-2 text-gray-600 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="Vista previa"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                            )}
                           </>
+                        )}
+                        {report.estado === 'proceso' && (
+                          <div className="p-2 text-gray-400">
+                            <Clock className="w-4 h-4 animate-spin" />
+                          </div>
                         )}
                       </div>
                     </td>

@@ -9,7 +9,6 @@ type Props = {
 
 export function CreateReportModal({ onClose, onCreate }: Props) {
   const [formData, setFormData] = useState({
-    nombre: '',
     tipo: 'ventas' as Report['tipo'],
     formato: 'pdf' as Report['formato'],
     generadoPor: 'Juan Pérez'
@@ -32,13 +31,11 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.nombre) {
-      alert('Por favor ingresa un nombre para el reporte');
-      return;
-    }
+    const tipoSeleccionado = tiposReporte.find(t => t.value === formData.tipo);
+    const nombreReporte = `${tipoSeleccionado?.label} - ${new Date(filters.fechaInicio!).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`;
 
     const reportData: Omit<Report, 'id' | 'fechaGeneracion' | 'estado'> = {
-      nombre: formData.nombre,
+      nombre: nombreReporte,
       tipo: formData.tipo,
       formato: formData.formato,
       generadoPor: formData.generadoPor,
@@ -77,20 +74,6 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-6">
-            {/* Nombre del reporte */}
-            <div>
-              <label className="block text-sm text-gray-700 mb-2">
-                Nombre del reporte *
-              </label>
-              <input
-                type="text"
-                value={formData.nombre}
-                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
-                placeholder="Ej: Reporte de Ventas - Noviembre 2024"
-              />
-            </div>
-
             {/* Tipo de reporte */}
             <div>
               <label className="block text-sm text-gray-700 mb-3">
@@ -239,7 +222,7 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   Formato de salida *
                 </label>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <label
                   className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
                     formData.formato === 'pdf'
@@ -276,25 +259,6 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   />
                   <Download className={`w-8 h-8 mb-2 ${formData.formato === 'excel' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
                   <span className="text-sm text-gray-900">Excel</span>
-                </label>
-
-                <label
-                  className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.formato === 'csv'
-                      ? 'border-[#D0323A] bg-red-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="formato"
-                    value="csv"
-                    checked={formData.formato === 'csv'}
-                    onChange={(e) => setFormData({ ...formData, formato: e.target.value as Report['formato'] })}
-                    className="sr-only"
-                  />
-                  <Download className={`w-8 h-8 mb-2 ${formData.formato === 'csv' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
-                  <span className="text-sm text-gray-900">CSV</span>
                 </label>
               </div>
             </div>

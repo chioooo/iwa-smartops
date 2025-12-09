@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {BarChart3, FileText, Plus, Filter} from 'lucide-react';
+import {BarChart3, FileText, Plus} from 'lucide-react';
 import {ReportsDashboard} from './ReportsDashboard';
 import {ReportsList} from './ReportsList';
 import {CreateReportModal} from './CreateReportModal';
@@ -13,7 +13,7 @@ export type Report = {
     fechaGeneracion: string;
     generadoPor: string;
     estado: 'disponible' | 'proceso' | 'error';
-    formato: 'pdf' | 'excel' | 'csv';
+    formato: 'pdf' | 'excel';
     parametros: ReportFilters;
 };
 
@@ -139,13 +139,6 @@ export function ReportsScreen() {
                         </div>
                         <div className="flex items-center gap-3">
                             <button
-                                onClick={() => setShowFiltersPanel(true)}
-                                className="flex items-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                                <Filter className="w-5 h-5"/>
-                                Filtros
-                            </button>
-                            <button
                                 onClick={() => setShowCreateModal(true)}
                                 className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
                             >
@@ -199,6 +192,7 @@ export function ReportsScreen() {
                         reports={reports}
                         onSelectReport={setSelectedReport}
                         selectedReportId={selectedReport?.id}
+                        onOpenFilters={() => setShowFiltersPanel(true)}
                     />
                 )}
             </div>

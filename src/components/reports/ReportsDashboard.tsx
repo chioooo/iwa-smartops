@@ -59,32 +59,6 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* Active Filters Display */}
-      {(filters.fechaInicio || filters.sucursal || filters.categoria) && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm text-blue-900">Filtros activos:</span>
-              {filters.fechaInicio && filters.fechaFin && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                  {new Date(filters.fechaInicio).toLocaleDateString('es-MX')} - {new Date(filters.fechaFin).toLocaleDateString('es-MX')}
-                </span>
-              )}
-              {filters.sucursal && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                  {filters.sucursal}
-                </span>
-              )}
-              {filters.categoria && (
-                <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                  {filters.categoria}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Ventas del día */}
