@@ -4,22 +4,22 @@ import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
   onClose: () => void;
-  onCreate: (reportData: Omit<Report, 'id' | 'fechaGeneracion' | 'estado'>) => void;
+  onCreate: (reportData: Omit<Report, 'id' | 'generationDate' | 'status'>) => void;
 };
 
 export function CreateReportModal({ onClose, onCreate }: Props) {
   const [formData, setFormData] = useState({
     tipo: 'ventas' as Report['tipo'],
-    formato: 'pdf' as Report['formato'],
-    generadoPor: 'Juan Pérez'
+    format: 'pdf' as Report['format'],
+    generatedBy: 'Juan Pérez'
   });
 
   const [filters, setFilters] = useState<ReportFilters>({
-    fechaInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    fechaFin: new Date().toISOString().split('T')[0],
+    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
   });
 
-  const tiposReporte = [
+  const reportTypes = [
     { value: 'ventas', label: 'Reporte de Ventas', description: 'Análisis de ventas, ingresos y tendencias' },
     { value: 'inventario', label: 'Reporte de Inventario', description: 'Stock, rotación y movimientos de productos' },
     { value: 'facturacion', label: 'Reporte de Facturación', description: 'Facturas emitidas, CFDI y totales fiscales' },
@@ -31,21 +31,21 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const tipoSeleccionado = tiposReporte.find(t => t.value === formData.tipo);
-    const nombreReporte = `${tipoSeleccionado?.label} - ${new Date(filters.fechaInicio!).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`;
+    const selectedType = reportTypes.find(t => t.value === formData.tipo);
+    const reportName = `${selectedType?.label} - ${new Date(filters.startDate!).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`;
 
-    const reportData: Omit<Report, 'id' | 'fechaGeneracion' | 'estado'> = {
-      nombre: nombreReporte,
+    const reportData: Omit<Report, 'id' | 'generationDate' | 'status'> = {
+      name: reportName,
       tipo: formData.tipo,
-      formato: formData.formato,
-      generadoPor: formData.generadoPor,
-      parametros: filters
+      format: formData.format,
+      generatedBy: formData.generatedBy,
+      parameters: filters
     };
 
     onCreate(reportData);
   };
 
-  const tipoSeleccionado = tiposReporte.find(t => t.value === formData.tipo);
+  const selectedType = reportTypes.find(t => t.value === formData.tipo);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -80,7 +80,7 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                 Tipo de reporte *
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {tiposReporte.map((tipo) => (
+                {reportTypes.map((tipo) => (
                   <label
                     key={tipo.value}
                     className={`relative flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all ${
@@ -124,8 +124,8 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha inicio</label>
                   <input
                     type="date"
-                    value={filters.fechaInicio}
-                    onChange={(e) => setFilters({ ...filters, fechaInicio: e.target.value })}
+                    value={filters.startDate}
+                    onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
                 </div>
@@ -133,8 +133,8 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha fin</label>
                   <input
                     type="date"
-                    value={filters.fechaFin}
-                    onChange={(e) => setFilters({ ...filters, fechaFin: e.target.value })}
+                    value={filters.endDate}
+                    onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
                 </div>
@@ -154,8 +154,8 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Sucursal</label>
                   <select
-                    value={filters.sucursal || ''}
-                    onChange={(e) => setFilters({ ...filters, sucursal: e.target.value || undefined })}
+                    value={filters.branch || ''}
+                    onChange={(e) => setFilters({ ...filters, branch: e.target.value || undefined })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
                   >
                     <option value="">Todas las sucursales</option>
@@ -170,8 +170,8 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Categoría</label>
                   <select
-                    value={filters.categoria || ''}
-                    onChange={(e) => setFilters({ ...filters, categoria: e.target.value || undefined })}
+                    value={filters.category || ''}
+                    onChange={(e) => setFilters({ ...filters, category: e.target.value || undefined })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
                   >
                     <option value="">Todas las categorías</option>
@@ -186,8 +186,8 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Usuario / Operador</label>
                   <select
-                    value={filters.usuario || ''}
-                    onChange={(e) => setFilters({ ...filters, usuario: e.target.value || undefined })}
+                    value={filters.user || ''}
+                    onChange={(e) => setFilters({ ...filters, user: e.target.value || undefined })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
                   >
                     <option value="">Todos los usuarios</option>
@@ -201,8 +201,8 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Cliente</label>
                   <select
-                    value={filters.cliente || ''}
-                    onChange={(e) => setFilters({ ...filters, cliente: e.target.value || undefined })}
+                    value={filters.client || ''}
+                    onChange={(e) => setFilters({ ...filters, client: e.target.value || undefined })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
                   >
                     <option value="">Todos los clientes</option>
@@ -225,39 +225,39 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
               <div className="grid grid-cols-2 gap-3">
                 <label
                   className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.formato === 'pdf'
+                    formData.format === 'pdf'
                       ? 'border-[#D0323A] bg-red-50'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                 >
                   <input
                     type="radio"
-                    name="formato"
+                    name="format"
                     value="pdf"
-                    checked={formData.formato === 'pdf'}
-                    onChange={(e) => setFormData({ ...formData, formato: e.target.value as Report['formato'] })}
+                    checked={formData.format === 'pdf'}
+                    onChange={(e) => setFormData({ ...formData, format: e.target.value as Report['format'] })}
                     className="sr-only"
                   />
-                  <FileText className={`w-8 h-8 mb-2 ${formData.formato === 'pdf' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
+                  <FileText className={`w-8 h-8 mb-2 ${formData.format === 'pdf' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
                   <span className="text-sm text-gray-900">PDF</span>
                 </label>
 
                 <label
                   className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.formato === 'excel'
+                    formData.format === 'excel'
                       ? 'border-[#D0323A] bg-red-50'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                 >
                   <input
                     type="radio"
-                    name="formato"
+                    name="format"
                     value="excel"
-                    checked={formData.formato === 'excel'}
-                    onChange={(e) => setFormData({ ...formData, formato: e.target.value as Report['formato'] })}
+                    checked={formData.format === 'excel'}
+                    onChange={(e) => setFormData({ ...formData, format: e.target.value as Report['format'] })}
                     className="sr-only"
                   />
-                  <Download className={`w-8 h-8 mb-2 ${formData.formato === 'excel' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
+                  <Download className={`w-8 h-8 mb-2 ${formData.format === 'excel' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
                   <span className="text-sm text-gray-900">Excel</span>
                 </label>
               </div>
@@ -267,11 +267,11 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <h4 className="text-sm text-gray-900 mb-2">Vista previa de configuración</h4>
               <div className="space-y-1 text-xs text-gray-700">
-                <p><strong>Tipo:</strong> {tipoSeleccionado?.label}</p>
-                <p><strong>Periodo:</strong> {new Date(filters.fechaInicio!).toLocaleDateString('es-MX')} - {new Date(filters.fechaFin!).toLocaleDateString('es-MX')}</p>
-                {filters.sucursal && <p><strong>Sucursal:</strong> {filters.sucursal}</p>}
-                {filters.categoria && <p><strong>Categoría:</strong> {filters.categoria}</p>}
-                <p><strong>Formato:</strong> {formData.formato.toUpperCase()}</p>
+                <p><strong>Tipo:</strong> {selectedType?.label}</p>
+                <p><strong>Periodo:</strong> {new Date(filters.startDate!).toLocaleDateString('es-MX')} - {new Date(filters.endDate!).toLocaleDateString('es-MX')}</p>
+                {filters.branch && <p><strong>Sucursal:</strong> {filters.branch}</p>}
+                {filters.category && <p><strong>Categoría:</strong> {filters.category}</p>}
+                <p><strong>Formato:</strong> {formData.format.toUpperCase()}</p>
               </div>
             </div>
           </div>

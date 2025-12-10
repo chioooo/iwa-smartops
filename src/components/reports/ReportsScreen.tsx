@@ -8,22 +8,22 @@ import {FiltersPanel} from './FiltersPanel';
 
 export type Report = {
     id: string;
-    nombre: string;
+    name: string;
     tipo: 'ventas' | 'inventario' | 'facturacion' | 'servicios' | 'clientes' | 'utilidades';
-    fechaGeneracion: string;
-    generadoPor: string;
-    estado: 'disponible' | 'proceso' | 'error';
-    formato: 'pdf' | 'excel';
-    parametros: ReportFilters;
+    generationDate: string;
+    generatedBy: string;
+    status: 'disponible' | 'proceso' | 'error';
+    format: 'pdf' | 'excel';
+    parameters: ReportFilters;
 };
 
 export type ReportFilters = {
-    fechaInicio?: string;
-    fechaFin?: string;
-    sucursal?: string;
-    categoria?: string;
-    usuario?: string;
-    cliente?: string;
+    startDate?: string;
+    endDate?: string;
+    branch?: string;
+    category?: string;
+    user?: string;
+    client?: string;
 };
 
 export type ChartDataPoint = {
@@ -37,78 +37,78 @@ export function ReportsScreen() {
     const [showFiltersPanel, setShowFiltersPanel] = useState(false);
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [filters, setFilters] = useState<ReportFilters>({
-        fechaInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-        fechaFin: new Date().toISOString().split('T')[0],
+        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+        endDate: new Date().toISOString().split('T')[0],
     });
 
     // Mock data - reportes generados
     const [reports, setReports] = useState<Report[]>([
         {
             id: '1',
-            nombre: 'Reporte de Ventas - Noviembre 2024',
+            name: 'Reporte de Ventas - Noviembre 2024',
             tipo: 'ventas',
-            fechaGeneracion: '2024-11-26T10:30:00',
-            generadoPor: 'Juan Pérez',
-            estado: 'disponible',
-            formato: 'pdf',
-            parametros: {
-                fechaInicio: '2024-11-01',
-                fechaFin: '2024-11-30',
-                sucursal: 'Principal'
+            generationDate: '2024-11-26T10:30:00',
+            generatedBy: 'Juan Pérez',
+            status: 'disponible',
+            format: 'pdf',
+            parameters: {
+                startDate: '2024-11-01',
+                endDate: '2024-11-30',
+                branch: 'Principal'
             }
         },
         {
             id: '2',
-            nombre: 'Inventario - Stock Crítico',
+            name: 'Inventario - Stock Crítico',
             tipo: 'inventario',
-            fechaGeneracion: '2024-11-25T14:15:00',
-            generadoPor: 'María González',
-            estado: 'disponible',
-            formato: 'excel',
-            parametros: {
-                fechaInicio: '2024-11-25',
-                fechaFin: '2024-11-25'
+            generationDate: '2024-11-25T14:15:00',
+            generatedBy: 'María González',
+            status: 'disponible',
+            format: 'excel',
+            parameters: {
+                startDate: '2024-11-25',
+                endDate: '2024-11-25'
             }
         },
         {
             id: '3',
-            nombre: 'Facturación Electrónica - Noviembre',
+            name: 'Facturación Electrónica - Noviembre',
             tipo: 'facturacion',
-            fechaGeneracion: '2024-11-26T09:00:00',
-            generadoPor: 'Carlos Ruiz',
-            estado: 'proceso',
-            formato: 'pdf',
-            parametros: {
-                fechaInicio: '2024-11-01',
-                fechaFin: '2024-11-30'
+            generationDate: '2024-11-26T09:00:00',
+            generatedBy: 'Carlos Ruiz',
+            status: 'proceso',
+            format: 'pdf',
+            parameters: {
+                startDate: '2024-11-01',
+                endDate: '2024-11-30'
             }
         },
     ]);
 
     // Mock data - métricas del dashboard
     const metrics = {
-        ventasHoy: 45680.50,
-        ventasMes: 892450.00,
-        facturasEmitidas: 127,
-        ordenesCompletadas: 89,
-        serviciosMasSolicitados: [
-            {nombre: 'Consultoría Tecnológica', cantidad: 45},
-            {nombre: 'Mantenimiento Preventivo', cantidad: 32},
-            {nombre: 'Soporte Técnico', cantidad: 28}
+        salesToday: 45680.50,
+        monthlySales: 892450.00,
+        invoicesIssued: 127,
+        completedOrders: 89,
+        mostRequestedServices: [
+            {name: 'Consultoría Tecnológica', quantity: 45},
+            {name: 'Mantenimiento Preventivo', quantity: 32},
+            {name: 'Soporte Técnico', quantity: 28}
         ],
-        productosRotacion: [
-            {nombre: 'Laptop Dell XPS', ventas: 15},
-            {nombre: 'Impresora HP', ventas: 12},
-            {nombre: 'Monitor LG 27"', ventas: 8}
+        productRotation: [
+            {name: 'Laptop Dell XPS', sales: 15},
+            {name: 'Impresora HP', sales: 12},
+            {name: 'Monitor LG 27"', sales: 8}
         ]
     };
 
-    const handleCreateReport = (reportData: Omit<Report, 'id' | 'fechaGeneracion' | 'estado'>) => {
+    const handleCreateReport = (reportData: Omit<Report, 'id' | 'generationDate' | 'status'>) => {
         const newReport: Report = {
             ...reportData,
             id: String(reports.length + 1),
-            fechaGeneracion: new Date().toISOString(),
-            estado: 'proceso'
+            generationDate: new Date().toISOString(),
+            status: 'proceso'
         };
 
         setReports([newReport, ...reports]);
@@ -117,7 +117,7 @@ export function ReportsScreen() {
         // Simular proceso de generación
         setTimeout(() => {
             setReports(prev => prev.map(r =>
-                r.id === newReport.id ? {...r, estado: 'disponible'} : r
+                r.id === newReport.id ? {...r, status: 'disponible'} : r
             ));
         }, 2000);
     };

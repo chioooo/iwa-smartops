@@ -5,47 +5,47 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 
 type Props = {
   metrics: {
-    ventasHoy: number;
-    ventasMes: number;
-    facturasEmitidas: number;
-    ordenesCompletadas: number;
-    serviciosMasSolicitados: Array<{ nombre: string; cantidad: number }>;
-    productosRotacion: Array<{ nombre: string; ventas: number }>;
+    salesToday: number;
+    monthlySales: number;
+    invoicesIssued: number;
+    completedOrders: number;
+    mostRequestedServices: Array<{ name: string; quantity: number }>;
+    productRotation: Array<{ name: string; sales: number }>;
   };
   filters: ReportFilters;
   onCreateReport: () => void;
 };
 
-export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
+export function ReportsDashboard({ metrics, onCreateReport }: Props) {
   // Mock data para gráficos
-  const ventasPorMes = [
-    { mes: 'Ene', ventas: 125000, egresos: 85000 },
-    { mes: 'Feb', ventas: 158000, egresos: 92000 },
-    { mes: 'Mar', ventas: 142000, egresos: 88000 },
-    { mes: 'Abr', ventas: 189000, egresos: 95000 },
-    { mes: 'May', ventas: 167000, egresos: 89000 },
-    { mes: 'Jun', ventas: 195000, egresos: 98000 },
-    { mes: 'Jul', ventas: 178000, egresos: 91000 },
-    { mes: 'Ago', ventas: 205000, egresos: 102000 },
-    { mes: 'Sep', ventas: 188000, egresos: 94000 },
-    { mes: 'Oct', ventas: 215000, egresos: 105000 },
-    { mes: 'Nov', ventas: metrics.ventasMes, egresos: 98000 },
+  const salesByMonth = [
+    { month: 'Ene', sales: 125000, expenses: 85000 },
+    { month: 'Feb', sales: 158000, expenses: 92000 },
+    { month: 'Mar', sales: 142000, expenses: 88000 },
+    { month: 'Abr', sales: 189000, expenses: 95000 },
+    { month: 'May', sales: 167000, expenses: 89000 },
+    { month: 'Jun', sales: 195000, expenses: 98000 },
+    { month: 'Jul', sales: 178000, expenses: 91000 },
+    { month: 'Ago', sales: 205000, expenses: 102000 },
+    { month: 'Sep', sales: 188000, expenses: 94000 },
+    { month: 'Oct', sales: 215000, expenses: 105000 },
+    { month: 'Nov', sales: metrics.monthlySales, expenses: 98000 },
   ];
 
-  const productosMasVendidos = [
-    { producto: 'Laptop Dell XPS', cantidad: 45 },
-    { producto: 'Monitor LG 27"', cantidad: 38 },
-    { producto: 'Teclado Mecánico', cantidad: 32 },
-    { producto: 'Mouse Inalámbrico', cantidad: 28 },
-    { producto: 'Impresora HP', cantidad: 25 },
+  const bestSellingProducts = [
+    { product: 'Laptop Dell XPS', quantity: 45 },
+    { product: 'Monitor LG 27"', quantity: 38 },
+    { product: 'Teclado Mecánico', quantity: 32 },
+    { product: 'Mouse Inalámbrico', quantity: 28 },
+    { product: 'Impresora HP', quantity: 25 },
   ];
 
-  const distribucionCategorias = [
-    { nombre: 'Tecnología', valor: 45, color: '#D0323A' },
-    { nombre: 'Mobiliario', valor: 25, color: '#F6A016' },
-    { nombre: 'Papelería', valor: 15, color: '#E9540D' },
-    { nombre: 'Consumibles', valor: 10, color: '#9F2743' },
-    { nombre: 'Otros', valor: 5, color: '#F9DC00' },
+  const categoryDistribution = [
+    { name: 'Tecnología', value: 45, color: '#D0323A' },
+    { name: 'Mobiliario', value: 25, color: '#F6A016' },
+    { name: 'Papelería', value: 15, color: '#E9540D' },
+    { name: 'Consumibles', value: 10, color: '#9F2743' },
+    { name: 'Otros', value: 5, color: '#F9DC00' },
   ];
 
   const formatCurrency = (value: number) => {
@@ -71,7 +71,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               +8.5%
             </span>
           </div>
-          <p className="text-2xl text-gray-900 mb-1">{formatCurrency(metrics.ventasHoy)}</p>
+          <p className="text-2xl text-gray-900 mb-1">{formatCurrency(metrics.salesToday)}</p>
           <p className="text-sm text-gray-600">Ventas del Día</p>
         </div>
 
@@ -85,7 +85,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               +15%
             </span>
           </div>
-          <p className="text-2xl text-gray-900 mb-1">{formatCurrency(metrics.ventasMes)}</p>
+          <p className="text-2xl text-gray-900 mb-1">{formatCurrency(metrics.monthlySales)}</p>
           <p className="text-sm text-gray-600">Ventas del Mes</p>
         </div>
 
@@ -96,7 +96,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               <FileText className="w-6 h-6 text-white" />
             </div>
           </div>
-          <p className="text-2xl text-gray-900 mb-1">{metrics.facturasEmitidas}</p>
+          <p className="text-2xl text-gray-900 mb-1">{metrics.invoicesIssued}</p>
           <p className="text-sm text-gray-600">Facturas Emitidas</p>
         </div>
 
@@ -110,7 +110,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               98%
             </span>
           </div>
-          <p className="text-2xl text-gray-900 mb-1">{metrics.ordenesCompletadas}</p>
+          <p className="text-2xl text-gray-900 mb-1">{metrics.completedOrders}</p>
           <p className="text-sm text-gray-600">Órdenes Completadas</p>
         </div>
       </div>
@@ -134,10 +134,10 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={ventasPorMes}>
+            <LineChart data={salesByMonth}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis
-                dataKey="mes"
+                dataKey="month"
                 tick={{ fill: '#6B7280', fontSize: 12 }}
                 axisLine={{ stroke: '#E5E7EB' }}
               />
@@ -158,7 +158,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               <Legend />
               <Line
                 type="monotone"
-                dataKey="ventas"
+                dataKey="sales"
                 stroke="#D0323A"
                 strokeWidth={3}
                 dot={{ fill: '#D0323A', r: 4 }}
@@ -166,7 +166,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               />
               <Line
                 type="monotone"
-                dataKey="egresos"
+                dataKey="expenses"
                 stroke="#6B7280"
                 strokeWidth={3}
                 dot={{ fill: '#6B7280', r: 4 }}
@@ -187,16 +187,16 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={distribucionCategorias}
+                data={categoryDistribution}
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ nombre, valor }) => `${nombre} ${valor}%`}
+                label={({ name, value }) => `${name} ${value}%`}
                 outerRadius={80}
                 fill="#8884d8"
-                dataKey="valor"
+                dataKey="value"
               >
-                {distribucionCategorias.map((entry, index) => (
+                {categoryDistribution.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -204,13 +204,13 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
             </PieChart>
           </ResponsiveContainer>
           <div className="mt-4 space-y-2">
-            {distribucionCategorias.map((cat) => (
-              <div key={cat.nombre} className="flex items-center justify-between text-sm">
+            {categoryDistribution.map((cat) => (
+              <div key={cat.name} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.color }} />
-                  <span className="text-gray-700">{cat.nombre}</span>
+                  <span className="text-gray-700">{cat.name}</span>
                 </div>
-                <span className="text-gray-900">{cat.valor}%</span>
+                <span className="text-gray-900">{cat.value}%</span>
               </div>
             ))}
           </div>
@@ -232,7 +232,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
           </button>
         </div>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={productosMasVendidos} layout="horizontal">
+          <BarChart data={bestSellingProducts} layout="horizontal">
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
               type="number"
@@ -241,7 +241,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
             />
             <YAxis
               type="category"
-              dataKey="producto"
+              dataKey="product"
               tick={{ fill: '#6B7280', fontSize: 12 }}
               axisLine={{ stroke: '#E5E7EB' }}
               width={150}
@@ -255,7 +255,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
               }}
             />
             <Bar
-              dataKey="cantidad"
+              dataKey="quantity"
               fill="url(#colorGradient)"
               radius={[0, 8, 8, 0]}
               maxBarSize={40}
@@ -284,7 +284,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
             </div>
           </div>
           <div className="space-y-3">
-            {metrics.serviciosMasSolicitados.map((servicio, index) => (
+            {metrics.mostRequestedServices.map((service, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100"
@@ -293,9 +293,9 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
                   <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white">
                     {index + 1}
                   </div>
-                  <span className="text-gray-900">{servicio.nombre}</span>
+                  <span className="text-gray-900">{service.name}</span>
                 </div>
-                <span className="text-purple-600">{servicio.cantidad} veces</span>
+                <span className="text-purple-600">{service.quantity} veces</span>
               </div>
             ))}
           </div>
@@ -313,7 +313,7 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
             </div>
           </div>
           <div className="space-y-3">
-            {metrics.productosRotacion.map((producto, index) => (
+            {metrics.productRotation.map((product, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg border border-orange-100"
@@ -322,9 +322,9 @@ export function ReportsDashboard({ metrics, filters, onCreateReport }: Props) {
                   <div className="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center text-white">
                     {index + 1}
                   </div>
-                  <span className="text-gray-900">{producto.nombre}</span>
+                  <span className="text-gray-900">{product.name}</span>
                 </div>
-                <span className="text-orange-600">{producto.ventas} ventas</span>
+                <span className="text-orange-600">{product.sales} ventas</span>
               </div>
             ))}
           </div>

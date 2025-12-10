@@ -11,19 +11,19 @@ type Props = {
 
 export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenFilters }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTipo, setFilterTipo] = useState('all');
-  const [filterEstado, setFilterEstado] = useState('all');
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   // Filtrado
   const filteredReports = reports.filter(report => {
     const matchesSearch =
-      report.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.generadoPor.toLowerCase().includes(searchQuery.toLowerCase());
+      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      report.generatedBy.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesTipo = filterTipo === 'all' || report.tipo === filterTipo;
-    const matchesEstado = filterEstado === 'all' || report.estado === filterEstado;
+    const matchesTipo = filterType === 'all' || report.tipo === filterType;
+    const matchesEstado = filterStatus === 'all' || report.status === filterStatus;
 
     return matchesSearch && matchesTipo && matchesEstado;
   });
@@ -43,7 +43,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
     });
   };
 
-  const getTipoLabel = (tipo: Report['tipo']) => {
+  const getTypeLabel = (tipo: Report['tipo']) => {
     const labels = {
       ventas: 'Ventas',
       inventario: 'Inventario',
@@ -55,7 +55,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
     return labels[tipo];
   };
 
-  const getTipoBadge = (tipo: Report['tipo']) => {
+  const getTypeBadge = (tipo: Report['tipo']) => {
     const badges = {
       ventas: 'bg-green-50 text-green-700 border-green-200',
       inventario: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -67,26 +67,26 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
     return badges[tipo];
   };
 
-  const getEstadoBadge = (estado: Report['estado']) => {
+  const getStatusBadge = (status: Report['status']) => {
     const badges = {
       disponible: { icon: CheckCircle, color: 'bg-green-50 text-green-700 border-green-200', label: 'Disponible' },
       proceso: { icon: Clock, color: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Procesando' },
       error: { icon: AlertCircle, color: 'bg-red-50 text-red-700 border-red-200', label: 'Error' }
     };
-    return badges[estado];
+    return badges[status];
   };
 
-  const getFormatoIcon = (formato: Report['formato']) => {
+  const getFormatIcon = (format: Report['format']) => {
     const icons = {
       pdf: FileText,
       excel: FileSpreadsheet
     };
-    return icons[formato];
+    return icons[format];
   };
 
   const handleDownload = (report: Report, e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Descargando reporte: ${report.nombre}`);
+    alert(`Descargando reporte: ${report.name}`);
   };
 
   return (
@@ -108,8 +108,8 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
 
           {/* Tipo Filter */}
           <select
-            value={filterTipo}
-            onChange={(e) => setFilterTipo(e.target.value)}
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
             className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
           >
             <option value="all">Todos los tipos</option>
@@ -123,8 +123,8 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
 
           {/* Estado Filter */}
           <select
-            value={filterEstado}
-            onChange={(e) => setFilterEstado(e.target.value)}
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
             className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
           >
             <option value="all">Todos los estados</option>
@@ -161,9 +161,9 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
             </thead>
             <tbody>
               {currentReports.map((report) => {
-                const estadoBadge = getEstadoBadge(report.estado);
-                const EstadoIcon = estadoBadge.icon;
-                const FormatoIcon = getFormatoIcon(report.formato);
+                const statusBadge = getStatusBadge(report.status);
+                const StatusIcon = statusBadge.icon;
+                const FormatIcon = getFormatIcon(report.format);
 
                 return (
                   <tr
@@ -180,7 +180,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
                           <FileText className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <p className="text-gray-900">{report.nombre}</p>
+                          <p className="text-gray-900">{report.name}</p>
                           <p className="text-xs text-gray-500">ID: {report.id}</p>
                         </div>
                       </div>
@@ -188,41 +188,41 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
 
                     {/* Tipo */}
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs border ${getTipoBadge(report.tipo)}`}>
-                        {getTipoLabel(report.tipo)}
+                      <span className={`px-3 py-1 rounded-full text-xs border ${getTypeBadge(report.tipo)}`}>
+                        {getTypeLabel(report.tipo)}
                       </span>
                     </td>
 
                     {/* Fecha */}
                     <td className="px-6 py-4">
-                      <span className="text-gray-600 text-sm">{formatDate(report.fechaGeneracion)}</span>
+                      <span className="text-gray-600 text-sm">{formatDate(report.generationDate)}</span>
                     </td>
 
                     {/* Generado por */}
                     <td className="px-6 py-4">
-                      <span className="text-gray-900">{report.generadoPor}</span>
+                      <span className="text-gray-900">{report.generatedBy}</span>
                     </td>
 
                     {/* Estado */}
                     <td className="px-6 py-4">
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border ${estadoBadge.color}`}>
-                        <EstadoIcon className="w-3.5 h-3.5" />
-                        {estadoBadge.label}
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border ${statusBadge.color}`}>
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        {statusBadge.label}
                       </div>
                     </td>
 
                     {/* Formato */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <FormatoIcon className="w-4 h-4 text-gray-600" />
-                        <span className="text-gray-600 text-sm uppercase">{report.formato}</span>
+                        <FormatIcon className="w-4 h-4 text-gray-600" />
+                        <span className="text-gray-600 text-sm uppercase">{report.format}</span>
                       </div>
                     </td>
 
                     {/* Acciones */}
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        {report.estado === 'disponible' && (
+                        {report.status === 'disponible' && (
                           <>
                             {/* Botón de vista de detalles - para PDF y Excel */}
                             <button
@@ -239,13 +239,13 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
                             <button
                               onClick={(e) => handleDownload(report, e)}
                               className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-                              title={`Descargar ${report.formato.toUpperCase()}`}
+                              title={`Descargar ${report.format.toUpperCase()}`}
                             >
                               <Download className="w-4 h-4" />
                             </button>
                           </>
                         )}
-                        {report.estado === 'proceso' && (
+                        {report.status === 'proceso' && (
                           <div className="p-2 text-gray-400">
                             <Clock className="w-4 h-4 animate-spin" />
                           </div>

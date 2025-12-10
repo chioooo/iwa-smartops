@@ -1,5 +1,5 @@
 //import React from 'react';
-import {X, Download, Eye, FileText, Calendar, User, Filter, CheckCircle, Clock, AlertCircle} from 'lucide-react';
+import {X, Download, FileText, Calendar, User, Filter, CheckCircle, Clock, AlertCircle} from 'lucide-react';
 import type {Report} from './ReportsScreen';
 
 type Props = {
@@ -18,7 +18,7 @@ export function ReportDetailView({report, onClose}: Props) {
         });
     };
 
-    const getEstadoConfig = (estado: Report['estado']) => {
+    const getStatusConfig = (status: Report['status']) => {
         const configs = {
             disponible: {
                 icon: CheckCircle,
@@ -39,11 +39,11 @@ export function ReportDetailView({report, onClose}: Props) {
                 description: 'Hubo un error al generar el reporte'
             }
         };
-        return configs[estado];
+        return configs[status];
     };
 
-    const estadoConfig = getEstadoConfig(report.estado);
-    const EstadoIcon = estadoConfig.icon;
+    const statusConfig = getStatusConfig(report.status);
+    const StatusIcon = statusConfig.icon;
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -65,9 +65,9 @@ export function ReportDetailView({report, onClose}: Props) {
                     </div>
 
                     {/* Status */}
-                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${estadoConfig.color}`}>
-                        <EstadoIcon className="w-4 h-4"/>
-                        <span className="text-sm">{estadoConfig.label}</span>
+                    <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${statusConfig.color}`}>
+                        <StatusIcon className="w-4 h-4"/>
+                        <span className="text-sm">{statusConfig.label}</span>
                     </div>
                 </div>
 
@@ -76,8 +76,8 @@ export function ReportDetailView({report, onClose}: Props) {
                     <div className="space-y-6">
                         {/* Nombre */}
                         <div>
-                            <h3 className="text-gray-900 mb-2">{report.nombre}</h3>
-                            <p className="text-sm text-gray-600">{estadoConfig.description}</p>
+                            <h3 className="text-gray-900 mb-2">{report.name}</h3>
+                            <p className="text-sm text-gray-600">{statusConfig.description}</p>
                         </div>
 
                         {/* Información básica */}
@@ -93,7 +93,7 @@ export function ReportDetailView({report, onClose}: Props) {
                                 </div>
                                 <div className="p-3 bg-gray-50 rounded-lg">
                                     <p className="text-xs text-gray-600 mb-1">Formato</p>
-                                    <p className="text-sm text-gray-900 uppercase">{report.formato}</p>
+                                    <p className="text-sm text-gray-900 uppercase">{report.format}</p>
                                 </div>
                             </div>
                         </div>
@@ -107,13 +107,13 @@ export function ReportDetailView({report, onClose}: Props) {
                             <div className="space-y-3">
                                 <div className="p-3 bg-gray-50 rounded-lg">
                                     <p className="text-xs text-gray-600 mb-1">Fecha de Generación</p>
-                                    <p className="text-sm text-gray-900">{formatDate(report.fechaGeneracion)}</p>
+                                    <p className="text-sm text-gray-900">{formatDate(report.generationDate)}</p>
                                 </div>
                                 <div className="p-3 bg-gray-50 rounded-lg">
                                     <p className="text-xs text-gray-600 mb-1">Generado Por</p>
                                     <div className="flex items-center gap-2">
                                         <User className="w-4 h-4 text-gray-600"/>
-                                        <p className="text-sm text-gray-900">{report.generadoPor}</p>
+                                        <p className="text-sm text-gray-900">{report.generatedBy}</p>
                                     </div>
                                 </div>
                             </div>
@@ -126,47 +126,47 @@ export function ReportDetailView({report, onClose}: Props) {
                                 <h3 className="text-gray-900 text-sm">Parámetros Aplicados</h3>
                             </div>
                             <div className="space-y-2">
-                                {report.parametros.fechaInicio && report.parametros.fechaFin && (
+                                {report.parameters.startDate && report.parameters.endDate && (
                                     <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                                         <p className="text-xs text-blue-700 mb-1">Periodo</p>
                                         <p className="text-sm text-blue-900">
-                                            {new Date(report.parametros.fechaInicio).toLocaleDateString('es-MX')} - {new Date(report.parametros.fechaFin).toLocaleDateString('es-MX')}
+                                            {new Date(report.parameters.startDate).toLocaleDateString('es-MX')} - {new Date(report.parameters.endDate).toLocaleDateString('es-MX')}
                                         </p>
                                     </div>
                                 )}
-                                {report.parametros.sucursal && (
+                                {report.parameters.branch && (
                                     <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
                                         <p className="text-xs text-purple-700 mb-1">Sucursal</p>
-                                        <p className="text-sm text-purple-900">{report.parametros.sucursal}</p>
+                                        <p className="text-sm text-purple-900">{report.parameters.branch}</p>
                                     </div>
                                 )}
-                                {report.parametros.categoria && (
+                                {report.parameters.category && (
                                     <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
                                         <p className="text-xs text-orange-700 mb-1">Categoría</p>
-                                        <p className="text-sm text-orange-900">{report.parametros.categoria}</p>
+                                        <p className="text-sm text-orange-900">{report.parameters.category}</p>
                                     </div>
                                 )}
-                                {report.parametros.usuario && (
+                                {report.parameters.user && (
                                     <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                                         <p className="text-xs text-green-700 mb-1">Usuario</p>
-                                        <p className="text-sm text-green-900">{report.parametros.usuario}</p>
+                                        <p className="text-sm text-green-900">{report.parameters.user}</p>
                                     </div>
                                 )}
-                                {report.parametros.cliente && (
+                                {report.parameters.client && (
                                     <div className="p-3 bg-pink-50 rounded-lg border border-pink-200">
                                         <p className="text-xs text-pink-700 mb-1">Cliente</p>
-                                        <p className="text-sm text-pink-900">{report.parametros.cliente}</p>
+                                        <p className="text-sm text-pink-900">{report.parameters.client}</p>
                                     </div>
                                 )}
 
-                                {!report.parametros.sucursal && !report.parametros.categoria && !report.parametros.usuario && !report.parametros.cliente && (
+                                {!report.parameters.branch && !report.parameters.category && !report.parameters.user && !report.parameters.client && (
                                     <p className="text-sm text-gray-500 italic">Sin filtros adicionales</p>
                                 )}
                             </div>
                         </div>
 
                         {/* Estado Processing */}
-                        {report.estado === 'proceso' && (
+                        {report.status === 'proceso' && (
                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
                                     <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 animate-spin"/>
@@ -181,7 +181,7 @@ export function ReportDetailView({report, onClose}: Props) {
                         )}
 
                         {/* Estado Error */}
-                        {report.estado === 'error' && (
+                        {report.status === 'error' && (
                             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                                 <div className="flex items-start gap-3">
                                     <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"/>
@@ -199,16 +199,16 @@ export function ReportDetailView({report, onClose}: Props) {
 
                 {/* Actions */}
                 <div className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
-                    {report.estado === 'disponible' && (
+                    {report.status === 'disponible' && (
                         <button
-                            onClick={() => alert(`Descargando reporte: ${report.nombre} (${report.formato.toUpperCase()})`)}
+                            onClick={() => alert(`Descargando reporte: ${report.name} (${report.format.toUpperCase()})`)}
                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
                         >
                             <Download className="w-4 h-4"/>
-                            Descargar {report.formato.toUpperCase()}
+                            Descargar {report.format.toUpperCase()}
                         </button>
                     )}
-                    {report.estado === 'proceso' && (
+                    {report.status === 'proceso' && (
                         <button
                             disabled
                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed"
@@ -217,7 +217,7 @@ export function ReportDetailView({report, onClose}: Props) {
                             Procesando...
                         </button>
                     )}
-                    {report.estado === 'error' && (
+                    {report.status === 'error' && (
                         <button
                             onClick={() => alert('Reintentando generación...')}
                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"

@@ -17,8 +17,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
 
   const handleClear = () => {
     const clearedFilters: ReportFilters = {
-      fechaInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-      fechaFin: new Date().toISOString().split('T')[0],
+      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0],
     };
     setLocalFilters(clearedFilters);
   };
@@ -72,8 +72,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha inicio</label>
                   <input
                     type="date"
-                    value={localFilters.fechaInicio}
-                    onChange={(e) => setLocalFilters({ ...localFilters, fechaInicio: e.target.value })}
+                    value={localFilters.startDate}
+                    onChange={(e) => setLocalFilters({ ...localFilters, startDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
                 </div>
@@ -81,8 +81,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha fin</label>
                   <input
                     type="date"
-                    value={localFilters.fechaFin}
-                    onChange={(e) => setLocalFilters({ ...localFilters, fechaFin: e.target.value })}
+                    value={localFilters.endDate}
+                    onChange={(e) => setLocalFilters({ ...localFilters, endDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
                 </div>
@@ -95,8 +95,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const today = new Date();
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: today.toISOString().split('T')[0],
-                      fechaFin: today.toISOString().split('T')[0]
+                      startDate: today.toISOString().split('T')[0],
+                      endDate: today.toISOString().split('T')[0]
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -109,8 +109,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: firstDay.toISOString().split('T')[0],
-                      fechaFin: today.toISOString().split('T')[0]
+                      startDate: firstDay.toISOString().split('T')[0],
+                      endDate: today.toISOString().split('T')[0]
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -124,8 +124,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: lastMonth.toISOString().split('T')[0],
-                      fechaFin: lastDay.toISOString().split('T')[0]
+                      startDate: lastMonth.toISOString().split('T')[0],
+                      endDate: lastDay.toISOString().split('T')[0]
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -138,8 +138,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const firstDay = new Date(today.getFullYear(), 0, 1);
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: firstDay.toISOString().split('T')[0],
-                      fechaFin: today.toISOString().split('T')[0]
+                      startDate: firstDay.toISOString().split('T')[0],
+                      endDate: today.toISOString().split('T')[0]
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -156,8 +156,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <label className="text-sm text-gray-900">Sucursal / Almacén</label>
               </div>
               <select
-                value={localFilters.sucursal || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, sucursal: e.target.value || undefined })}
+                value={localFilters.branch || ''}
+                onChange={(e) => setLocalFilters({ ...localFilters, branch: e.target.value || undefined })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
               >
                 <option value="">Todas las sucursales</option>
@@ -175,8 +175,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <label className="text-sm text-gray-900">Categoría</label>
               </div>
               <select
-                value={localFilters.categoria || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, categoria: e.target.value || undefined })}
+                value={localFilters.category || ''}
+                onChange={(e) => setLocalFilters({ ...localFilters, category: e.target.value || undefined })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
               >
                 <option value="">Todas las categorías</option>
@@ -194,8 +194,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <label className="text-sm text-gray-900">Usuario / Operador</label>
               </div>
               <select
-                value={localFilters.usuario || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, usuario: e.target.value || undefined })}
+                value={localFilters.user || ''}
+                onChange={(e) => setLocalFilters({ ...localFilters, user: e.target.value || undefined })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
               >
                 <option value="">Todos los usuarios</option>
@@ -213,8 +213,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <label className="text-sm text-gray-900">Cliente</label>
               </div>
               <select
-                value={localFilters.cliente || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, cliente: e.target.value || undefined })}
+                value={localFilters.client || ''}
+                onChange={(e) => setLocalFilters({ ...localFilters, client: e.target.value || undefined })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
               >
                 <option value="">Todos los clientes</option>
@@ -238,36 +238,36 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {localFilters.fechaInicio && localFilters.fechaFin && (
+                  {localFilters.startDate && localFilters.endDate && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Calendar className="w-3 h-3" />
                       <span>
-                        {new Date(localFilters.fechaInicio).toLocaleDateString('es-MX')} - {new Date(localFilters.fechaFin).toLocaleDateString('es-MX')}
+                        {new Date(localFilters.startDate).toLocaleDateString('es-MX')} - {new Date(localFilters.endDate).toLocaleDateString('es-MX')}
                       </span>
                     </div>
                   )}
-                  {localFilters.sucursal && (
+                  {localFilters.branch && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Building2 className="w-3 h-3" />
-                      <span>{localFilters.sucursal}</span>
+                      <span>{localFilters.branch}</span>
                     </div>
                   )}
-                  {localFilters.categoria && (
+                  {localFilters.category && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Package className="w-3 h-3" />
-                      <span>{localFilters.categoria}</span>
+                      <span>{localFilters.category}</span>
                     </div>
                   )}
-                  {localFilters.usuario && (
+                  {localFilters.user && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <User className="w-3 h-3" />
-                      <span>{localFilters.usuario}</span>
+                      <span>{localFilters.user}</span>
                     </div>
                   )}
-                  {localFilters.cliente && (
+                  {localFilters.client && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Users className="w-3 h-3" />
-                      <span>{localFilters.cliente}</span>
+                      <span>{localFilters.client}</span>
                     </div>
                   )}
                 </div>
