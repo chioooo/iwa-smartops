@@ -8,10 +8,12 @@ import { PermissionsEditor } from './PermissionsEditor';
 
 import { demoDataService } from '../../services/usersService.tsx'
 import type { User, Role } from "../../data/types/users.types.ts";
+import {CreateRoleModal} from "./CreateRoleModal.tsx";
 
 export function UsersScreen() {
   const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
 
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -30,9 +32,7 @@ export function UsersScreen() {
     setRoles(demoDataService.getRoles());
   }, []);
 
-  // ------------------------------------
   //  CRUD USERS
-  // ------------------------------------
 
   const handleCreateUser = (userData: User) => {
     const newUser: User = {
@@ -74,9 +74,7 @@ export function UsersScreen() {
     }
   };
 
-  // ------------------------------------
   //  ROLES
-  // ------------------------------------
 
   const handleCreateRole = (roleData: any) => {
     const newRole: Role = {
@@ -105,9 +103,7 @@ export function UsersScreen() {
     setShowPermissionsEditor(false);
   };
 
-  // ------------------------------------
   //  FILTRADO
-  // ------------------------------------
 
   const filteredUsers = users.filter((user) => {
     if (!user) return false;
@@ -126,10 +122,7 @@ export function UsersScreen() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-
-  // ------------------------------------
   //  RENDER
-  // ------------------------------------
 
   return (
       <div className="min-h-screen bg-gray-50">
@@ -148,7 +141,7 @@ export function UsersScreen() {
                   onClick={() =>
                       activeTab === 'users'
                           ? setShowCreateModal(true)
-                          : handleCreateRole({ name: 'Nuevo Rol', description: 'Descripción pendiente' })
+                          : setShowCreateRoleModal(true)
                   }
                   className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
               >
@@ -266,7 +259,7 @@ export function UsersScreen() {
                     setSelectedRole(role);
                     setShowPermissionsEditor(true);
                   }}
-                  onCreateRole={handleCreateRole}
+                  onOpenCreateRoleModal={() => setShowCreateRoleModal(true)}
               />
           )}
         </div>
@@ -276,6 +269,13 @@ export function UsersScreen() {
                 roles={roles}
                 onClose={() => setShowCreateModal(false)}
                 onCreate={handleCreateUser}
+            />
+        )}
+
+        {showCreateRoleModal && (
+            <CreateRoleModal
+                onClose={() => setShowCreateRoleModal(false)}
+                onCreate={handleCreateRole}
             />
         )}
 

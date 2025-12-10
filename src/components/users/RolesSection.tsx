@@ -4,7 +4,7 @@ import type {Role} from "../../data/types/users.types";
 type Props = {
     roles: Role[];
     onEditPermissions: (role: Role) => void;
-    onCreateRole: (roleData: { name: string; description: string }) => void;
+    onOpenCreateRoleModal: () => void;
 };
 
 // Helpers visuales
@@ -31,7 +31,7 @@ const getRoleColor = (roleName: string) => {
     }
 };
 
-export function RolesSection({roles, onEditPermissions, onCreateRole}: Props) {
+export function RolesSection({roles, onEditPermissions, onOpenCreateRoleModal}: Props) {
     // Transformación visual (no altera el tipo Role)
     const decoratedRoles = roles.map((r) => ({
         ...r,
@@ -141,11 +141,7 @@ export function RolesSection({roles, onEditPermissions, onCreateRole}: Props) {
 
                 {/* Crear nuevo */}
                 <button
-                    onClick={() => {
-                        const name = prompt("Nombre del nuevo rol:");
-                        const description = prompt("Descripción del rol:");
-                        if (name && description) onCreateRole({name, description});
-                    }}
+                    onClick={onOpenCreateRoleModal}
                     className="bg-white rounded-xl shadow-sm border-2 border-dashed border-gray-300 hover:border-[#D0323A] hover:bg-gray-50 transition-all p-12 flex flex-col items-center justify-center gap-3 text-gray-600 hover:text-[#D0323A] min-h-[280px]"
                 >
                     <div className="p-4 bg-gray-100 rounded-full">
