@@ -418,6 +418,105 @@ const SettingsScreen: React.FC = () => {
                       Modo de Pruebas (Timbrar en modo pruebas)
                     </label>
                   </div>
+                </div>
+
+                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-6">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h2a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm text-blue-700">
+                        La configuración de la IA afecta cómo el sistema genera respuestas. Ajusta estos parámetros según tus necesidades de precisión y creatividad.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Configuración IA */}
+            {activeTab === 'ai' && (
+              <div className="space-y-6">
+                <h2 className="text-lg font-medium text-gray-900">Configuración de Inteligencia Artificial</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="md:col-span-2">
+                    <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-1">
+                      API Key <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      ref={apiKeyRef}
+                      type="password"
+                      name="apiKey"
+                      id="apiKey"
+                      value={ai.apiKey}
+                      onChange={handleAIChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      placeholder="sk-..."
+                      required
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Tu clave de API de OpenAI. Mantenla segura y no la compartas.</p>
+                  </div>
+
+                  <div>
+                    <label htmlFor="model" className="block text-sm font-medium text-gray-700 mb-1">
+                      Modelo <span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      id="model"
+                      name="model"
+                      value={ai.model}
+                      onChange={handleAIChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    >
+                      <option value="gpt-4">GPT-4</option>
+                      <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label htmlFor="temperature" className="block text-sm font-medium text-gray-700 mb-1">
+                      Temperatura: {ai.temperature}
+                    </label>
+                    <input
+                      type="range"
+                      name="temperature"
+                      id="temperature"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={ai.temperature}
+                      onChange={handleAIChange}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>Preciso (0)</span>
+                      <span>Creativo (1)</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="maxTokens" className="block text-sm font-medium text-gray-700 mb-1">
+                      Máximo de Tokens
+                    </label>
+                    <input
+                      type="number"
+                      name="maxTokens"
+                      id="maxTokens"
+                      value={ai.maxTokens}
+                      onChange={handleAIChange}
+                      min="100"
+                      max="8000"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">Límite de tokens por respuesta (100-8000)</p>
+                  </div>
+                </div>
 
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-6">
                   <div className="flex">
@@ -490,9 +589,6 @@ const SettingsScreen: React.FC = () => {
               </div>
             </div>
           </form>
-        </div>
-      </div>
-    </div>
         </div>
       </div>
     </div>
