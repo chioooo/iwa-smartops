@@ -16,4 +16,3 @@
 - Contexto adicional importante
 - Dependencias necesarias
 - Cambios en documentación
-Cambio de prueba
