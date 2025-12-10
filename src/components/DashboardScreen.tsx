@@ -10,6 +10,7 @@ import { InventoryScreen } from "./inventory/InventoryScreen";
 import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
 import { FinancesScreen } from "./finances/FinancesScreen";
+import SettingsScreen from "./SettingsScreen";
 
 export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -75,12 +76,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
 
         {activeSection === 'finances' && <FinancesScreen />}
 
-        {activeSection === 'settings' && (
-          <div className="p-8">
-            <h1 className="text-gray-900 text-3xl mb-2">Configuración</h1>
-            <p className="text-gray-600">Módulo en desarrollo...</p>
-          </div>
-        )}
+        {activeSection === 'settings' && <SettingsScreen />}
       </div>
 
       {/* Chatbot */}
