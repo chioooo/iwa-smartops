@@ -43,7 +43,10 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
       return;
     }
 
-    const reportName = `${selectedType.label} - ${new Date(filters.startDate).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`;
+    const start = new Date(filters.startDate).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' });
+    const end = new Date(filters.endDate).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' });
+
+    const reportName = `${selectedType.label} - ${start} a ${end}`;
 
     const reportData: Omit<Report, 'id' | 'generationDate' | 'status'> = {
       name: reportName,

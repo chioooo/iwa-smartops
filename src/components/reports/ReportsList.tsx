@@ -181,7 +181,6 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
                         </div>
                         <div>
                           <p className="text-gray-900">{report.name}</p>
-                          <p className="text-xs text-gray-500">ID: {report.id}</p>
                         </div>
                       </div>
                     </td>

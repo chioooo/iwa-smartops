@@ -54,7 +54,6 @@ export function ReportDetailView({report, onClose}: Props) {
                     <div className="flex items-start justify-between mb-4">
                         <div>
                             <h2 className="text-white mb-1">Detalle del Reporte</h2>
-                            <p className="text-white/90 text-sm">ID: {report.id}</p>
                         </div>
                         <button
                             onClick={onClose}

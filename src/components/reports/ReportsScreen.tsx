@@ -45,41 +45,41 @@ export function ReportsScreen() {
     const [reports, setReports] = useState<Report[]>([
         {
             id: '1',
-            name: 'Reporte de Ventas - Noviembre 2024',
+            name: 'Reporte de Ventas - nov 2024 a dic 2024',
             tipo: 'ventas',
-            generationDate: '2024-11-26T10:30:00',
+            generationDate: '2024-12-10T15:22:00',
             generatedBy: 'Juan Pérez',
             status: 'disponible',
             format: 'pdf',
             parameters: {
-                startDate: '2024-11-01',
-                endDate: '2024-11-30',
+                startDate: '2024-11-10',
+                endDate: '2024-12-10',
                 branch: 'Principal'
             }
         },
         {
             id: '2',
-            name: 'Inventario - Stock Crítico',
+            name: 'Reporte de Inventario - sep 2024 a oct 2024',
             tipo: 'inventario',
-            generationDate: '2024-11-25T14:15:00',
+            generationDate: '2024-10-25T14:15:00',
             generatedBy: 'María González',
             status: 'disponible',
             format: 'excel',
             parameters: {
-                startDate: '2024-11-25',
-                endDate: '2024-11-25'
+                startDate: '2024-09-25',
+                endDate: '2024-10-25'
             }
         },
         {
             id: '3',
-            name: 'Facturación Electrónica - Noviembre',
+            name: 'Reporte de Facturación - oct 2024 a nov 2024',
             tipo: 'facturacion',
-            generationDate: '2024-11-26T09:00:00',
+            generationDate: '2024-11-30T09:00:00',
             generatedBy: 'Carlos Ruiz',
             status: 'proceso',
             format: 'pdf',
             parameters: {
-                startDate: '2024-11-01',
+                startDate: '2024-10-30',
                 endDate: '2024-11-30'
             }
         },
