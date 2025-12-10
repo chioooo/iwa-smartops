@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Layers, Grid3x3, TrendingDown } from 'lucide-react';
 import { InventoryDashboard } from './InventoryDashboard';
 import { ProductTable } from './ProductTable';
@@ -7,6 +7,7 @@ import { CategoriesSection } from './CategoriesSection';
 import { ProductModal } from './ProductModal';
 import { InventoryAdjustmentModal } from './InventoryAdjustmentModal';
 import { ProductDetailPanel } from './ProductDetailPanel';
+import { SupplyModal } from './SupplyModal';
 
 export type Product = {
   id: string;
@@ -53,168 +54,231 @@ export type InventoryMovement = {
   user: string;
 };
 
+// Claves para localStorage
+const STORAGE_KEYS = {
+  PRODUCTS: 'inventory_products',
+  SUPPLIES: 'inventory_supplies',
+  CATEGORIES: 'inventory_categories',
+  MOVEMENTS: 'inventory_movements',
+};
+
+// Datos iniciales por defecto
+const DEFAULT_PRODUCTS: Product[] = [
+  {
+    id: '1',
+    name: 'Laptop Dell XPS 15',
+    sku: 'TECH-001',
+    category: 'Tecnología',
+    stock: 15,
+    minStock: 5,
+    price: 1299.99,
+    purchasePrice: 999.99,
+    unit: 'pieza',
+    supplier: 'Dell Inc.',
+    description: 'Laptop de alto rendimiento',
+    status: 'active',
+    image: 'LP',
+    warehouse: 'Almacén Principal'
+  },
+  {
+    id: '2',
+    name: 'Silla Ergonómica Pro',
+    sku: 'FURN-002',
+    category: 'Mobiliario',
+    stock: 3,
+    minStock: 10,
+    price: 299.99,
+    purchasePrice: 199.99,
+    unit: 'pieza',
+    supplier: 'Office Supplies Co.',
+    description: 'Silla ergonómica con soporte lumbar',
+    status: 'active',
+    image: 'SE',
+    warehouse: 'Almacén Principal'
+  },
+  {
+    id: '3',
+    name: 'Papel Carta 500 hojas',
+    sku: 'OFF-003',
+    category: 'Papelería',
+    stock: 120,
+    minStock: 20,
+    price: 5.99,
+    purchasePrice: 3.99,
+    unit: 'paquete',
+    supplier: 'Papelería Moderna',
+    description: 'Papel carta tamaño estándar',
+    status: 'active',
+    image: 'PC',
+    warehouse: 'Almacén Secundario'
+  },
+  {
+    id: '4',
+    name: 'Monitor LG 27" 4K',
+    sku: 'TECH-004',
+    category: 'Tecnología',
+    stock: 8,
+    minStock: 5,
+    price: 399.99,
+    purchasePrice: 299.99,
+    unit: 'pieza',
+    supplier: 'LG Electronics',
+    description: 'Monitor 4K con HDR',
+    status: 'active',
+    image: 'ML',
+    warehouse: 'Almacén Principal'
+  },
+  {
+    id: '5',
+    name: 'Impresora HP LaserJet',
+    sku: 'TECH-005',
+    category: 'Tecnología',
+    stock: 2,
+    minStock: 3,
+    price: 249.99,
+    purchasePrice: 179.99,
+    unit: 'pieza',
+    supplier: 'HP Inc.',
+    description: 'Impresora láser monocromática',
+    status: 'inactive',
+    image: 'IH',
+    warehouse: 'Almacén Principal'
+  },
+];
+
+const DEFAULT_SUPPLIES: Supply[] = [
+  {
+    id: '1',
+    name: 'Tóner Negro HP',
+    unit: 'pieza',
+    stock: 15,
+    category: 'Consumibles',
+    supplier: 'HP Inc.',
+    status: 'active'
+  },
+  {
+    id: '2',
+    name: 'Cable HDMI 2m',
+    unit: 'pieza',
+    stock: 45,
+    category: 'Cables',
+    supplier: 'Tech Supplies',
+    status: 'active'
+  },
+  {
+    id: '3',
+    name: 'Clip Metálico',
+    unit: 'caja',
+    stock: 5,
+    category: 'Papelería',
+    supplier: 'Papelería Moderna',
+    status: 'active'
+  },
+];
+
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: '1', name: 'Tecnología', description: 'Equipos electrónicos y tecnológicos', productsCount: 3, color: '#D0323A' },
+  { id: '2', name: 'Mobiliario', description: 'Muebles y equipamiento de oficina', productsCount: 1, color: '#F6A016' },
+  { id: '3', name: 'Papelería', description: 'Artículos de oficina y papelería', productsCount: 1, color: '#E9540D' },
+  { id: '4', name: 'Consumibles', description: 'Insumos y materiales consumibles', productsCount: 0, color: '#9F2743' },
+];
+
+const DEFAULT_MOVEMENTS: InventoryMovement[] = [
+  {
+    id: '1',
+    productId: '1',
+    type: 'entry',
+    quantity: 10,
+    date: '2024-11-20',
+    reason: 'Compra nueva',
+    user: 'Juan Pérez'
+  },
+  {
+    id: '2',
+    productId: '1',
+    type: 'exit',
+    quantity: 5,
+    date: '2024-11-22',
+    reason: 'Venta',
+    user: 'María González'
+  },
+  {
+    id: '3',
+    productId: '2',
+    type: 'adjustment',
+    quantity: -2,
+    date: '2024-11-23',
+    reason: 'Producto dañado',
+    user: 'Carlos Ruiz'
+  },
+];
+
+// Funciones de utilidad para localStorage
+function loadFromStorage<T>(key: string, defaultValue: T): T {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      return JSON.parse(stored) as T;
+    }
+  } catch (error) {
+    console.error(`Error loading ${key} from localStorage:`, error);
+  }
+  return defaultValue;
+}
+
+function saveToStorage<T>(key: string, value: T): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error(`Error saving ${key} to localStorage:`, error);
+  }
+}
+
 export function InventoryScreen() {
   const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard'>('products');
   const [showProductModal, setShowProductModal] = useState(false);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
 
-  // Mock data - productos
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: '1',
-      name: 'Laptop Dell XPS 15',
-      sku: 'TECH-001',
-      category: 'Tecnología',
-      stock: 15,
-      minStock: 5,
-      price: 1299.99,
-      purchasePrice: 999.99,
-      unit: 'pieza',
-      supplier: 'Dell Inc.',
-      description: 'Laptop de alto rendimiento',
-      status: 'active',
-      image: 'LP',
-      warehouse: 'Almacén Principal'
-    },
-    {
-      id: '2',
-      name: 'Silla Ergonómica Pro',
-      sku: 'FURN-002',
-      category: 'Mobiliario',
-      stock: 3,
-      minStock: 10,
-      price: 299.99,
-      purchasePrice: 199.99,
-      unit: 'pieza',
-      supplier: 'Office Supplies Co.',
-      description: 'Silla ergonómica con soporte lumbar',
-      status: 'active',
-      image: 'SE',
-      warehouse: 'Almacén Principal'
-    },
-    {
-      id: '3',
-      name: 'Papel Carta 500 hojas',
-      sku: 'OFF-003',
-      category: 'Papelería',
-      stock: 120,
-      minStock: 20,
-      price: 5.99,
-      purchasePrice: 3.99,
-      unit: 'paquete',
-      supplier: 'Papelería Moderna',
-      description: 'Papel carta tamaño estándar',
-      status: 'active',
-      image: 'PC',
-      warehouse: 'Almacén Secundario'
-    },
-    {
-      id: '4',
-      name: 'Monitor LG 27" 4K',
-      sku: 'TECH-004',
-      category: 'Tecnología',
-      stock: 8,
-      minStock: 5,
-      price: 399.99,
-      purchasePrice: 299.99,
-      unit: 'pieza',
-      supplier: 'LG Electronics',
-      description: 'Monitor 4K con HDR',
-      status: 'active',
-      image: 'ML',
-      warehouse: 'Almacén Principal'
-    },
-    {
-      id: '5',
-      name: 'Impresora HP LaserJet',
-      sku: 'TECH-005',
-      category: 'Tecnología',
-      stock: 2,
-      minStock: 3,
-      price: 249.99,
-      purchasePrice: 179.99,
-      unit: 'pieza',
-      supplier: 'HP Inc.',
-      description: 'Impresora láser monocromática',
-      status: 'inactive',
-      image: 'IH',
-      warehouse: 'Almacén Principal'
-    },
-  ]);
+  // Estado inicializado desde localStorage
+  const [products, setProducts] = useState<Product[]>(() => 
+    loadFromStorage(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS)
+  );
 
-  // Mock data - insumos
-  const [supplies, setSupplies] = useState<Supply[]>([
-    {
-      id: '1',
-      name: 'Tóner Negro HP',
-      unit: 'pieza',
-      stock: 15,
-      category: 'Consumibles',
-      supplier: 'HP Inc.',
-      status: 'active'
-    },
-    {
-      id: '2',
-      name: 'Cable HDMI 2m',
-      unit: 'pieza',
-      stock: 45,
-      category: 'Cables',
-      supplier: 'Tech Supplies',
-      status: 'active'
-    },
-    {
-      id: '3',
-      name: 'Clip Metálico',
-      unit: 'caja',
-      stock: 5,
-      category: 'Papelería',
-      supplier: 'Papelería Moderna',
-      status: 'active'
-    },
-  ]);
+  const [supplies, setSupplies] = useState<Supply[]>(() => 
+    loadFromStorage(STORAGE_KEYS.SUPPLIES, DEFAULT_SUPPLIES)
+  );
 
-  // Mock data - categorías
-  const [categories, setCategories] = useState<Category[]>([
-    { id: '1', name: 'Tecnología', description: 'Equipos electrónicos y tecnológicos', productsCount: 3, color: '#D0323A' },
-    { id: '2', name: 'Mobiliario', description: 'Muebles y equipamiento de oficina', productsCount: 1, color: '#F6A016' },
-    { id: '3', name: 'Papelería', description: 'Artículos de oficina y papelería', productsCount: 1, color: '#E9540D' },
-    { id: '4', name: 'Consumibles', description: 'Insumos y materiales consumibles', productsCount: 0, color: '#9F2743' },
-  ]);
+  const [categories, setCategories] = useState<Category[]>(() => 
+    loadFromStorage(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES)
+  );
 
-  // Mock data - movimientos
-  const [movements, setMovements] = useState<InventoryMovement[]>([
-    {
-      id: '1',
-      productId: '1',
-      type: 'entry',
-      quantity: 10,
-      date: '2024-11-20',
-      reason: 'Compra nueva',
-      user: 'Juan Pérez'
-    },
-    {
-      id: '2',
-      productId: '1',
-      type: 'exit',
-      quantity: 5,
-      date: '2024-11-22',
-      reason: 'Venta',
-      user: 'María González'
-    },
-    {
-      id: '3',
-      productId: '2',
-      type: 'adjustment',
-      quantity: -2,
-      date: '2024-11-23',
-      reason: 'Producto dañado',
-      user: 'Carlos Ruiz'
-    },
-  ]);
+  const [movements, setMovements] = useState<InventoryMovement[]>(() => 
+    loadFromStorage(STORAGE_KEYS.MOVEMENTS, DEFAULT_MOVEMENTS)
+  );
+
+  // Sincronizar productos con localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+  }, [products]);
+
+  // Sincronizar insumos con localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.SUPPLIES, supplies);
+  }, [supplies]);
+
+  // Sincronizar categorías con localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.CATEGORIES, categories);
+  }, [categories]);
+
+  // Sincronizar movimientos con localStorage
+  useEffect(() => {
+    saveToStorage(STORAGE_KEYS.MOVEMENTS, movements);
+  }, [movements]);
 
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
@@ -244,13 +308,36 @@ export function InventoryScreen() {
     setShowSupplyModal(false);
   };
 
+  const handleUpdateSupply = (supplyId: string, updates: Partial<Supply>) => {
+    setSupplies(supplies.map(s => s.id === supplyId ? { ...s, ...updates } : s));
+    setShowSupplyModal(false);
+    setEditingSupply(null);
+  };
+
+  const handleEditSupply = (supply: Supply) => {
+    setEditingSupply(supply);
+    setShowSupplyModal(true);
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    setProducts(products.filter(p => p.id !== productId));
+    // Limpiar selección si el producto eliminado estaba seleccionado
+    if (selectedProduct?.id === productId) {
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleDeleteSupply = (supplyId: string) => {
+    setSupplies(supplies.filter(s => s.id !== supplyId));
+  };
+
   const handleInventoryAdjustment = (productId: string, physicalStock: number, reason: string) => {
     const product = products.find(p => p.id === productId);
     if (product) {
       const difference = physicalStock - product.stock;
       
-      // Actualizar stock del producto
-      handleUpdateProduct(productId, { stock: physicalStock });
+      // Actualizar stock del producto directamente
+      setProducts(products.map(p => p.id === productId ? { ...p, stock: physicalStock } : p));
       
       // Registrar movimiento
       const newMovement: InventoryMovement = {
@@ -264,7 +351,9 @@ export function InventoryScreen() {
       };
       setMovements([...movements, newMovement]);
     }
+    // Cerrar modal y limpiar selección
     setShowAdjustmentModal(false);
+    setSelectedProduct(null);
   };
 
   const handleEditProduct = (product: Product) => {
@@ -304,7 +393,10 @@ export function InventoryScreen() {
             )}
             {activeTab === 'supplies' && (
               <button
-                onClick={() => setShowSupplyModal(true)}
+                onClick={() => {
+                  setEditingSupply(null);
+                  setShowSupplyModal(true);
+                }}
                 className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
               >
                 <Layers className="w-5 h-5" />
@@ -391,6 +483,7 @@ export function InventoryScreen() {
             onSelectProduct={setSelectedProduct}
             onEditProduct={handleEditProduct}
             onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={handleDeleteProduct}
             onOpenAdjustment={handleOpenAdjustment}
             selectedProductId={selectedProduct?.id}
           />
@@ -400,19 +493,22 @@ export function InventoryScreen() {
           <SuppliesTable
             supplies={supplies}
             onCreateSupply={handleCreateSupply}
+            onEditSupply={handleEditSupply}
+            onDeleteSupply={handleDeleteSupply}
           />
         )}
 
         {activeTab === 'categories' && (
           <CategoriesSection
             categories={categories}
+            products={products}
             onUpdateCategories={setCategories}
           />
         )}
       </div>
 
       {/* Product Detail Modal */}
-      {selectedProduct && (
+      {selectedProduct && !showAdjustmentModal && (
         <ProductDetailPanel
           product={selectedProduct}
           movements={movements.filter(m => m.productId === selectedProduct.id)}
@@ -444,6 +540,20 @@ export function InventoryScreen() {
             setSelectedProduct(null);
           }}
           onAdjust={handleInventoryAdjustment}
+        />
+      )}
+
+      {/* Supply Modal */}
+      {showSupplyModal && (
+        <SupplyModal
+          supply={editingSupply}
+          categories={categories}
+          onClose={() => {
+            setShowSupplyModal(false);
+            setEditingSupply(null);
+          }}
+          onCreate={handleCreateSupply}
+          onUpdate={handleUpdateSupply}
         />
       )}
     </div>

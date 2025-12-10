@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Grid3x3, Package, X, AlertCircle } from 'lucide-react';
-import type {Category} from './InventoryScreen';
+import type {Category, Product} from './InventoryScreen';
 
 type Props = {
   categories: Category[];
+  products: Product[];
   onUpdateCategories: (categories: Category[]) => void;
 };
 
-export function CategoriesSection({ categories, onUpdateCategories }: Props) {
+export function CategoriesSection({ categories, products, onUpdateCategories }: Props) {
+  // Calcular conteo de productos por categoría dinámicamente
+  const getProductCount = (categoryName: string) => 
+    products.filter(p => p.category === categoryName).length;
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
-  const totalProducts = categories.reduce((sum, cat) => sum + cat.productsCount, 0);
+  const totalProducts = products.length;
 
   return (
     <div className="space-y-6">
@@ -93,7 +97,8 @@ export function CategoriesSection({ categories, onUpdateCategories }: Props) {
                   </button>
                   <button
                     onClick={() => {
-                      if (category.productsCount === 0) {
+                      const productCount = getProductCount(category.name);
+                      if (productCount === 0) {
                         if (confirm(`¿Eliminar la categoría "${category.name}"?`)) {
                           onUpdateCategories(categories.filter(c => c.id !== category.id));
                         }
@@ -103,7 +108,7 @@ export function CategoriesSection({ categories, onUpdateCategories }: Props) {
                     }}
                     className="p-2 text-gray-600 hover:text-red-600 hover:bg-gray-100 rounded-lg transition-colors"
                     title="Eliminar"
-                    disabled={category.productsCount > 0}
+                    disabled={getProductCount(category.name) > 0}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -124,7 +129,7 @@ export function CategoriesSection({ categories, onUpdateCategories }: Props) {
                     color: category.color
                   }}
                 >
-                  {category.productsCount}
+                  {getProductCount(category.name)}
                 </span>
               </div>
             </div>
