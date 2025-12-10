@@ -32,7 +32,18 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
     e.preventDefault();
 
     const selectedType = reportTypes.find(t => t.value === formData.tipo);
-    const reportName = `${selectedType?.label} - ${new Date(filters.startDate!).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`;
+    
+    if (!selectedType) {
+      alert('Por favor selecciona un tipo de reporte válido');
+      return;
+    }
+
+    if (!filters.startDate || !filters.endDate) {
+      alert('Por favor selecciona un rango de fechas válido');
+      return;
+    }
+
+    const reportName = `${selectedType.label} - ${new Date(filters.startDate).toLocaleDateString('es-MX', { month: 'long', year: 'numeric' })}`;
 
     const reportData: Omit<Report, 'id' | 'generationDate' | 'status'> = {
       name: reportName,
