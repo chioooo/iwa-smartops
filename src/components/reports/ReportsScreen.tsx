@@ -184,7 +184,6 @@ export function ReportsScreen() {
                 {activeTab === 'dashboard' ? (
                     <ReportsDashboard
                         metrics={metrics}
-                        filters={filters}
                         onCreateReport={() => setShowCreateModal(true)}
                     />
                 ) : (

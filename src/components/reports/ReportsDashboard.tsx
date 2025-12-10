@@ -1,6 +1,5 @@
 //import React from 'react';
 import { DollarSign, FileText, CheckCircle, TrendingUp, Package, ShoppingCart, Download, FileSpreadsheet } from 'lucide-react';
-import type {ReportFilters} from './ReportsScreen';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 type Props = {
@@ -12,7 +11,6 @@ type Props = {
     mostRequestedServices: Array<{ name: string; quantity: number }>;
     productRotation: Array<{ name: string; sales: number }>;
   };
-  filters: ReportFilters;
   onCreateReport: () => void;
 };
 
