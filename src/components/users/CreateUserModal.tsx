@@ -218,11 +218,11 @@ export function CreateUserModal({ roles, onClose, onCreate }: Props) {
               </div>
             </div>
 
-            {/* Contraseña temporal */}
+            {/* Contraseña */}
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <h3 className="text-gray-900 text-sm mb-3 flex items-center gap-2">
                 <Lock className="w-4 h-4" />
-                Contraseña temporal (opcional)
+                Contraseña
               </h3>
               
               <div className="space-y-3">
@@ -236,7 +236,7 @@ export function CreateUserModal({ roles, onClose, onCreate }: Props) {
                         ? 'border-red-300 focus:ring-red-200'
                         : 'border-gray-300 focus:ring-[#D0323A] focus:border-transparent'
                     }`}
-                    placeholder="Contraseña temporal"
+                    placeholder="Contraseña"
                   />
                   {errors.password && (
                     <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1">
@@ -266,10 +266,6 @@ export function CreateUserModal({ roles, onClose, onCreate }: Props) {
                   )}
                 </div>
               </div>
-
-              <p className="text-xs text-gray-600 mt-3">
-                Si no se especifica, se enviará un correo al usuario para que configure su contraseña.
-              </p>
             </div>
           </div>
 
