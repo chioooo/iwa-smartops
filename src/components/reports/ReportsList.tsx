@@ -249,6 +249,11 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
                             <Clock className="w-4 h-4 animate-spin" />
                           </div>
                         )}
+                        {report.status === 'error' && (
+                          <div className="p-2 text-red-500" title="Error al generar el reporte">
+                            <AlertCircle className="w-4 h-4" />
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>
