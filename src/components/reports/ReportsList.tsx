@@ -1,20 +1,29 @@
 import React, { useState } from 'react';
 import { Search, Download, Eye, FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle, Filter } from 'lucide-react';
-import type {Report} from './ReportsScreen';
+import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
   reports: Report[];
   onSelectReport: (report: Report) => void;
   selectedReportId?: string;
   onOpenFilters: () => void;
+  advancedFilters: ReportFilters;
 };
 
-export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenFilters }: Props) {
+export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenFilters, advancedFilters }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const isDateInRange = (dateString: string, startDate?: string, endDate?: string): boolean => {
+    if (!startDate || !endDate) return true;
+    
+    const reportDateOnly = new Date(dateString).toISOString().split('T')[0];
+    
+    return reportDateOnly >= startDate && reportDateOnly <= endDate;
+  };
 
   // Filtrado
   const filteredReports = reports.filter(report => {
@@ -25,7 +34,21 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
     const matchesTipo = filterType === 'all' || report.tipo === filterType;
     const matchesEstado = filterStatus === 'all' || report.status === filterStatus;
 
-    return matchesSearch && matchesTipo && matchesEstado;
+    const matchesDates = isDateInRange(
+      report.generationDate, 
+      advancedFilters.startDate, 
+      advancedFilters.endDate
+    );
+
+    const matchesBranch = !advancedFilters.branch || report.parameters.branch === advancedFilters.branch;
+
+    const matchesCategory = !advancedFilters.category || report.parameters.category === advancedFilters.category;
+
+    const matchesUser = !advancedFilters.user || report.generatedBy === advancedFilters.user;
+
+    const matchesClient = !advancedFilters.client || report.parameters.client === advancedFilters.client;
+
+    return matchesSearch && matchesTipo && matchesEstado && matchesDates && matchesBranch && matchesCategory && matchesUser && matchesClient;
   });
 
   const totalPages = Math.ceil(filteredReports.length / itemsPerPage);

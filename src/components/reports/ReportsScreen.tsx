@@ -36,10 +36,7 @@ export function ReportsScreen() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showFiltersPanel, setShowFiltersPanel] = useState(false);
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
-    const [filters, setFilters] = useState<ReportFilters>({
-        startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-        endDate: new Date().toISOString().split('T')[0],
-    });
+    const [filters, setFilters] = useState<ReportFilters>({});
 
     // Mock data - reportes generados
     const [reports, setReports] = useState<Report[]>([
@@ -192,6 +189,7 @@ export function ReportsScreen() {
                         onSelectReport={setSelectedReport}
                         selectedReportId={selectedReport?.id}
                         onOpenFilters={() => setShowFiltersPanel(true)}
+                        advancedFilters={filters}
                     />
                 )}
             </div>

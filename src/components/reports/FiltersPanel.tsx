@@ -16,10 +16,7 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
   };
 
   const handleClear = () => {
-    const clearedFilters: ReportFilters = {
-      startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-      endDate: new Date().toISOString().split('T')[0],
-    };
+    const clearedFilters: ReportFilters = {};
     setLocalFilters(clearedFilters);
   };
 
@@ -238,14 +235,6 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {localFilters.startDate && localFilters.endDate && (
-                    <div className="flex items-center gap-2 text-xs text-blue-700">
-                      <Calendar className="w-3 h-3" />
-                      <span>
-                        {new Date(localFilters.startDate).toLocaleDateString('es-MX')} - {new Date(localFilters.endDate).toLocaleDateString('es-MX')}
-                      </span>
-                    </div>
-                  )}
                   {localFilters.branch && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Building2 className="w-3 h-3" />
