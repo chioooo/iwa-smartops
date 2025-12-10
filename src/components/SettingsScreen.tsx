@@ -3,26 +3,26 @@ import React, { useState, useEffect, useRef } from 'react';
 // Types for our settings
 interface CompanySettings {
   rfc: string;
-  razonSocial: string;
-  regimenFiscal: string;
-  codigoPostal: string;
-  direccion: string;
-  telefono: string;
+  businessName: string;
+  taxRegime: string;
+  postalCode: string;
+  address: string;
+  phone: string;
   email: string;
 }
 
 interface CFDISettings {
   pac: string;
-  usuario: string;
-  contrasena: string;
+  username: string;
+  password: string;
   url: string;
-  modoPruebas: boolean;
+  testMode: boolean;
 }
 
 interface AISettings {
   apiKey: string;
-  modelo: string;
-  temperatura: number;
+  model: string;
+  temperature: number;
   maxTokens: number;
 }
 
@@ -39,7 +39,7 @@ const SettingsScreen: React.FC = () => {
         const savedSettings = localStorage.getItem('appSettings');
         if (savedSettings) {
           const parsed = JSON.parse(savedSettings);
-          if (parsed.empresa) setCompany(parsed.empresa);
+          if (parsed.company) setCompany(parsed.company);
           if (parsed.cfdi) setCfdi(parsed.cfdi);
           if (parsed.ai) setAi(parsed.ai);
         }
@@ -64,50 +64,56 @@ const SettingsScreen: React.FC = () => {
   // Form states
   const [company, setCompany] = useState<CompanySettings>({
     rfc: 'XXXX000000XX',
-    razonSocial: 'IWA CONSOLTI ',
-    regimenFiscal: '601',
-    codigoPostal: '94300',
-    direccion: 'C. Norte 32 673, Adolfo Lopez Mateos, 94324 Orizaba, Ver.',
-    telefono: '272 115 3322',
+    businessName: 'IWA CONSOLTI ',
+    taxRegime: '601',
+    postalCode: '94300',
+    address: 'C. Norte 32 673, Adolfo Lopez Mateos, 94324 Orizaba, Ver.',
+    phone: '272 115 3322',
     email: 'contacto@iwa.com.mx',
   });
 
   const [cfdi, setCfdi] = useState<CFDISettings>({
     pac: 'FACTURAMA',
-    usuario: 'facturama@user.com',
-    contrasena: '12345678',
+    username: 'facturama@user.com',
+    password: '12345678',
     url: 'https://dev.facturama.mx',
-    modoPruebas: true,
+    testMode: true,
   });
 
   const [ai, setAi] = useState<AISettings>({
     apiKey: 'sk-proj-Pi3Khncc4a0p3Wuk3asRzEIeLhiEZk6Bob8T2kIaQ3I6YWrciK0KSTNOl6WxN2TrTN8ZlT3BlbkFJlL877Sp6FE2CD7kc3oPoiwXnVyRMy3CtXs1zr-yeQrKHYf01mYvjzybaosaYkMPgA',
-    modelo: 'gpt-4',
-    temperatura: 0.7,
+    model: 'gpt-4',
+    temperature: 0.7,
     maxTokens: 2000,
   });
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
     setCompany(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
   const handleCFDIChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
     setCfdi(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
   const handleAIChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
     setAi(prev => ({
       ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -117,9 +123,9 @@ const SettingsScreen: React.FC = () => {
     
     try {
       const settingsToSave = {
-        empresa: company,
-        cfdi,
-        ai,
+        companySettings: company,
+        cfdiSettings: cfdi,
+        aiSettings: ai,
         lastUpdated: new Date().toISOString()
       };
       
@@ -144,9 +150,9 @@ const SettingsScreen: React.FC = () => {
   };
 
   const tabs = [
-    { id: 'empresa', label: 'Datos Fiscales' },
+    { id: 'company', label: 'Datos Fiscales' },
     { id: 'cfdi', label: 'Proveedor CFDI' },
-    { id: 'ia', label: 'Configuración IA' },
+    { id: 'ai', label: 'Configuración IA' },
   ];
 
   return (
@@ -185,7 +191,7 @@ const SettingsScreen: React.FC = () => {
         <div className="p-6">
           <form onSubmit={(e) => { e.preventDefault(); saveSettings(); }}>
             {/* Datos Fiscales */}
-            {activeTab === 'empresa' && (
+            {activeTab === 'company' && (
               <div className="space-y-6">
                 <div>
                   <h2 className="text-lg font-medium text-gray-900 mb-4">Datos Fiscales de la Empresa</h2>
@@ -208,14 +214,14 @@ const SettingsScreen: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="razonSocial" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-1">
                         Razón Social <span className="text-red-600">*</span>
                       </label>
                       <input
                         type="text"
-                        name="razonSocial"
-                        id="razonSocial"
-                        value={company.razonSocial}
+                        name="businessName"
+                        id="businessName"
+                        value={company.businessName}
                         onChange={handleCompanyChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Empresa S.A. de C.V."
@@ -224,13 +230,13 @@ const SettingsScreen: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="regimenFiscal" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="taxRegime" className="block text-sm font-medium text-gray-700 mb-1">
                         Régimen Fiscal <span className="text-red-600">*</span>
                       </label>
                       <select
-                        id="regimenFiscal"
-                        name="regimenFiscal"
-                        value={company.regimenFiscal}
+                        id="taxRegime"
+                        name="taxRegime"
+                        value={company.taxRegime}
                         onChange={handleCompanyChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         required
@@ -258,14 +264,14 @@ const SettingsScreen: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="codigoPostal" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700 mb-1">
                         Código Postal <span className="text-red-600">*</span>
                       </label>
                       <input
                         type="text"
-                        name="codigoPostal"
-                        id="codigoPostal"
-                        value={company.codigoPostal}
+                        name="postalCode"
+                        id="postalCode"
+                        value={company.postalCode}
                         onChange={handleCompanyChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="01000"
@@ -274,14 +280,14 @@ const SettingsScreen: React.FC = () => {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label htmlFor="direccion" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
                         Dirección Fiscal <span className="text-red-600">*</span>
                       </label>
                       <textarea
-                        id="direccion"
-                        name="direccion"
+                        id="address"
+                        name="address"
                         rows={3}
-                        value={company.direccion}
+                        value={company.address}
                         onChange={handleCompanyChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Calle, Número, Colonia, Ciudad, Estado"
@@ -290,14 +296,14 @@ const SettingsScreen: React.FC = () => {
                     </div>
 
                     <div>
-                      <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
                         Teléfono <span className="text-red-600">*</span>
                       </label>
                       <input
                         type="tel"
-                        name="telefono"
-                        id="telefono"
-                        value={company.telefono}
+                        name="phone"
+                        id="phone"
+                        value={company.phone}
                         onChange={handleCompanyChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         placeholder="5512345678"
@@ -346,19 +352,18 @@ const SettingsScreen: React.FC = () => {
                       <option value="FACTURAMA">FACTURAMA</option>
                       <option value="SOLUCION_FACTIBLE">Solución Factible</option>
                       <option value="FACTURE_FACIL">Facture Fácil</option>
-                      <option value="OTRO">Otro</option>
                     </select>
                   </div>
 
                   <div>
-                    <label htmlFor="usuario" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
                       Usuario <span className="text-red-600">*</span>
                     </label>
                     <input
                       type="text"
-                      name="usuario"
-                      id="usuario"
-                      value={cfdi.usuario}
+                      name="username"
+                      id="username"
+                      value={cfdi.username}
                       onChange={handleCFDIChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Usuario del PAC"
@@ -367,19 +372,21 @@ const SettingsScreen: React.FC = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="contrasena" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
                       Contraseña <span className="text-red-600">*</span>
                     </label>
-                    <input
-                      type="password"
-                      name="contrasena"
-                      id="contrasena"
-                      value={cfdi.contrasena}
-                      onChange={handleCFDIChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="••••••••"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        value={cfdi.password}
+                        onChange={handleCFDIChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
                   </div>
 
                   <div>
@@ -393,148 +400,24 @@ const SettingsScreen: React.FC = () => {
                       value={cfdi.url}
                       onChange={handleCFDIChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="https://demo.pac.com.mx"
+                      placeholder="https://api.pac.com"
                       required
                     />
                   </div>
 
                   <div className="flex items-center">
                     <input
-                      id="modoPruebas"
-                      name="modoPruebas"
+                      id="testMode"
+                      name="testMode"
                       type="checkbox"
-                      checked={cfdi.modoPruebas}
+                      checked={cfdi.testMode}
                       onChange={handleCFDIChange}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
-                    <label htmlFor="modoPruebas" className="ml-2 block text-sm text-gray-700">
+                    <label htmlFor="testMode" className="ml-2 block text-sm text-gray-700">
                       Modo de Pruebas (Timbrar en modo pruebas)
                     </label>
                   </div>
-                </div>
-
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-6">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-yellow-700">
-                        Los datos de acceso al PAC son sensibles. Asegúrate de que la conexión sea segura y de que solo el personal autorizado tenga acceso a esta información.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Configuración IA */}
-            {activeTab === 'ia' && (
-              <div className="space-y-6">
-                <h2 className="text-lg font-medium text-gray-900">Configuración de la API de IA (OpenAI)</h2>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-1">
-                      API Key <span className="text-red-600">*</span>
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="password"
-                        name="apiKey"
-                        ref={apiKeyRef}
-                        value={ai.apiKey}
-                        onChange={handleAIChange}
-                        className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="sk-..."
-                        required
-                      />
-                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                        <button
-                          type="button"
-                          className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                          onClick={() => {
-                            if (apiKeyRef.current) {
-                              apiKeyRef.current.type = 
-                                apiKeyRef.current.type === 'password' ? 'text' : 'password';
-                            }
-                          }}
-                        >
-                          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    <p className="mt-1 text-xs text-gray-500">
-                      Tu clave API nunca se compartirá y se almacenará de forma segura.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label htmlFor="modelo" className="block text-sm font-medium text-gray-700 mb-1">
-                      Modelo <span className="text-red-600">*</span>
-                    </label>
-                    <select
-                      id="modelo"
-                      name="modelo"
-                      value={ai.modelo}
-                      onChange={handleAIChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    >
-                      <option value="gpt-4">GPT-4</option>
-                      <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                      <option value="text-davinci-003">Text-DaVinci-003</option>
-                      <option value="code-davinci-002">Code-DaVinci-002</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label htmlFor="temperatura" className="block text-sm font-medium text-gray-700 mb-1">
-                      Temperatura: <span className="font-normal">{ai.temperatura}</span>
-                    </label>
-                    <input
-                      type="range"
-                      name="temperatura"
-                      id="temperatura"
-                      min="0"
-                      max="1"
-                      step="0.1"
-                      value={ai.temperatura}
-                      onChange={handleAIChange}
-                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                    />
-                    <div className="flex justify-between text-xs text-gray-500">
-                      <span>Preciso</span>
-                      <span>Creativo</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="maxTokens" className="block text-sm font-medium text-gray-700 mb-1">
-                      Máximo de Tokens <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name="maxTokens"
-                      id="maxTokens"
-                      min="100"
-                      max="4000"
-                      step="100"
-                      value={ai.maxTokens}
-                      onChange={handleAIChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      required
-                    />
-                    <p className="mt-1 text-xs text-gray-500">
-                      Controla la longitud máxima de la respuesta.
-                    </p>
-                  </div>
-                </div>
 
                 <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-6">
                   <div className="flex">
@@ -578,7 +461,7 @@ const SettingsScreen: React.FC = () => {
                     const savedSettings = localStorage.getItem('appSettings');
                     if (savedSettings) {
                       const parsed = JSON.parse(savedSettings);
-                      if (parsed.empresa) setCompany(parsed.empresa);
+                      if (parsed.company) setCompany(parsed.company);
                       if (parsed.cfdi) setCfdi(parsed.cfdi);
                       if (parsed.ai) setAi(parsed.ai);
                     }
@@ -607,6 +490,9 @@ const SettingsScreen: React.FC = () => {
               </div>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
         </div>
       </div>
     </div>
