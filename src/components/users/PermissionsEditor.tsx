@@ -6,8 +6,7 @@ import {
   Package, 
   FileText, 
   Settings, 
-  BarChart3, 
-  Briefcase,
+  BarChart3,
   Check,
   AlertCircle
 } from 'lucide-react';
@@ -72,17 +71,6 @@ export function PermissionsEditor({ role, onClose, onSave }: Props) {
         { id: 'billing.create', label: 'Crear facturas', description: 'Generar nuevas facturas' },
         { id: 'billing.edit', label: 'Editar facturas', description: 'Modificar facturas existentes' },
         { id: 'billing.delete', label: 'Anular facturas', description: 'Cancelar o anular facturas' },
-      ]
-    },
-    {
-      name: 'Operaciones / Servicios',
-      icon: <Briefcase className="w-5 h-5" />,
-      color: 'from-purple-500 to-indigo-600',
-      permissions: [
-        { id: 'operations.view', label: 'Ver operaciones', description: 'Consultar servicios y tareas' },
-        { id: 'operations.create', label: 'Crear operaciones', description: 'Registrar nuevos servicios' },
-        { id: 'operations.edit', label: 'Editar operaciones', description: 'Modificar servicios existentes' },
-        { id: 'operations.delete', label: 'Eliminar operaciones', description: 'Borrar servicios del sistema' },
       ]
     },
     {
