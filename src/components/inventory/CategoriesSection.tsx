@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Grid3x3, Package, X, AlertCircle } from 'lucide-react';
 import type {Category, Product} from './InventoryScreen';
 
@@ -247,6 +247,15 @@ function CategoryModal({ category, categories, onClose, onSave }: CategoryModalP
     '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#6366F1'
   ];
 
+  // Bloquear scroll del body cuando el modal está abierto
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -279,28 +288,30 @@ function CategoryModal({ category, categories, onClose, onSave }: CategoryModalP
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] flex flex-col my-auto">
         {/* Header */}
-        <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-gray-900">
-              {isEditing ? 'Editar Categoría' : 'Nueva Categoría'}
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              {isEditing ? 'Actualiza la información' : 'Crea una nueva categoría de productos'}
-            </p>
+        <div className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 rounded-t-2xl text-white flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-white mb-1">
+                {isEditing ? 'Editar Categoría' : 'Nueva Categoría'}
+              </h2>
+              <p className="text-white/90 text-sm">
+                {isEditing ? 'Actualiza la información' : 'Crea una nueva categoría de productos'}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
           <div className="space-y-5">
             {/* Name */}
             <div>
