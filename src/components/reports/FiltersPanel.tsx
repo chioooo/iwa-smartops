@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Filter, Calendar, Building2, Package, User, Users, Trash2 } from 'lucide-react';
+import { X, Filter, Calendar, Building2, Package, User, Users, Trash2, ChevronDown } from 'lucide-react';
 import type {ReportFilters} from './ReportsScreen';
 
 type Props = {
@@ -152,17 +152,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <Building2 className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Sucursal / Almacén</label>
               </div>
-              <select
-                value={localFilters.branch || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, branch: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todas las sucursales</option>
-                <option value="Principal">Almacén Principal</option>
-                <option value="Secundario">Almacén Secundario</option>
-                <option value="Norte">Sucursal Norte</option>
-                <option value="Sur">Sucursal Sur</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.branch || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, branch: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todas las sucursales</option>
+                  <option value="Principal">Almacén Principal</option>
+                  <option value="Secundario">Almacén Secundario</option>
+                  <option value="Norte">Sucursal Norte</option>
+                  <option value="Sur">Sucursal Sur</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Categoría */}
@@ -171,17 +174,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <Package className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Categoría</label>
               </div>
-              <select
-                value={localFilters.category || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, category: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todas las categorías</option>
-                <option value="Tecnología">Tecnología</option>
-                <option value="Mobiliario">Mobiliario</option>
-                <option value="Papelería">Papelería</option>
-                <option value="Consumibles">Consumibles</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.category || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, category: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todas las categorías</option>
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Mobiliario">Mobiliario</option>
+                  <option value="Papelería">Papelería</option>
+                  <option value="Consumibles">Consumibles</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Usuario */}
@@ -190,17 +196,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <User className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Usuario / Operador</label>
               </div>
-              <select
-                value={localFilters.user || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, user: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todos los usuarios</option>
-                <option value="Juan Pérez">Juan Pérez</option>
-                <option value="María González">María González</option>
-                <option value="Carlos Ruiz">Carlos Ruiz</option>
-                <option value="Ana Martínez">Ana Martínez</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.user || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, user: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todos los usuarios</option>
+                  <option value="Juan Pérez">Juan Pérez</option>
+                  <option value="María González">María González</option>
+                  <option value="Carlos Ruiz">Carlos Ruiz</option>
+                  <option value="Ana Martínez">Ana Martínez</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Cliente */}
@@ -209,17 +218,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <Users className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Cliente</label>
               </div>
-              <select
-                value={localFilters.client || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, client: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todos los clientes</option>
-                <option value="Acme Corporation">Acme Corporation S.A. de C.V.</option>
-                <option value="TechSolutions">TechSolutions México</option>
-                <option value="Distribuidora">Distribuidora Nacional</option>
-                <option value="GlobalTech">GlobalTech Industries</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.client || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, client: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todos los clientes</option>
+                  <option value="Acme Corporation">Acme Corporation S.A. de C.V.</option>
+                  <option value="TechSolutions">TechSolutions México</option>
+                  <option value="Distribuidora">Distribuidora Nacional</option>
+                  <option value="GlobalTech">GlobalTech Industries</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Active Filters Display */}

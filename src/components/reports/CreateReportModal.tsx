@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, FileText, Calendar, Filter, Download } from 'lucide-react';
+import { X, FileText, Calendar, Filter, Download, ChevronDown } from 'lucide-react';
 import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
@@ -251,64 +251,76 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Sucursal */}
                 <div>
-                  <label className="block text-xs text-gray-600 mb-2">Sucursal</label>
-                  <select
-                    value={filters.branch || ''}
-                    onChange={(e) => setFilters({ ...filters, branch: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todas las sucursales</option>
-                    <option value="Principal">Almacén Principal</option>
-                    <option value="Secundario">Almacén Secundario</option>
-                    <option value="Norte">Sucursal Norte</option>
-                    <option value="Sur">Sucursal Sur</option>
-                  </select>
+                    <label className="block text-xs text-gray-600 mb-2">Sucursal</label>
+                  <div className='relative'>
+                    <select
+                      value={filters.branch || ''}
+                      onChange={(e) => setFilters({ ...filters, branch: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todas las sucursales</option>
+                      <option value="Principal">Almacén Principal</option>
+                      <option value="Secundario">Almacén Secundario</option>
+                      <option value="Norte">Sucursal Norte</option>
+                      <option value="Sur">Sucursal Sur</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
 
                 {/* Categoría */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Categoría</label>
-                  <select
-                    value={filters.category || ''}
-                    onChange={(e) => setFilters({ ...filters, category: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todas las categorías</option>
-                    <option value="Tecnología">Tecnología</option>
-                    <option value="Mobiliario">Mobiliario</option>
-                    <option value="Papelería">Papelería</option>
-                    <option value="Consumibles">Consumibles</option>
-                  </select>
+                  <div className='relative'>
+                    <select
+                      value={filters.category || ''}
+                      onChange={(e) => setFilters({ ...filters, category: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todas las categorías</option>
+                      <option value="Tecnología">Tecnología</option>
+                      <option value="Mobiliario">Mobiliario</option>
+                      <option value="Papelería">Papelería</option>
+                      <option value="Consumibles">Consumibles</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
 
                 {/* Usuario */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Usuario / Operador</label>
-                  <select
-                    value={filters.user || ''}
-                    onChange={(e) => setFilters({ ...filters, user: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todos los usuarios</option>
-                    <option value="Juan Pérez">Juan Pérez</option>
-                    <option value="María González">María González</option>
-                    <option value="Carlos Ruiz">Carlos Ruiz</option>
-                  </select>
+                  <div className='relative'>
+                    <select
+                      value={filters.user || ''}
+                      onChange={(e) => setFilters({ ...filters, user: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todos los usuarios</option>
+                      <option value="Juan Pérez">Juan Pérez</option>
+                      <option value="María González">María González</option>
+                      <option value="Carlos Ruiz">Carlos Ruiz</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
 
                 {/* Cliente */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Cliente</label>
-                  <select
-                    value={filters.client || ''}
-                    onChange={(e) => setFilters({ ...filters, client: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todos los clientes</option>
-                    <option value="Acme Corporation">Acme Corporation</option>
-                    <option value="TechSolutions">TechSolutions México</option>
-                    <option value="Distribuidora">Distribuidora Nacional</option>
-                  </select>
+                  <div className='relative'>
+                    <select
+                      value={filters.client || ''}
+                      onChange={(e) => setFilters({ ...filters, client: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todos los clientes</option>
+                      <option value="Acme Corporation">Acme Corporation</option>
+                      <option value="TechSolutions">TechSolutions México</option>
+                      <option value="Distribuidora">Distribuidora Nacional</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Download, Eye, FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle, Filter } from 'lucide-react';
+import { Search, Download, Eye, FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle, Filter, ChevronDown } from 'lucide-react';
 import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
@@ -130,31 +130,37 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
           </div>
 
           {/* Tipo Filter */}
-          <select
-            value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-          >
-            <option value="all">Todos los tipos</option>
-            <option value="ventas">Ventas</option>
-            <option value="inventario">Inventario</option>
-            <option value="facturacion">Facturación</option>
-            <option value="servicios">Servicios</option>
-            <option value="clientes">Clientes</option>
-            <option value="utilidades">Utilidades</option>
-          </select>
+          <div className='relative'>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+            >
+              <option value="all">Todos los tipos</option>
+              <option value="ventas">Ventas</option>
+              <option value="inventario">Inventario</option>
+              <option value="facturacion">Facturación</option>
+              <option value="servicios">Servicios</option>
+              <option value="clientes">Clientes</option>
+              <option value="utilidades">Utilidades</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+          </div>
 
           {/* Estado Filter */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-          >
-            <option value="all">Todos los estados</option>
-            <option value="disponible">Disponible</option>
-            <option value="proceso">En proceso</option>
-            <option value="error">Error</option>
-          </select>
+          <div className='relative'>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+            >
+              <option value="all">Todos los estados</option>
+              <option value="disponible">Disponible</option>
+              <option value="proceso">En proceso</option>
+              <option value="error">Error</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+          </div>
 
           {/* Botón Filtros Avanzados */}
           <button
