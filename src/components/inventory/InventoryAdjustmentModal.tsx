@@ -24,9 +24,10 @@ export function InventoryAdjustmentModal({ product, onClose, onAdjust }: Props) 
 
   // Bloquear scroll del body cuando el modal está abierto
   useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = originalOverflow;
     };
   }, []);
 
