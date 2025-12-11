@@ -1,5 +1,5 @@
 //import React from 'react';
-import { DollarSign, FileText, CheckCircle, TrendingUp, Package, ShoppingCart, Download, FileSpreadsheet } from 'lucide-react';
+import { DollarSign, FileText, CheckCircle, TrendingUp, Package, ShoppingCart } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 type Props = {
@@ -122,14 +122,6 @@ export function ReportsDashboard({ metrics, onCreateReport }: Props) {
               <h3 className="text-gray-900 mb-1">Ingresos vs Egresos por Mes</h3>
               <p className="text-sm text-gray-600">Comparativa mensual</p>
             </div>
-            <div className="flex gap-2">
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Descargar PDF">
-                <Download className="w-4 h-4" />
-              </button>
-              <button className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Exportar Excel">
-                <FileSpreadsheet className="w-4 h-4" />
-              </button>
-            </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={salesByMonth}>
@@ -229,11 +221,18 @@ export function ReportsDashboard({ metrics, onCreateReport }: Props) {
             Ver reporte completo →
           </button>
         </div>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={bestSellingProducts} layout="horizontal">
+        <ResponsiveContainer width="100%" height={320}>
+          <BarChart
+            data={bestSellingProducts}
+            layout="vertical"
+            margin={{ top: 8, right: 16, bottom: 8, left: 0 }}
+            barCategoryGap="20%"
+          >
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis
               type="number"
+              dataKey="quantity"
+              domain={[0, 'dataMax + 5']}
               tick={{ fill: '#6B7280', fontSize: 12 }}
               axisLine={{ stroke: '#E5E7EB' }}
             />
@@ -245,6 +244,7 @@ export function ReportsDashboard({ metrics, onCreateReport }: Props) {
               width={150}
             />
             <Tooltip
+              formatter={(value) => [value, 'Unidades']}
               contentStyle={{
                 backgroundColor: 'white',
                 border: '1px solid #E5E7EB',
@@ -256,7 +256,8 @@ export function ReportsDashboard({ metrics, onCreateReport }: Props) {
               dataKey="quantity"
               fill="url(#colorGradient)"
               radius={[0, 8, 8, 0]}
-              maxBarSize={40}
+              barSize={22}
+              maxBarSize={32}
             />
             <defs>
               <linearGradient id="colorGradient" x1="0" y1="0" x2="1" y2="0">
@@ -350,9 +351,6 @@ export function ReportsDashboard({ metrics, onCreateReport }: Props) {
           <p className="text-sm text-gray-700 mb-3">
             Las ventas han aumentado un <span className="text-blue-600">15%</span> este mes
           </p>
-          <button className="text-sm text-blue-600 hover:text-blue-700">
-            Ver análisis detallado →
-          </button>
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-8">
@@ -363,9 +361,6 @@ export function ReportsDashboard({ metrics, onCreateReport }: Props) {
           <p className="text-sm text-gray-700 mb-3">
             Tasa de completación de <span className="text-green-600">98%</span> en órdenes
           </p>
-          <button className="text-sm text-green-600 hover:text-green-700">
-            Ver detalles →
-          </button>
         </div>
       </div>
     </div>
