@@ -10,13 +10,8 @@ import {
   Check,
   AlertCircle
 } from 'lucide-react';
+import type {Role} from "../../data/types/users.types.ts";
 
-type Role = {
-  id: string;
-  name: string;
-  description: string;
-  permissions: string[];
-};
 
 type Props = {
   role: Role;
@@ -36,7 +31,7 @@ type PermissionCategory = {
 };
 
 export function PermissionsEditor({ role, onClose, onSave }: Props) {
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(role.permissions);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>(role.permissions!);
   const [hasChanges, setHasChanges] = useState(false);
 
   const permissionCategories: PermissionCategory[] = [
