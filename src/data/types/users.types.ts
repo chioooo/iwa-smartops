@@ -2,6 +2,7 @@ export interface User {
     id: string;
     name: string;
     email: string;
+    roleId?: string;
     role: string;
     status: 'active' | 'inactive';
     createdAt: string;
@@ -9,10 +10,10 @@ export interface User {
 }
 
 export interface Role {
-    id: string;
+    id?: string;
     name: string;
     description: string;
-    permissionsCount: number;
-    usersCount: number;
-    permissions: string[];
+    permissionsCount?: number;
+    usersCount?: number;
+    permissions?: string[];
 }
