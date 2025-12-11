@@ -1,12 +1,12 @@
-import { useState } from "react";
-import { X, Shield, FileText, AlertCircle } from "lucide-react";
+import {useState} from "react";
+import {X, Shield, FileText, AlertCircle} from "lucide-react";
 
 interface Props {
     onClose: () => void;
     onCreate: (roleData: { name: string; description: string }) => void;
 }
 
-export function CreateRoleModal({ onClose, onCreate }: Props) {
+export function CreateRoleModal({onClose, onCreate}: Props) {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
@@ -17,15 +17,15 @@ export function CreateRoleModal({ onClose, onCreate }: Props) {
     });
 
     const handleChange = (field: "name" | "description", value: string) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-        setErrors((prev) => ({ ...prev, [field]: "" }));
+        setFormData((prev) => ({...prev, [field]: value}));
+        setErrors((prev) => ({...prev, [field]: ""}));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         let hasErrors = false;
-        const newErrors = { name: "" };
+        const newErrors = {name: ""};
 
         if (!formData.name.trim()) {
             newErrors.name = "El nombre del rol es obligatorio";
@@ -45,23 +45,26 @@ export function CreateRoleModal({ onClose, onCreate }: Props) {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col my-auto">
 
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-                    <div>
-                        <h2 className="text-gray-900">Crear Nuevo Rol</h2>
-                        <p className="text-gray-600 text-sm mt-1">
-                            Define los datos del nuevo rol del sistema
-                        </p>
+                <div
+                    className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 rounded-t-2xl text-white flex-shrink-0">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h2 className="text-white mb-1">Crear Nuevo Rol</h2>
+                            <p className="text-white/90 text-sm">
+                                Define los datos del nuevo rol del sistema
+                            </p>
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        >
+                            <X className="w-5 h-5"/>
+                        </button>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
                 </div>
 
                 {/* Form */}
@@ -74,7 +77,7 @@ export function CreateRoleModal({ onClose, onCreate }: Props) {
                                 Nombre del rol *
                             </label>
                             <div className="relative">
-                                <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"/>
                                 <input
                                     type="text"
                                     value={formData.name}
@@ -90,7 +93,7 @@ export function CreateRoleModal({ onClose, onCreate }: Props) {
 
                             {errors.name && (
                                 <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1">
-                                    <AlertCircle className="w-4 h-4" />
+                                    <AlertCircle className="w-4 h-4"/>
                                     {errors.name}
                                 </p>
                             )}
@@ -102,7 +105,7 @@ export function CreateRoleModal({ onClose, onCreate }: Props) {
                                 Descripción
                             </label>
                             <div className="relative">
-                                <FileText className="absolute left-3 top-4 w-5 h-5 text-gray-400" />
+                                <FileText className="absolute left-3 top-4 w-5 h-5 text-gray-400"/>
                                 <textarea
                                     value={formData.description}
                                     onChange={(e) =>
