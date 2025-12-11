@@ -40,6 +40,7 @@ export function UsersScreen() {
       id: crypto.randomUUID(),
       name: userData.name,
       email: userData.email,
+      roleId: userData.roleId,
       role: userData.role,
       status: userData.status || 'active',
       createdAt: new Date().toISOString().split('T')[0],
@@ -50,8 +51,9 @@ export function UsersScreen() {
           .toUpperCase(),
     };
 
-    demoDataService.addUser(newUser);   // ✔ guardar en localStorage
-    setUsers(demoDataService.getUsers()); // ✔ actualizar UI
+    demoDataService.addUser(newUser);   // guardar en localStorage
+    setUsers(demoDataService.getUsers()); // actualizar UI
+    setRoles(demoDataService.getRoles());
 
     setShowCreateModal(false);
   };
@@ -63,12 +65,14 @@ export function UsersScreen() {
     const updatedUser: User = {
       ...existing,
       ...updates,
+      roleId: updates.roleId ?? existing.roleId,
     };
 
     demoDataService.updateUser(updatedUser);
 
     const updatedList = demoDataService.getUsers();
     setUsers(updatedList);
+    setRoles(demoDataService.getRoles());
 
     if (selectedUser?.id === userId) {
       setSelectedUser(updatedUser);

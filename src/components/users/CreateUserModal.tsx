@@ -14,38 +14,23 @@ export function CreateUserModal({roles, onClose, onCreate, onUpdate, initialData
     const [formData, setFormData] = useState({
         name: initialData?.name || '',
         email: initialData?.email || '',
-        role: initialData?.role || roles[0]?.id || '',
+        role: initialData?.roleId || roles[0]?.id || '',
         status: initialData?.status || 'active',
         password: '',
         confirmPassword: ''
     });
 
     useEffect(() => {
-        if (initialData) {
-            // Modo edición
-            setFormData({
-                name: initialData.name || '',
-                email: initialData.email || '',
-                role: initialData.roleId || '',
-                status: initialData.status || 'active',
-                password: '',
-                confirmPassword: ''
-            });
-        } else {
-            // Modo creación (reset completo)
-            setFormData({
-                name: '',
-                email: '',
-                role: roles[0]?.id || '',
-                status: 'active',
-                password: '',
-                confirmPassword: ''
-            });
-        }
-    }, [initialData, roles]);
+        if (!initialData) return;
 
-    console.log("initialData.roleId:", initialData?.roleId);
-    console.log("roles:", roles);
+        setFormData(prev => ({
+            ...prev,
+            name: initialData.name || '',
+            email: initialData.email || '',
+            role: initialData.roleId || '',
+            status: initialData.status || 'active',
+        }));
+    }, [initialData]);
 
     const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -66,10 +51,6 @@ export function CreateUserModal({roles, onClose, onCreate, onUpdate, initialData
 
         if (!formData.role) {
             newErrors.role = 'Selecciona un rol';
-        }
-
-        if (!formData.password.trim()) {
-            newErrors.password = 'La contraseña es requerida';
         }
 
         if (formData.password && formData.password.length < 8) {

@@ -25,20 +25,75 @@ class UsersService {
     }
 
     addUser(user: User) {
-        const current = this.getUsers();
-        this.saveUsers([...current, user]);
+        const currentUsers = this.getUsers();
+        const currentRoles = this.getRoles();
+
+        // Encontrar el rol asignado (roleId o por nombre)
+        const assignedRole = currentRoles.find(r =>
+            r.id === user.roleId || r.name === user.role
+        );
+
+        if (assignedRole) {
+            assignedRole.usersCount = (assignedRole.usersCount || 0) + 1;
+            this.saveRoles(currentRoles);
+        }
+
+        this.saveUsers([...currentUsers, user]);
     }
 
     updateUser(updatedUser: User) {
-        const users = this.getUsers().map(u =>
+        const users = this.getUsers();
+        const roles = this.getRoles();
+
+        const oldUser = users.find(u => u.id === updatedUser.id);
+
+        if (!oldUser) {
+            console.warn("Usuario no encontrado para actualizar");
+            return;
+        }
+
+        const oldRole = roles.find(r =>
+            r.id === oldUser.roleId || r.name === oldUser.role
+        );
+
+        const newRole = roles.find(r =>
+            r.id === updatedUser.roleId || r.name === updatedUser.role
+        );
+
+        // actualizar contadores
+        if (oldRole && newRole && oldRole.id !== newRole.id) {
+            oldRole.usersCount = Math.max(0, (oldRole.usersCount || 0) - 1);
+            newRole.usersCount = (newRole.usersCount || 0) + 1;
+            console.log("ROLES: ",roles)
+            this.saveRoles(roles);
+        }
+
+        const updatedUsers = users.map(u =>
             u.id === updatedUser.id ? updatedUser : u
         );
-        this.saveUsers(users);
+
+        this.saveUsers(updatedUsers);
     }
 
     deleteUser(id: string) {
-        const users = this.getUsers().filter(u => u.id !== id);
-        this.saveUsers(users);
+        const users = this.getUsers();
+        const roles = this.getRoles();
+
+        const userToDelete = users.find(u => u.id === id);
+
+        if (userToDelete) {
+            const role = roles.find(r =>
+                r.id === userToDelete.roleId || r.name === userToDelete.role
+            );
+
+            if (role) {
+                role.usersCount = Math.max(0, (role.usersCount || 0) - 1);
+                this.saveRoles(roles);
+            }
+        }
+
+        const updatedUsers = users.filter(u => u.id !== id);
+        this.saveUsers(updatedUsers);
     }
 
     getRoles(): Role[] {
