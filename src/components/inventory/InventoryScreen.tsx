@@ -337,8 +337,8 @@ export function InventoryScreen() {
       const difference = physicalStock - product.stock;
       
       // Actualizar stock del producto directamente
-      setProducts(prevProducts => prevProducts.map(p => p.id === productId ? { ...p, stock: physicalStock } : p));
-      
+      handleUpdateProduct(productId, { stock: physicalStock });
+            
       // Registrar movimiento
       const newMovement: InventoryMovement = {
         id: String(movements.length + 1),
