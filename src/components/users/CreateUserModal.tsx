@@ -1,29 +1,55 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { X, User, Mail, Shield, Lock, AlertCircle } from 'lucide-react';
-
-type Role = {
-  id: string;
-  name: string;
-  description: string;
-};
+import type {Role} from "../../data/types/users.types.ts";
 
 type Props = {
   roles: Role[];
   onClose: () => void;
-  onCreate: (userData: any) => void;
+  onCreate?: (userData: any) => void;
+  onUpdate?: (userData: any) => void;
+  initialData?: any;
 };
 
-export function CreateUserModal({ roles, onClose, onCreate }: Props) {
+export function CreateUserModal({ roles, onClose, onCreate, onUpdate, initialData }: Props) {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    role: roles[0]?.id || '',
-    status: 'active',
+    name: initialData?.name || '',
+    email: initialData?.email || '',
+    role: initialData?.role || roles[0]?.id || '',
+    status: initialData?.status || 'active',
     password: '',
     confirmPassword: ''
   });
 
+  useEffect(() => {
+    if (initialData) {
+      // Modo edición
+      setFormData({
+        name: initialData.name || '',
+        email: initialData.email || '',
+        role: initialData.roleId || '',
+        status: initialData.status || 'active',
+        password: '',
+        confirmPassword: ''
+      });
+    } else {
+      // Modo creación (reset completo)
+      setFormData({
+        name: '',
+        email: '',
+        role: roles[0]?.id || '',
+        status: 'active',
+        password: '',
+        confirmPassword: ''
+      });
+    }
+  }, [initialData, roles]);
+
+  console.log("initialData.roleId:", initialData?.roleId);
+  console.log("roles:", roles);
+
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const isEdit = Boolean(initialData);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -56,15 +82,23 @@ export function CreateUserModal({ roles, onClose, onCreate }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       const selectedRole = roles.find(r => r.id === formData.role);
-      onCreate({
+
+      const payload = {
         name: formData.name,
         email: formData.email,
+        roleId: selectedRole?.id,
         role: selectedRole?.name || 'Usuario',
         status: formData.status
-      });
+      };
+
+      if (isEdit && onUpdate) {
+        onUpdate(payload);
+      } else if (onCreate) {
+        onCreate(payload);
+      }
     }
   };
 
@@ -81,8 +115,10 @@ export function CreateUserModal({ roles, onClose, onCreate }: Props) {
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
           <div>
-            <h2 className="text-gray-900">Crear Nuevo Usuario</h2>
-            <p className="text-gray-600 text-sm mt-1">Completa los datos del nuevo usuario</p>
+            <h2 className="text-gray-900">{isEdit ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</h2>
+            <p className="text-gray-600 text-sm mt-1">{isEdit ? 'Actualiza los datos del usuario' : 'Completa los datos del nuevo usuario'}</p>
+
+
           </div>
           <button
             onClick={onClose}
@@ -282,7 +318,7 @@ export function CreateUserModal({ roles, onClose, onCreate }: Props) {
               type="submit"
               className="flex-1 px-4 py-3 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
             >
-              Crear Usuario
+              {isEdit ? 'Guardar Cambios' : 'Crear Usuario'}
             </button>
           </div>
         </form>
