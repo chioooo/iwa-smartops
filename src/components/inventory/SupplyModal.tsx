@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Package, AlertCircle, Layers } from 'lucide-react';
 import type { Supply, Category } from './InventoryScreen';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   supply?: Supply | null;
@@ -79,14 +80,7 @@ export function SupplyModal({ supply, categories, onClose, onCreate, onUpdate }:
 
   const units = ['pieza', 'caja', 'paquete', 'litro', 'kilogramo', 'metro', 'rollo'];
 
-  // Bloquear scroll del body cuando el modal está abierto
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
+  useModalScrollLock();
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">

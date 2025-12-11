@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
 import { X, Package, DollarSign, Warehouse, Calendar, TrendingUp, TrendingDown, Edit2, AlertTriangle } from 'lucide-react';
 import type {Product, InventoryMovement} from './InventoryScreen';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   product: Product;
@@ -10,14 +10,7 @@ type Props = {
 };
 
 export function ProductDetailPanel({ product, movements, onClose, onEdit }: Props) {
-  // Bloquear scroll del body cuando el modal está abierto
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
+  useModalScrollLock();
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);

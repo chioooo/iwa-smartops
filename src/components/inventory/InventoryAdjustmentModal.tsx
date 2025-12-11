@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { X, Package, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 import type {Product} from './InventoryScreen';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   product: Product;
@@ -22,14 +23,7 @@ export function InventoryAdjustmentModal({ product, onClose, onAdjust }: Props) 
   const [reason, setReason] = useState('');
   const [customReason, setCustomReason] = useState('');
 
-  // Bloquear scroll del body cuando el modal está abierto
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
+  useModalScrollLock();
 
   const difference = physicalStock - product.stock;
   const isDifferent = difference !== 0;

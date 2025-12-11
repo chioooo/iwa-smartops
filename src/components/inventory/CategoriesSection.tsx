@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Grid3x3, Package, X, AlertCircle } from 'lucide-react';
 import type {Category, Product} from './InventoryScreen';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   categories: Category[];
@@ -247,14 +248,7 @@ function CategoryModal({ category, categories, onClose, onSave }: CategoryModalP
     '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#6366F1'
   ];
 
-  // Bloquear scroll del body cuando el modal está abierto
-  useEffect(() => {
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, []);
+  useModalScrollLock();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
