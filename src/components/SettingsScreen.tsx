@@ -246,7 +246,7 @@ const SettingsScreen: React.FC = () => {
                     name="taxRegime"
                     value={company.taxRegime}
                     onChange={handleCompanyChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
                     required
                   >
                     <option value="601">General de Ley Personas Morales</option>
@@ -353,7 +353,7 @@ const SettingsScreen: React.FC = () => {
                     name="pac"
                     value={cfdi.pac}
                     onChange={handleCFDIChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
                     required
                   >
                     <option value="FACTURAMA">FACTURAMA</option>
@@ -466,7 +466,7 @@ const SettingsScreen: React.FC = () => {
                     name="model"
                     value={ai.model}
                     onChange={handleAIChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
                     required
                   >
                     <option value="gpt-4">GPT-4</option>
