@@ -28,13 +28,13 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
 
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+        {/* Header */}
+        <DashboardHeader onLogout={onLogout} />
+
         {/* Render content based on active section */}
         {activeSection === 'dashboard' && (
           <>
-            {/* Header */}
-              <DashboardHeader onLogout={onLogout} />
-
-              {/* Dashboard Content */}
+            {/* Dashboard Content */}
             <main className="p-8">
               {/* Welcome Section */}
               <div className="mb-8">
@@ -81,6 +81,15 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
             <p className="text-gray-600">Módulo en desarrollo...</p>
           </div>
         )}
+
+        {/* Footer */}
+        <footer className="mt-auto border-t border-gray-200 bg-white py-4">
+          <div className="px-8">
+            <p className="text-center text-sm text-gray-600">
+              Design and Development by IWAConsolti 2025 (R)
+            </p>
+          </div>
+        </footer>
       </div>
 
       {/* Chatbot */}
