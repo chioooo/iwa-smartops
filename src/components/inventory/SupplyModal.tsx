@@ -184,7 +184,7 @@ export function SupplyModal({ supply, categories, onClose, onCreate, onUpdate }:
                   type="number"
                   min="0"
                   value={formData.stock}
-                  onChange={(e) => handleChange('stock', parseInt(e.target.value) || 0)}
+                  onChange={(e) => handleChange('stock', Math.max(0, parseInt(e.target.value, 10) || 0))}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
                     errors.stock
                       ? 'border-red-300 focus:ring-red-200'

@@ -309,7 +309,7 @@ export function InventoryScreen() {
   };
 
   const handleUpdateSupply = (supplyId: string, updates: Partial<Supply>) => {
-    setSupplies(supplies.map(s => s.id === supplyId ? { ...s, ...updates } : s));
+    setSupplies(prevSupplies => prevSupplies.map(s => s.id === supplyId ? { ...s, ...updates } : s));
     setShowSupplyModal(false);
     setEditingSupply(null);
   };
@@ -320,7 +320,7 @@ export function InventoryScreen() {
   };
 
   const handleDeleteProduct = (productId: string) => {
-    setProducts(products.filter(p => p.id !== productId));
+    setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
     // Limpiar selección si el producto eliminado estaba seleccionado
     if (selectedProduct?.id === productId) {
       setSelectedProduct(null);
@@ -328,7 +328,7 @@ export function InventoryScreen() {
   };
 
   const handleDeleteSupply = (supplyId: string) => {
-    setSupplies(supplies.filter(s => s.id !== supplyId));
+    setSupplies(prevSupplies => prevSupplies.filter(s => s.id !== supplyId));
   };
 
   const handleInventoryAdjustment = (productId: string, physicalStock: number, reason: string) => {
@@ -337,7 +337,7 @@ export function InventoryScreen() {
       const difference = physicalStock - product.stock;
       
       // Actualizar stock del producto directamente
-      setProducts(products.map(p => p.id === productId ? { ...p, stock: physicalStock } : p));
+      setProducts(prevProducts => prevProducts.map(p => p.id === productId ? { ...p, stock: physicalStock } : p));
       
       // Registrar movimiento
       const newMovement: InventoryMovement = {
