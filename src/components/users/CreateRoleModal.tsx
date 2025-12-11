@@ -12,36 +12,35 @@ export function CreateRoleModal({onClose, onCreate}: Props) {
         description: "",
     });
 
-    const [errors, setErrors] = useState({
-        name: "",
-    });
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (field: "name" | "description", value: string) => {
         setFormData((prev) => ({...prev, [field]: value}));
         setErrors((prev) => ({...prev, [field]: ""}));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        let hasErrors = false;
-        const newErrors = {name: ""};
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
 
         if (!formData.name.trim()) {
             newErrors.name = "El nombre del rol es obligatorio";
-            hasErrors = true;
         }
 
         setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    }
 
-        if (hasErrors) return;
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
 
-        onCreate({
-            name: formData.name.trim(),
-            description: formData.description.trim(),
-        });
+        if (validateForm()) {
+            onCreate({
+                name: formData.name.trim(),
+                description: formData.description.trim(),
+            });
 
-        onClose();
+            onClose();
+        }
     };
 
     return (
