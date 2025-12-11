@@ -7,6 +7,8 @@ type Props = {
   onCreate: (reportData: Omit<Report, 'id' | 'generationDate' | 'status'>) => void;
 };
 
+const getDateString = (date: Date) => date.toLocaleDateString('en-CA');
+
 export function CreateReportModal({ onClose, onCreate }: Props) {
   const [formData, setFormData] = useState({
     tipo: 'ventas' as Report['tipo'],
@@ -15,9 +17,11 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
   });
 
   const [filters, setFilters] = useState<ReportFilters>({
-    startDate: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
+      startDate: getDateString(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+      endDate: getDateString(new Date())
   });
+
+  const [dateError, setDateError] = useState<string>('');
 
   const reportTypes = [
     { value: 'ventas', label: 'Reporte de Ventas', description: 'Análisis de ventas, ingresos y tendencias' },
@@ -28,38 +32,108 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
     { value: 'utilidades', label: 'Reporte de Utilidades', description: 'Ingresos, egresos y margen de ganancia' }
   ];
 
+  const todayDate = getDateString(new Date());
+
+  const parseDate = (isoDate: string) => {
+    const [year, month, day] = isoDate.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  const formatMonthYear = (isoDate: string) => {
+    return parseDate(isoDate).toLocaleDateString('es-MX', { 
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  const getMonthAndYear = (isoDate: string) => {
+    const date = parseDate(isoDate);
+    return {
+      month: date.toLocaleDateString('es-MX', { month: 'short' }),
+      year: date.getFullYear().toString()
+    };
+  };
+
+  const formatReportName = (startDate: string, endDate: string, reportLabel: string): string => {
+    const { month: startMonth, year: startYear } = getMonthAndYear(startDate);
+    const { month: endMonth, year: endYear } = getMonthAndYear(endDate);
+
+    if (startYear === endYear && startMonth === endMonth) {
+      return `${reportLabel} - ${formatMonthYear(startDate)}`;
+    }
+
+    if (startYear === endYear) {
+      return `${reportLabel} - ${startMonth} a ${endMonth} ${startYear}`;
+    }
+
+    return `${reportLabel} - ${formatMonthYear(startDate)} a ${formatMonthYear(endDate)}`;
+  };
+
+  const formatDatePreview = (isoDate: string) => {
+    return isoDate?.split('-').reverse().join('/') || '';
+  };
+
+  const selectedType = reportTypes.find(t => t.value === formData.tipo);
+
+  const validateDates = (startDate: string, endDate: string): string => {
+    if (!startDate || !endDate) {
+      return 'Por favor selecciona un rango de fechas válido';
+    }
+
+    if (startDate > todayDate) {
+      return `La fecha de inicio no puede ser mayor a la fecha actual (${formatDatePreview(todayDate)})`;
+    }
+
+    if (endDate > todayDate) {
+      return `La fecha de fin no puede ser mayor a la fecha actual (${formatDatePreview(todayDate)})`;
+    }
+
+    if (startDate > endDate) {
+      return 'La fecha de inicio no puede ser mayor a la fecha de fin';
+    }
+
+    return '';
+  };
+
+  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+    const updates: Partial<ReportFilters> = { [field]: value };
+    
+    if (field === 'startDate' && filters.endDate && value > filters.endDate) {
+      updates.endDate = value;
+    } else if (field === 'endDate' && filters.startDate && value < filters.startDate) {
+      updates.startDate = value;
+    }
+    
+    const newFilters = { ...filters, ...updates };
+    setFilters(newFilters);
+    
+    const error = validateDates(newFilters.startDate || '', newFilters.endDate || '');
+    setDateError(error);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const selectedType = reportTypes.find(t => t.value === formData.tipo);
-    
     if (!selectedType) {
-      alert('Por favor selecciona un tipo de reporte válido');
+      setDateError('Por favor selecciona un tipo de reporte válido');
       return;
     }
 
-    if (!filters.startDate || !filters.endDate) {
-      alert('Por favor selecciona un rango de fechas válido');
+    const error = validateDates(filters.startDate || '', filters.endDate || '');
+    if (error) {
+      setDateError(error);
       return;
     }
 
-    const start = new Date(filters.startDate).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' });
-    const end = new Date(filters.endDate).toLocaleDateString('es-MX', { month: 'short', year: 'numeric' });
-
-    const reportName = `${selectedType.label} - ${start} a ${end}`;
-
-    const reportData: Omit<Report, 'id' | 'generationDate' | 'status'> = {
-      name: reportName,
+    setDateError('');
+    onCreate({
+      name: formatReportName(filters.startDate!, filters.endDate!, selectedType.label),
       tipo: formData.tipo,
       format: formData.format,
       generatedBy: formData.generatedBy,
       parameters: filters
-    };
-
-    onCreate(reportData);
+    });
   };
-
-  const selectedType = reportTypes.find(t => t.value === formData.tipo);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -139,8 +213,11 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   <input
                     type="date"
                     value={filters.startDate}
-                    onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
+                    max={filters.endDate || todayDate}
+                    onChange={(e) => handleDateChange('startDate', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent ${
+                      dateError ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   />
                 </div>
                 <div>
@@ -148,11 +225,19 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   <input
                     type="date"
                     value={filters.endDate}
-                    onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
+                    max={todayDate}
+                    onChange={(e) => handleDateChange('endDate', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent ${
+                      dateError ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   />
                 </div>
               </div>
+              {dateError && (
+                <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{dateError}</p>
+                </div>
+              )}
             </div>
 
             {/* Filtros específicos */}
@@ -282,7 +367,7 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
               <h4 className="text-sm text-gray-900 mb-2">Vista previa de configuración</h4>
               <div className="space-y-1 text-xs text-gray-700">
                 <p><strong>Tipo:</strong> {selectedType?.label}</p>
-                <p><strong>Periodo:</strong> {new Date(filters.startDate!).toLocaleDateString('es-MX')} - {new Date(filters.endDate!).toLocaleDateString('es-MX')}</p>
+                <p><strong>Periodo:</strong> {formatDatePreview(filters.startDate || '')} - {formatDatePreview(filters.endDate || '')}</p>
                 {filters.branch && <p><strong>Sucursal:</strong> {filters.branch}</p>}
                 {filters.category && <p><strong>Categoría:</strong> {filters.category}</p>}
                 <p><strong>Formato:</strong> {formData.format.toUpperCase()}</p>

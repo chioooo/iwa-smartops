@@ -69,7 +69,7 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha inicio</label>
                   <input
                     type="date"
-                    value={localFilters.startDate}
+                    value={localFilters.startDate || ''}
                     onChange={(e) => setLocalFilters({ ...localFilters, startDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
@@ -78,7 +78,7 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha fin</label>
                   <input
                     type="date"
-                    value={localFilters.endDate}
+                    value={localFilters.endDate || ''}
                     onChange={(e) => setLocalFilters({ ...localFilters, endDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
@@ -92,8 +92,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const today = new Date();
                     setLocalFilters({
                       ...localFilters,
-                      startDate: today.toISOString().split('T')[0],
-                      endDate: today.toISOString().split('T')[0]
+                      startDate: today.toLocaleDateString('en-CA'),
+                      endDate: today.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -106,8 +106,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                     setLocalFilters({
                       ...localFilters,
-                      startDate: firstDay.toISOString().split('T')[0],
-                      endDate: today.toISOString().split('T')[0]
+                      startDate: firstDay.toLocaleDateString('en-CA'),
+                      endDate: today.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -121,8 +121,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
                     setLocalFilters({
                       ...localFilters,
-                      startDate: lastMonth.toISOString().split('T')[0],
-                      endDate: lastDay.toISOString().split('T')[0]
+                      startDate: lastMonth.toLocaleDateString('en-CA'),
+                      endDate: lastDay.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -135,8 +135,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const firstDay = new Date(today.getFullYear(), 0, 1);
                     setLocalFilters({
                       ...localFilters,
-                      startDate: firstDay.toISOString().split('T')[0],
-                      endDate: today.toISOString().split('T')[0]
+                      startDate: firstDay.toLocaleDateString('en-CA'),
+                      endDate: today.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -235,6 +235,14 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   </button>
                 </div>
                 <div className="space-y-2">
+                {localFilters.startDate && localFilters.endDate && (
+                    <div className="flex items-center gap-2 text-xs text-blue-700">
+                      <Calendar className="w-3 h-3" />
+                        <span>
+                          {localFilters.startDate!.split('-').reverse().join('/')} - {localFilters.endDate!.split('-').reverse().join('/')}
+                      </span>
+                    </div>
+                  )}
                   {localFilters.branch && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Building2 className="w-3 h-3" />
