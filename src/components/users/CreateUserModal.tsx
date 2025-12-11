@@ -68,6 +68,10 @@ export function CreateUserModal({roles, onClose, onCreate, onUpdate, initialData
             newErrors.role = 'Selecciona un rol';
         }
 
+        if (!formData.password.trim()) {
+            newErrors.password = 'La contraseña es requerida';
+        }
+
         if (formData.password && formData.password.length < 8) {
             newErrors.password = 'La contraseña debe tener al menos 8 caracteres';
         }
@@ -259,7 +263,7 @@ export function CreateUserModal({roles, onClose, onCreate, onUpdate, initialData
                         <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
                             <h3 className="text-gray-900 text-sm mb-3 flex items-center gap-2">
                                 <Lock className="w-4 h-4"/>
-                                Contraseña
+                                Contraseña *
                             </h3>
 
                             <div className="space-y-3">
