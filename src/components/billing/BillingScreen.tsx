@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { FileText, Plus, Receipt, Settings as SettingsIcon } from 'lucide-react';
+import { FileText, Plus, Receipt } from 'lucide-react';
 import { BillingDashboard } from './BillingDashboard';
 import { InvoiceTable } from './InvoiceTable';
 import { CreateInvoiceForm } from './CreateInvoiceForm';
 import { InvoiceDetailPanel } from './InvoiceDetailPanel';
 import { CancelInvoiceModal } from './CancelInvoiceModal';
 import { PaymentComplementForm } from './PaymentComplementForm';
-import { BillingSettings } from './BillingSettings';
 
 export type Invoice = {
   id: string;
@@ -277,17 +276,6 @@ export function BillingScreen() {
               Complementos de Pago
             </button>
             <button
-              onClick={() => setActiveTab('settings')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'settings'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <SettingsIcon className="w-5 h-5" />
-              Configuración
-            </button>
-            <button
               onClick={() => setActiveTab('dashboard')}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
                 activeTab === 'dashboard'
@@ -336,7 +324,6 @@ export function BillingScreen() {
           />
         )}
 
-        {activeTab === 'settings' && <BillingSettings />}
       </div>
 
       {/* Invoice Detail Modal */}

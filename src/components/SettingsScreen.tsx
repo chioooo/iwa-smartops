@@ -202,28 +202,18 @@ const SettingsScreen: React.FC = () => {
           {/* Datos Fiscales */}
           {activeTab === 'company' && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-6">Datos Fiscales de la Empresa</h2>
+              <div className="mb-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-2">Datos Fiscales del Emisor</h2>
+                <p className="text-sm text-gray-600">
+                  Información que aparecerá en todas las facturas emitidas
+                </p>
+              </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label htmlFor="rfc" className="block text-sm font-medium text-gray-700 mb-2">
-                    RFC <span className="text-red-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="rfc"
-                    id="rfc"
-                    value={company.rfc}
-                    onChange={handleCompanyChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
-                    placeholder="XAXX010101000"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
-                    Razón Social <span className="text-red-600">*</span>
+                {/* Razón Social */}
+                <div className="md:col-span-2">
+                  <label htmlFor="businessName" className="block text-sm text-gray-700 mb-2">
+                    Razón Social / Nombre <span className="text-red-600">*</span>
                   </label>
                   <input
                     type="text"
@@ -233,6 +223,23 @@ const SettingsScreen: React.FC = () => {
                     onChange={handleCompanyChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                     placeholder="Empresa S.A. de C.V."
+                    required
+                  />
+                </div>
+
+                {/* RFC */}
+                <div>
+                  <label htmlFor="rfc" className="block text-sm text-gray-700 mb-2">
+                    RFC <span className="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="rfc"
+                    id="rfc"
+                    value={company.rfc}
+                    onChange={handleCompanyChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent font-mono"
+                    placeholder="XAXX010101000"
                     required
                   />
                 </div>
@@ -287,14 +294,15 @@ const SettingsScreen: React.FC = () => {
                   />
                 </div>
 
+                {/* Domicilio Fiscal */}
                 <div className="md:col-span-2">
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                    Dirección Fiscal <span className="text-red-600">*</span>
+                  <label htmlFor="address" className="block text-sm text-gray-700 mb-2">
+                    Domicilio Fiscal <span className="text-red-600">*</span>
                   </label>
-                  <textarea
+                  <input
+                    type="text"
                     id="address"
                     name="address"
-                    rows={3}
                     value={company.address}
                     onChange={handleCompanyChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
@@ -303,9 +311,10 @@ const SettingsScreen: React.FC = () => {
                   />
                 </div>
 
+                {/* Teléfono */}
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                    Teléfono <span className="text-red-600">*</span>
+                  <label htmlFor="phone" className="block text-sm text-gray-700 mb-2">
+                    Teléfono
                   </label>
                   <input
                     type="tel"
@@ -315,13 +324,13 @@ const SettingsScreen: React.FC = () => {
                     onChange={handleCompanyChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                     placeholder="5512345678"
-                    required
                   />
                 </div>
 
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                    Correo Electrónico <span className="text-red-600">*</span>
+                {/* Email */}
+                <div className="md:col-span-2">
+                  <label htmlFor="email" className="block text-sm text-gray-700 mb-2">
+                    Email de facturación
                   </label>
                   <input
                     type="email"
@@ -331,7 +340,6 @@ const SettingsScreen: React.FC = () => {
                     onChange={handleCompanyChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                     placeholder="contacto@empresa.com"
-                    required
                   />
                 </div>
               </div>
