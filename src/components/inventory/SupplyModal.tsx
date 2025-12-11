@@ -143,7 +143,7 @@ export function SupplyModal({ supply, categories, onClose, onCreate, onUpdate }:
               <select
                 value={formData.category}
                 onChange={(e) => handleChange('category', e.target.value)}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors bg-white ${
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors appearance-none bg-white ${
                   errors.category
                     ? 'border-red-300 focus:ring-red-200'
                     : 'border-gray-300 focus:ring-[#D0323A] focus:border-transparent'
@@ -170,7 +170,7 @@ export function SupplyModal({ supply, categories, onClose, onCreate, onUpdate }:
               <select
                 value={formData.unit}
                 onChange={(e) => handleChange('unit', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
               >
                 {units.map((unit) => (
                   <option key={unit} value={unit}>{unit}</option>

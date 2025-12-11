@@ -297,7 +297,7 @@ export function ProductModal({ categories, product, onClose, onCreate, onUpdate 
               <select
                 value={formData.unit}
                 onChange={(e) => handleChange('unit', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
               >
                 <option value="pieza">Pieza</option>
                 <option value="paquete">Paquete</option>
@@ -317,7 +317,7 @@ export function ProductModal({ categories, product, onClose, onCreate, onUpdate 
               <select
                 value={formData.warehouse}
                 onChange={(e) => handleChange('warehouse', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
               >
                 <option value="Almacén Principal">Almacén Principal</option>
                 <option value="Almacén Secundario">Almacén Secundario</option>
