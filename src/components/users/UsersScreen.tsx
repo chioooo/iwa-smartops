@@ -21,6 +21,7 @@ export function UsersScreen() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [showPermissionsEditor, setShowPermissionsEditor] = useState(false);
+  const [editUser, setEditUser] = useState<User | null>(null);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
@@ -76,7 +77,7 @@ export function UsersScreen() {
 
   //  ROLES
 
-  const handleCreateRole = (roleData: any) => {
+  const handleCreateRole = (roleData: Role) => {
     const newRole: Role = {
       id: crypto.randomUUID(),
       name: roleData.name,
@@ -237,8 +238,8 @@ export function UsersScreen() {
                   {/* User Table */}
                   <UserTable
                       users={filteredUsers}
-                      onSelectUser={setSelectedUser}
                       onUpdateUser={handleUpdateUser}
+                      onEditUser={(user) => setEditUser(user)}
                       selectedUserId={selectedUser?.id}
                   />
                 </div>
@@ -264,11 +265,25 @@ export function UsersScreen() {
           )}
         </div>
 
+        {/* Modal Crear */}
         {showCreateModal && (
             <CreateUserModal
                 roles={roles}
                 onClose={() => setShowCreateModal(false)}
                 onCreate={handleCreateUser}
+            />
+        )}
+
+        {/* Modal Editar */}
+        {editUser && (
+            <CreateUserModal
+                roles={roles}
+                initialData={editUser}
+                onClose={() => setEditUser(null)}
+                onUpdate={(updates) => {
+                  handleUpdateUser(editUser.id, updates);
+                  setEditUser(null);
+                }}
             />
         )}
 
@@ -287,7 +302,7 @@ export function UsersScreen() {
                   setSelectedRole(null);
                 }}
                 onSave={(permissions) =>
-                    handleUpdatePermissions(selectedRole.id, permissions)
+                    handleUpdatePermissions(selectedRole.id!, permissions)
                 }
             />
         )}

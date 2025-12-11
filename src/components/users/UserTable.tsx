@@ -12,16 +12,16 @@ import type { User } from '../../data/types/users.types.ts'
 
 type Props = {
   users: User[];
-  onSelectUser: (user: User) => void;
   onUpdateUser: (userId: string, updates: Partial<User>) => void;
   selectedUserId?: string;
+  onEditUser: (user: User) => void;
 };
 
 export function UserTable({
                             users,
-                            onSelectUser,
                             onUpdateUser,
                             selectedUserId,
+                            onEditUser,
                           }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
@@ -144,19 +144,10 @@ export function UserTable({
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
 
-                        {/* Ver */}
-                        <button
-                            title="Ver usuario"
-                            onClick={() => onSelectUser(user)}
-                            className="p-2 text-gray-600 hover:text-[#D0323A] hover:bg-gray-100 rounded-lg"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-
                         {/* Editar */}
                         <button
                             title="Editar usuario"
-                            onClick={() => onSelectUser(user)}
+                            onClick={() => onEditUser(user)}
                             className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg"
                         >
                           <Edit2 className="w-4 h-4" />
