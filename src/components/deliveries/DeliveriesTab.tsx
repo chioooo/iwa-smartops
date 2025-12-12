@@ -31,6 +31,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
   const [totals, setTotals] = useState<RouteTotals>({ distanceKm: '0.00', durationMin: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneByLegId, setPhoneByLegId] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -132,6 +133,16 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
           distanceKm: (totalDistanceM / 1000).toFixed(2),
           durationMin: Math.round(totalDurationS / 60),
         });
+
+        setPhoneByLegId((prev) => {
+          const next = { ...prev };
+          computedLegs.forEach((leg) => {
+            if (next[leg.id] === undefined) {
+              next[leg.id] = '2720000000';
+            }
+          });
+          return next;
+        });
       } catch (e) {
         setError('No se pudieron calcular las rutas.');
       } finally {
@@ -173,6 +184,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kilómetros</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo estimado</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número de teléfono</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notificar</th>
               </tr>
             </thead>
@@ -183,6 +195,17 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
                   <td className="px-4 py-3 text-sm text-gray-900">{leg.destination}</td>
                   <td className="px-4 py-3 text-sm text-gray-700">{leg.distanceKm} km</td>
                   <td className="px-4 py-3 text-sm text-gray-700">{leg.durationMin} min</td>
+                  <td className="px-4 py-3">
+                    <input
+                      type="tel"
+                      value={phoneByLegId[leg.id] ?? '2720000000'}
+                      onChange={(e) => {
+                        const nextValue = e.target.value;
+                        setPhoneByLegId((prev) => ({ ...prev, [leg.id]: nextValue }));
+                      }}
+                      className="w-40 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D0323A] focus:border-[#D0323A] outline-none"
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <button
@@ -205,7 +228,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
               ))}
               {legs.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-sm text-gray-500 text-center">
+                  <td colSpan={6} className="px-4 py-6 text-sm text-gray-500 text-center">
                     No hay tramos para mostrar.
                   </td>
                 </tr>
