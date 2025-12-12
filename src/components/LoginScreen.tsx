@@ -8,7 +8,7 @@ interface LoginScreenProps {
   onLogin: (email: string) => void;
 }
 
-export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -139,12 +139,6 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
                   Recordarme
                 </span>
               </label>
-              <a
-                href="#"
-                className="text-sm text-[#D0323A] hover:text-[#9F2743] transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </a>
             </div>
 
             {/* Submit Button */}
@@ -156,18 +150,6 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
             </button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
-              ¿No tienes una cuenta?{" "}
-              <button
-                onClick={onGoToRegister}
-                className="text-[#D0323A] hover:text-[#9F2743] transition-colors"
-              >
-                Solicita acceso
-              </button>
-            </p>
-          </div>
 
           {/* Version */}
           <div className="mt-8 text-center text-xs text-gray-400">

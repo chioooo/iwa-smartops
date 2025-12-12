@@ -6,7 +6,6 @@ import {
   Package, 
   FileText, 
   Settings, 
-  BarChart3,
   Check,
   AlertCircle
 } from 'lucide-react';
@@ -70,16 +69,6 @@ export function PermissionsEditor({ role, onClose, onSave }: Props) {
         { id: 'billing.create', label: 'Crear facturas', description: 'Generar nuevas facturas' },
         { id: 'billing.edit', label: 'Editar facturas', description: 'Modificar facturas existentes' },
         { id: 'billing.delete', label: 'Anular facturas', description: 'Cancelar o anular facturas' },
-      ]
-    },
-    {
-      name: 'Reportes',
-      icon: <BarChart3 className="w-5 h-5" />,
-      color: 'from-blue-500 to-cyan-600',
-      permissions: [
-        { id: 'reports.view', label: 'Ver reportes', description: 'Consultar análisis y métricas' },
-        { id: 'reports.create', label: 'Crear reportes', description: 'Generar nuevos reportes' },
-        { id: 'reports.export', label: 'Exportar reportes', description: 'Descargar reportes en diferentes formatos' },
       ]
     },
     {
