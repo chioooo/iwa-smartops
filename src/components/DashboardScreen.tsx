@@ -10,6 +10,8 @@ import { InventoryScreen } from "./inventory/InventoryScreen";
 import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
 import { FinancesScreen } from "./finances/FinancesScreen";
+import { DeliveriesScreen } from "./deliveries/DeliveriesScreen";
+import SettingsScreen from "./SettingsScreen";
 
 export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -69,18 +71,15 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
 
         {activeSection === 'inventory' && <InventoryScreen />}
 
+        {activeSection === 'deliveries' && <DeliveriesScreen />}
+
         {activeSection === 'billing' && <BillingScreen />}
 
         {activeSection === 'reports' && <ReportsScreen />}
 
         {activeSection === 'finances' && <FinancesScreen />}
 
-        {activeSection === 'settings' && (
-          <div className="p-8">
-            <h1 className="text-gray-900 text-3xl mb-2">Configuración</h1>
-            <p className="text-gray-600">Módulo en desarrollo...</p>
-          </div>
-        )}
+        {activeSection === 'settings' && <SettingsScreen />}
 
         {/* Footer */}
         <footer className="mt-auto border-t border-gray-200 bg-white py-4">

@@ -1,6 +1,6 @@
 //import React from 'react';
 import { Package, Layers, Grid3x3, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import type {Product, Supply, Category} from "./InventoryScreen.tsx";
+import type { Product, Supply, Category } from '../../services/inventory/inventory.types';
 
 type Props = {
   products: Product[];
@@ -184,7 +184,7 @@ export function InventoryDashboard({ products, supplies, categories, lowStockCou
                   />
                   <p className="text-sm text-gray-900">{category.name}</p>
                 </div>
-                <p className="text-2xl text-gray-900 mb-1">{category.productsCount}</p>
+                <p className="text-2xl text-gray-900 mb-1">{categoryProducts.length}</p>
                 <p className="text-xs text-gray-600">{categoryStock} unidades en stock</p>
               </div>
             );

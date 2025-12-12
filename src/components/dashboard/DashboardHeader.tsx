@@ -20,7 +20,7 @@ export function DashboardHeader({ user, onLogout }: { user: any; onLogout: () =>
       <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8">
         {/* Title */}
         <div className="flex-1">
-          <h2 className="text-xl text-gray-900">iWA SmartOps Demo</h2>
+          <h2 className="text-xl text-gray-900">IWA SmartOps Demo</h2>
         </div>
 
         {/* Right Section */}

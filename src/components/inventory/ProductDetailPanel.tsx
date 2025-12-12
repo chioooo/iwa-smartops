@@ -1,5 +1,6 @@
 import { X, Package, DollarSign, Warehouse, Calendar, TrendingUp, TrendingDown, Edit2, AlertTriangle } from 'lucide-react';
-import type {Product, InventoryMovement} from './InventoryScreen';
+import type { Product, InventoryMovement } from '../../services/inventory/inventory.types';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   product: Product;
@@ -9,6 +10,8 @@ type Props = {
 };
 
 export function ProductDetailPanel({ product, movements, onClose, onEdit }: Props) {
+  useModalScrollLock();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', {
@@ -64,12 +67,17 @@ export function ProductDetailPanel({ product, movements, onClose, onEdit }: Prop
   const profitMargin = ((product.price - product.purchasePrice) / product.purchasePrice * 100).toFixed(1);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col my-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 flex-shrink-0">
-          <div className="flex items-start justify-between mb-4">
-            <h2 className="text-white">Detalle del Producto</h2>
+        <div className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 rounded-t-2xl text-white flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-white mb-1">Detalle del Producto</h2>
+              <p className="text-white/90 text-sm">
+                Información completa y movimientos del producto
+              </p>
+            </div>
             <button
               onClick={onClose}
               className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -77,23 +85,22 @@ export function ProductDetailPanel({ product, movements, onClose, onEdit }: Prop
               <X className="w-5 h-5" />
             </button>
           </div>
+        </div>
 
-          {/* Product Image & Name */}
-          <div className="flex flex-col items-center text-center">
-            <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-[#D0323A] to-[#9F2743] flex items-center justify-center text-white text-3xl mb-3 shadow-lg">
+        {/* Product Info */}
+        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex-shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-[#D0323A] to-[#9F2743] rounded-xl flex items-center justify-center text-white text-xl">
               {product.image}
             </div>
-            <h3 className="text-gray-900 mb-1">{product.name}</h3>
-            <p className="text-sm text-gray-600">{product.sku}</p>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                {product.category}
-              </span>
-              <div className="flex items-center gap-1">
+            <div className="flex-1">
+              <h3 className="text-gray-900">{product.name}</h3>
+              <p className="text-sm text-gray-600">{product.sku} • {product.category}</p>
+              <div className="flex items-center gap-1 mt-1">
                 <div className={`w-2 h-2 rounded-full ${
                   product.status === 'active' ? 'bg-green-500' : 'bg-gray-400'
                 }`} />
-                <span className={`text-sm ${
+                <span className={`text-xs ${
                   product.status === 'active' ? 'text-green-700' : 'text-gray-500'
                 }`}>
                   {product.status === 'active' ? 'Activo' : 'Inactivo'}
@@ -238,10 +245,16 @@ export function ProductDetailPanel({ product, movements, onClose, onEdit }: Prop
         </div>
 
         {/* Actions */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 rounded-b-xl">
+        <div className="flex gap-3 px-6 py-4 border-t border-gray-200 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Cerrar
+          </button>
           <button
             onClick={onEdit}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
           >
             <Edit2 className="w-4 h-4" />
             Editar Producto
