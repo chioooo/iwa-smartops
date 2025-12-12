@@ -1,22 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, Mail, Calendar, Shield, Key, Power, Edit2, Check } from 'lucide-react';
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  avatar?: string;
-};
-
-type Role = {
-  id: string;
-  name: string;
-  description: string;
-  permissions: string[];
-};
+import type {Role, User} from "../../data/types/users.types.ts";
 
 type Props = {
   user: User;
@@ -53,32 +37,32 @@ export function UserDetailsPanel({ user, roles, onClose, onUpdate }: Props) {
   const permissionCategories = [
     {
       name: 'Usuarios',
-      permissions: currentRole?.permissions.filter(p => p.startsWith('users.')) || []
+      permissions: currentRole?.permissions!.filter(p => p.startsWith('users.')) || []
     },
     {
       name: 'Inventario',
-      permissions: currentRole?.permissions.filter(p => p.startsWith('inventory.')) || []
+      permissions: currentRole?.permissions!.filter(p => p.startsWith('inventory.')) || []
     },
     {
       name: 'Facturación',
-      permissions: currentRole?.permissions.filter(p => p.startsWith('billing.')) || []
+      permissions: currentRole?.permissions!.filter(p => p.startsWith('billing.')) || []
     },
     {
       name: 'Operaciones',
-      permissions: currentRole?.permissions.filter(p => p.startsWith('operations.')) || []
+      permissions: currentRole?.permissions!.filter(p => p.startsWith('operations.')) || []
     },
     {
       name: 'Reportes',
-      permissions: currentRole?.permissions.filter(p => p.startsWith('reports.')) || []
+      permissions: currentRole?.permissions!.filter(p => p.startsWith('reports.')) || []
     },
     {
       name: 'Configuración',
-      permissions: currentRole?.permissions.filter(p => p.startsWith('settings.')) || []
+      permissions: currentRole?.permissions!.filter(p => p.startsWith('settings.')) || []
     }
   ].filter(cat => cat.permissions.length > 0);
 
   const getPermissionLabel = (permission: string) => {
-    const [category, action] = permission.split('.');
+    const [action] = permission.split('.');
     const actionLabels: Record<string, string> = {
       view: 'Ver',
       create: 'Crear',

@@ -1,8 +1,14 @@
 import express from 'express';
 import cors from 'cors';
+import crypto from 'crypto';
 import { EmailClient } from '@azure/communication-email';
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+
+// Polyfill para crypto en Node.js con ES modules
+if (!globalThis.crypto) {
+  globalThis.crypto = crypto;
+}
 
 dotenv.config();
 
