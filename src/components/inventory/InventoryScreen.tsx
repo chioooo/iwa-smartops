@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Package, Layers, Grid3x3, TrendingDown, X, Star, FileDown, Mail } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { useChatbot } from '../../contexts/ChatbotContext';
 import { InventoryDashboard } from './InventoryDashboard';
 import { ProductTable } from './ProductTable';
 import { SuppliesTable } from './SuppliesTable';
 import { CategoriesSection } from './CategoriesSection';
 import { ProductModal } from './ProductModal';
-import { InventoryAdjustmentModal } from './InventoryAdjustmentModal';
 import { ProductDetailPanel } from './ProductDetailPanel';
+import { InventoryAdjustmentModal } from './InventoryAdjustmentModal';
 import {
   buildInventoryAIResponse,
   type InventoryAIOption,
@@ -60,6 +61,7 @@ export type InventoryMovement = {
 };
 
 export function InventoryScreen() {
+  const { pendingAction, consumeAction, highlightedElement } = useChatbot();
   const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard'>('products');
   const [showProductModal, setShowProductModal] = useState(false);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
@@ -78,6 +80,16 @@ export function InventoryScreen() {
   const [emailAddress, setEmailAddress] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+
+  // Escuchar acciones del chatbot
+  useEffect(() => {
+    if (pendingAction === 'openCreateProduct') {
+      consumeAction();
+      setActiveTab('products');
+      setEditingProduct(null);
+      setShowProductModal(true);
+    }
+  }, [pendingAction, consumeAction]);
 
   useEffect(() => {
     if (!analysisDetail || !showAnalysisDetailModal) {
@@ -636,7 +648,7 @@ export function InventoryScreen() {
               
               <!-- Pie de email -->
               <p style="color: #999; font-size: 11px; margin-top: 20px;">
-                © ${new Date().getFullYear()} SmartOps - Todos los derechos reservados
+                &copy; ${new Date().getFullYear()} SmartOps - Todos los derechos reservados
               </p>
             </td>
           </tr>
@@ -672,11 +684,12 @@ export function InventoryScreen() {
               )}
               {activeTab === 'products' && (
                 <button
+                  id="btn-nuevo-producto"
                   onClick={() => {
                     setEditingProduct(null);
                     setShowProductModal(true);
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                  className={`flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors ${highlightedElement === 'btn-nuevo-producto' ? 'chatbot-highlight' : ''}`}
                 >
                   <Package className="w-5 h-5" />
                   Nuevo Producto

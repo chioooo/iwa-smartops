@@ -10,6 +10,7 @@ import { InventoryScreen } from "./inventory/InventoryScreen";
 import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
 import { FinancesScreen } from "./finances/FinancesScreen";
+import { ChatbotProvider } from "../contexts/ChatbotContext";
 
 export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -17,6 +18,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
   const [activeSection, setActiveSection] = useState('dashboard');
 
   return (
+    <ChatbotProvider onNavigate={setActiveSection}>
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar
@@ -39,7 +41,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
               {/* Welcome Section */}
               <div className="mb-8">
                 <h1 className="text-gray-900 text-3xl mb-2">
-                  Bienvenido, Juan Pérez
+                  Bienvenido, {localStorage.getItem('username')}
                 </h1>
                 <p className="text-gray-600">
                   Aquí está el resumen de tus operaciones de hoy
@@ -96,5 +98,6 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
       <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
       {!chatbotOpen && <ChatbotButton onClick={() => setChatbotOpen(true)} hasNotification={true} />}
     </div>
+    </ChatbotProvider>
   );
 }

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Receipt, Settings as SettingsIcon } from 'lucide-react';
+import { useChatbot } from '../../contexts/ChatbotContext';
 import { BillingDashboard } from './BillingDashboard';
 import { InvoiceTable } from './InvoiceTable';
 import { CreateInvoiceForm } from './CreateInvoiceForm';
@@ -50,12 +51,23 @@ export type Client = {
 };
 
 export function BillingScreen() {
+  const { pendingAction, consumeAction, highlightedElement } = useChatbot();
   const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'settings' | 'dashboard'>('invoices');
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+
+  // Escuchar acciones del chatbot
+  useEffect(() => {
+    if (pendingAction === 'openCreateInvoice') {
+      consumeAction();
+      setActiveTab('invoices');
+      setEditingInvoice(null);
+      setShowCreateInvoice(true);
+    }
+  }, [pendingAction, consumeAction]);
 
   // Mock data - clientes
   const [clients] = useState<Client[]>([
@@ -228,11 +240,12 @@ export function BillingScreen() {
             </div>
             {activeTab === 'invoices' && (
               <button
+                id="btn-nueva-factura"
                 onClick={() => {
                   setEditingInvoice(null);
                   setShowCreateInvoice(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                className={`flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors ${highlightedElement === 'btn-nueva-factura' ? 'chatbot-highlight' : ''}`}
               >
                 <Plus className="w-5 h-5" />
                 Nueva Factura
