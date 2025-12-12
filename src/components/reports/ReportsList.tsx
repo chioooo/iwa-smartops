@@ -1,30 +1,54 @@
 import React, { useState } from 'react';
-import { Search, Download, Eye, FileText, FileSpreadsheet, File, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import type {Report} from './ReportsScreen';
+import { Search, Download, Eye, FileText, FileSpreadsheet, ChevronLeft, ChevronRight, Clock, CheckCircle, AlertCircle, Filter, ChevronDown } from 'lucide-react';
+import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
   reports: Report[];
   onSelectReport: (report: Report) => void;
   selectedReportId?: string;
+  onOpenFilters: () => void;
+  advancedFilters: ReportFilters;
 };
 
-export function ReportsList({ reports, onSelectReport, selectedReportId }: Props) {
+export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenFilters, advancedFilters }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTipo, setFilterTipo] = useState('all');
-  const [filterEstado, setFilterEstado] = useState('all');
+  const [filterType, setFilterType] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const isDateInRange = (dateString: string, startDate?: string, endDate?: string): boolean => {
+    if (!startDate || !endDate) return true;
+    
+    const reportDateOnly = new Date(dateString).toISOString().split('T')[0];
+    
+    return reportDateOnly >= startDate && reportDateOnly <= endDate;
+  };
 
   // Filtrado
   const filteredReports = reports.filter(report => {
     const matchesSearch =
-      report.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.generadoPor.toLowerCase().includes(searchQuery.toLowerCase());
+      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      report.generatedBy.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesTipo = filterTipo === 'all' || report.tipo === filterTipo;
-    const matchesEstado = filterEstado === 'all' || report.estado === filterEstado;
+    const matchesTipo = filterType === 'all' || report.tipo === filterType;
+    const matchesEstado = filterStatus === 'all' || report.status === filterStatus;
 
-    return matchesSearch && matchesTipo && matchesEstado;
+    const matchesDates = isDateInRange(
+      report.generationDate, 
+      advancedFilters.startDate, 
+      advancedFilters.endDate
+    );
+
+    const matchesBranch = !advancedFilters.branch || report.parameters.branch === advancedFilters.branch;
+
+    const matchesCategory = !advancedFilters.category || report.parameters.category === advancedFilters.category;
+
+    const matchesUser = !advancedFilters.user || report.generatedBy === advancedFilters.user;
+
+    const matchesClient = !advancedFilters.client || report.parameters.client === advancedFilters.client;
+
+    return matchesSearch && matchesTipo && matchesEstado && matchesDates && matchesBranch && matchesCategory && matchesUser && matchesClient;
   });
 
   const totalPages = Math.ceil(filteredReports.length / itemsPerPage);
@@ -42,7 +66,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
     });
   };
 
-  const getTipoLabel = (tipo: Report['tipo']) => {
+  const getTypeLabel = (tipo: Report['tipo']) => {
     const labels = {
       ventas: 'Ventas',
       inventario: 'Inventario',
@@ -54,7 +78,7 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
     return labels[tipo];
   };
 
-  const getTipoBadge = (tipo: Report['tipo']) => {
+  const getTypeBadge = (tipo: Report['tipo']) => {
     const badges = {
       ventas: 'bg-green-50 text-green-700 border-green-200',
       inventario: 'bg-blue-50 text-blue-700 border-blue-200',
@@ -66,34 +90,33 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
     return badges[tipo];
   };
 
-  const getEstadoBadge = (estado: Report['estado']) => {
+  const getStatusBadge = (status: Report['status']) => {
     const badges = {
       disponible: { icon: CheckCircle, color: 'bg-green-50 text-green-700 border-green-200', label: 'Disponible' },
       proceso: { icon: Clock, color: 'bg-blue-50 text-blue-700 border-blue-200', label: 'Procesando' },
       error: { icon: AlertCircle, color: 'bg-red-50 text-red-700 border-red-200', label: 'Error' }
     };
-    return badges[estado];
+    return badges[status];
   };
 
-  const getFormatoIcon = (formato: Report['formato']) => {
+  const getFormatIcon = (format: Report['format']) => {
     const icons = {
       pdf: FileText,
-      excel: FileSpreadsheet,
-      csv: File
+      excel: FileSpreadsheet
     };
-    return icons[formato];
+    return icons[format];
   };
 
   const handleDownload = (report: Report, e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Descargando reporte: ${report.nombre}`);
+    alert(`Descargando reporte: ${report.name}`);
   };
 
   return (
     <div className="space-y-6">
       {/* Filters Bar */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -107,31 +130,46 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
           </div>
 
           {/* Tipo Filter */}
-          <select
-            value={filterTipo}
-            onChange={(e) => setFilterTipo(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-          >
-            <option value="all">Todos los tipos</option>
-            <option value="ventas">Ventas</option>
-            <option value="inventario">Inventario</option>
-            <option value="facturacion">Facturación</option>
-            <option value="servicios">Servicios</option>
-            <option value="clientes">Clientes</option>
-            <option value="utilidades">Utilidades</option>
-          </select>
+          <div className='relative'>
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+            >
+              <option value="all">Todos los tipos</option>
+              <option value="ventas">Ventas</option>
+              <option value="inventario">Inventario</option>
+              <option value="facturacion">Facturación</option>
+              <option value="servicios">Servicios</option>
+              <option value="clientes">Clientes</option>
+              <option value="utilidades">Utilidades</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+          </div>
 
           {/* Estado Filter */}
-          <select
-            value={filterEstado}
-            onChange={(e) => setFilterEstado(e.target.value)}
-            className="px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+          <div className='relative'>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+            >
+              <option value="all">Todos los estados</option>
+              <option value="disponible">Disponible</option>
+              <option value="proceso">En proceso</option>
+              <option value="error">Error</option>
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+          </div>
+
+          {/* Botón Filtros Avanzados */}
+          <button
+            onClick={onOpenFilters}
+            className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            <option value="all">Todos los estados</option>
-            <option value="disponible">Disponible</option>
-            <option value="proceso">En proceso</option>
-            <option value="error">Error</option>
-          </select>
+            <Filter className="w-5 h-5"/>
+            Filtros Avanzados
+          </button>
         </div>
       </div>
 
@@ -152,9 +190,9 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
             </thead>
             <tbody>
               {currentReports.map((report) => {
-                const estadoBadge = getEstadoBadge(report.estado);
-                const EstadoIcon = estadoBadge.icon;
-                const FormatoIcon = getFormatoIcon(report.formato);
+                const statusBadge = getStatusBadge(report.status);
+                const StatusIcon = statusBadge.icon;
+                const FormatIcon = getFormatIcon(report.format);
 
                 return (
                   <tr
@@ -171,80 +209,79 @@ export function ReportsList({ reports, onSelectReport, selectedReportId }: Props
                           <FileText className="w-4 h-4 text-white" />
                         </div>
                         <div>
-                          <p className="text-gray-900">{report.nombre}</p>
-                          <p className="text-xs text-gray-500">ID: {report.id}</p>
+                          <p className="text-gray-900">{report.name}</p>
                         </div>
                       </div>
                     </td>
 
                     {/* Tipo */}
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs border ${getTipoBadge(report.tipo)}`}>
-                        {getTipoLabel(report.tipo)}
+                      <span className={`px-3 py-1 rounded-full text-xs border ${getTypeBadge(report.tipo)}`}>
+                        {getTypeLabel(report.tipo)}
                       </span>
                     </td>
 
                     {/* Fecha */}
                     <td className="px-6 py-4">
-                      <span className="text-gray-600 text-sm">{formatDate(report.fechaGeneracion)}</span>
+                      <span className="text-gray-600 text-sm">{formatDate(report.generationDate)}</span>
                     </td>
 
                     {/* Generado por */}
                     <td className="px-6 py-4">
-                      <span className="text-gray-900">{report.generadoPor}</span>
+                      <span className="text-gray-900">{report.generatedBy}</span>
                     </td>
 
                     {/* Estado */}
                     <td className="px-6 py-4">
-                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border ${estadoBadge.color}`}>
-                        <EstadoIcon className="w-3.5 h-3.5" />
-                        {estadoBadge.label}
+                      <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border ${statusBadge.color}`}>
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        {statusBadge.label}
                       </div>
                     </td>
 
                     {/* Formato */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <FormatoIcon className="w-4 h-4 text-gray-600" />
-                        <span className="text-gray-600 text-sm uppercase">{report.formato}</span>
+                        <FormatIcon className="w-4 h-4 text-gray-600" />
+                        <span className="text-gray-600 text-sm uppercase">{report.format}</span>
                       </div>
                     </td>
 
                     {/* Acciones */}
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectReport(report);
-                          }}
-                          className="p-2 text-gray-600 hover:text-[#D0323A] hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Ver detalles"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {report.estado === 'disponible' && (
+                        {report.status === 'disponible' && (
                           <>
+                            {/* Botón de vista de detalles - para PDF y Excel */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onSelectReport(report);
+                              }}
+                              className="p-2 text-gray-600 hover:text-[#D0323A] hover:bg-gray-100 rounded-lg transition-colors"
+                              title="Ver detalles"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
+                            {/* Botón de descarga */}
                             <button
                               onClick={(e) => handleDownload(report, e)}
                               className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-                              title={`Descargar ${report.formato.toUpperCase()}`}
+                              title={`Descargar ${report.format.toUpperCase()}`}
                             >
                               <Download className="w-4 h-4" />
                             </button>
-                            {report.formato === 'pdf' && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  alert('Abriendo vista previa...');
-                                }}
-                                className="p-2 text-gray-600 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="Vista previa"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                            )}
                           </>
+                        )}
+                        {report.status === 'proceso' && (
+                          <div className="p-2 text-gray-400">
+                            <Clock className="w-4 h-4 animate-spin" />
+                          </div>
+                        )}
+                        {report.status === 'error' && (
+                          <div className="p-2 text-red-500" title="Error al generar el reporte">
+                            <AlertCircle className="w-4 h-4" />
+                          </div>
                         )}
                       </div>
                     </td>

@@ -1,26 +1,29 @@
 import React, { useState } from 'react';
-import { X, FileText, Calendar, Filter, Download } from 'lucide-react';
+import { X, FileText, Calendar, Filter, Download, ChevronDown } from 'lucide-react';
 import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
   onClose: () => void;
-  onCreate: (reportData: Omit<Report, 'id' | 'fechaGeneracion' | 'estado'>) => void;
+  onCreate: (reportData: Omit<Report, 'id' | 'generationDate' | 'status'>) => void;
 };
+
+const getDateString = (date: Date) => date.toLocaleDateString('en-CA');
 
 export function CreateReportModal({ onClose, onCreate }: Props) {
   const [formData, setFormData] = useState({
-    nombre: '',
     tipo: 'ventas' as Report['tipo'],
-    formato: 'pdf' as Report['formato'],
-    generadoPor: 'Juan Pérez'
+    format: 'pdf' as Report['format'],
+    generatedBy: 'Juan Pérez'
   });
 
   const [filters, setFilters] = useState<ReportFilters>({
-    fechaInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-    fechaFin: new Date().toISOString().split('T')[0],
+      startDate: getDateString(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+      endDate: getDateString(new Date())
   });
 
-  const tiposReporte = [
+  const [dateError, setDateError] = useState<string>('');
+
+  const reportTypes = [
     { value: 'ventas', label: 'Reporte de Ventas', description: 'Análisis de ventas, ingresos y tendencias' },
     { value: 'inventario', label: 'Reporte de Inventario', description: 'Stock, rotación y movimientos de productos' },
     { value: 'facturacion', label: 'Reporte de Facturación', description: 'Facturas emitidas, CFDI y totales fiscales' },
@@ -29,26 +32,108 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
     { value: 'utilidades', label: 'Reporte de Utilidades', description: 'Ingresos, egresos y margen de ganancia' }
   ];
 
+  const todayDate = getDateString(new Date());
+
+  const parseDate = (isoDate: string) => {
+    const [year, month, day] = isoDate.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  const formatMonthYear = (isoDate: string) => {
+    return parseDate(isoDate).toLocaleDateString('es-MX', { 
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+
+  const getMonthAndYear = (isoDate: string) => {
+    const date = parseDate(isoDate);
+    return {
+      month: date.toLocaleDateString('es-MX', { month: 'short' }),
+      year: date.getFullYear().toString()
+    };
+  };
+
+  const formatReportName = (startDate: string, endDate: string, reportLabel: string): string => {
+    const { month: startMonth, year: startYear } = getMonthAndYear(startDate);
+    const { month: endMonth, year: endYear } = getMonthAndYear(endDate);
+
+    if (startYear === endYear && startMonth === endMonth) {
+      return `${reportLabel} - ${formatMonthYear(startDate)}`;
+    }
+
+    if (startYear === endYear) {
+      return `${reportLabel} - ${startMonth} a ${endMonth} ${startYear}`;
+    }
+
+    return `${reportLabel} - ${formatMonthYear(startDate)} a ${formatMonthYear(endDate)}`;
+  };
+
+  const formatDatePreview = (isoDate: string) => {
+    return isoDate?.split('-').reverse().join('/') || '';
+  };
+
+  const selectedType = reportTypes.find(t => t.value === formData.tipo);
+
+  const validateDates = (startDate: string, endDate: string): string => {
+    if (!startDate || !endDate) {
+      return 'Por favor selecciona un rango de fechas válido';
+    }
+
+    if (startDate > todayDate) {
+      return `La fecha de inicio no puede ser mayor a la fecha actual (${formatDatePreview(todayDate)})`;
+    }
+
+    if (endDate > todayDate) {
+      return `La fecha de fin no puede ser mayor a la fecha actual (${formatDatePreview(todayDate)})`;
+    }
+
+    if (startDate > endDate) {
+      return 'La fecha de inicio no puede ser mayor a la fecha de fin';
+    }
+
+    return '';
+  };
+
+  const handleDateChange = (field: 'startDate' | 'endDate', value: string) => {
+    const updates: Partial<ReportFilters> = { [field]: value };
+    
+    if (field === 'startDate' && filters.endDate && value > filters.endDate) {
+      updates.endDate = value;
+    } else if (field === 'endDate' && filters.startDate && value < filters.startDate) {
+      updates.startDate = value;
+    }
+    
+    const newFilters = { ...filters, ...updates };
+    setFilters(newFilters);
+    
+    const error = validateDates(newFilters.startDate || '', newFilters.endDate || '');
+    setDateError(error);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.nombre) {
-      alert('Por favor ingresa un nombre para el reporte');
+    if (!selectedType) {
+      setDateError('Por favor selecciona un tipo de reporte válido');
       return;
     }
 
-    const reportData: Omit<Report, 'id' | 'fechaGeneracion' | 'estado'> = {
-      nombre: formData.nombre,
+    const error = validateDates(filters.startDate || '', filters.endDate || '');
+    if (error) {
+      setDateError(error);
+      return;
+    }
+
+    setDateError('');
+    onCreate({
+      name: formatReportName(filters.startDate!, filters.endDate!, selectedType.label),
       tipo: formData.tipo,
-      formato: formData.formato,
-      generadoPor: formData.generadoPor,
-      parametros: filters
-    };
-
-    onCreate(reportData);
+      format: formData.format,
+      generatedBy: formData.generatedBy,
+      parameters: filters
+    });
   };
-
-  const tipoSeleccionado = tiposReporte.find(t => t.value === formData.tipo);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -77,27 +162,13 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6">
           <div className="space-y-6">
-            {/* Nombre del reporte */}
-            <div>
-              <label className="block text-sm text-gray-700 mb-2">
-                Nombre del reporte *
-              </label>
-              <input
-                type="text"
-                value={formData.nombre}
-                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
-                placeholder="Ej: Reporte de Ventas - Noviembre 2024"
-              />
-            </div>
-
             {/* Tipo de reporte */}
             <div>
               <label className="block text-sm text-gray-700 mb-3">
                 Tipo de reporte *
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {tiposReporte.map((tipo) => (
+                {reportTypes.map((tipo) => (
                   <label
                     key={tipo.value}
                     className={`relative flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all ${
@@ -141,21 +212,32 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha inicio</label>
                   <input
                     type="date"
-                    value={filters.fechaInicio}
-                    onChange={(e) => setFilters({ ...filters, fechaInicio: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
+                    value={filters.startDate}
+                    max={filters.endDate || todayDate}
+                    onChange={(e) => handleDateChange('startDate', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent ${
+                      dateError ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   />
                 </div>
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Fecha fin</label>
                   <input
                     type="date"
-                    value={filters.fechaFin}
-                    onChange={(e) => setFilters({ ...filters, fechaFin: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
+                    value={filters.endDate}
+                    max={todayDate}
+                    onChange={(e) => handleDateChange('endDate', e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent ${
+                      dateError ? 'border-red-300' : 'border-gray-300'
+                    }`}
                   />
                 </div>
               </div>
+              {dateError && (
+                <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">{dateError}</p>
+                </div>
+              )}
             </div>
 
             {/* Filtros específicos */}
@@ -169,64 +251,76 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Sucursal */}
                 <div>
-                  <label className="block text-xs text-gray-600 mb-2">Sucursal</label>
-                  <select
-                    value={filters.sucursal || ''}
-                    onChange={(e) => setFilters({ ...filters, sucursal: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todas las sucursales</option>
-                    <option value="Principal">Almacén Principal</option>
-                    <option value="Secundario">Almacén Secundario</option>
-                    <option value="Norte">Sucursal Norte</option>
-                    <option value="Sur">Sucursal Sur</option>
-                  </select>
+                    <label className="block text-xs text-gray-600 mb-2">Sucursal</label>
+                  <div className='relative'>
+                    <select
+                      value={filters.branch || ''}
+                      onChange={(e) => setFilters({ ...filters, branch: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todas las sucursales</option>
+                      <option value="Principal">Almacén Principal</option>
+                      <option value="Secundario">Almacén Secundario</option>
+                      <option value="Norte">Sucursal Norte</option>
+                      <option value="Sur">Sucursal Sur</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
 
                 {/* Categoría */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Categoría</label>
-                  <select
-                    value={filters.categoria || ''}
-                    onChange={(e) => setFilters({ ...filters, categoria: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todas las categorías</option>
-                    <option value="Tecnología">Tecnología</option>
-                    <option value="Mobiliario">Mobiliario</option>
-                    <option value="Papelería">Papelería</option>
-                    <option value="Consumibles">Consumibles</option>
-                  </select>
+                  <div className='relative'>
+                    <select
+                      value={filters.category || ''}
+                      onChange={(e) => setFilters({ ...filters, category: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todas las categorías</option>
+                      <option value="Tecnología">Tecnología</option>
+                      <option value="Mobiliario">Mobiliario</option>
+                      <option value="Papelería">Papelería</option>
+                      <option value="Consumibles">Consumibles</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
 
                 {/* Usuario */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Usuario / Operador</label>
-                  <select
-                    value={filters.usuario || ''}
-                    onChange={(e) => setFilters({ ...filters, usuario: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todos los usuarios</option>
-                    <option value="Juan Pérez">Juan Pérez</option>
-                    <option value="María González">María González</option>
-                    <option value="Carlos Ruiz">Carlos Ruiz</option>
-                  </select>
+                  <div className='relative'>
+                    <select
+                      value={filters.user || ''}
+                      onChange={(e) => setFilters({ ...filters, user: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todos los usuarios</option>
+                      <option value="Juan Pérez">Juan Pérez</option>
+                      <option value="María González">María González</option>
+                      <option value="Carlos Ruiz">Carlos Ruiz</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
 
                 {/* Cliente */}
                 <div>
                   <label className="block text-xs text-gray-600 mb-2">Cliente</label>
-                  <select
-                    value={filters.cliente || ''}
-                    onChange={(e) => setFilters({ ...filters, cliente: e.target.value || undefined })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-                  >
-                    <option value="">Todos los clientes</option>
-                    <option value="Acme Corporation">Acme Corporation</option>
-                    <option value="TechSolutions">TechSolutions México</option>
-                    <option value="Distribuidora">Distribuidora Nacional</option>
-                  </select>
+                  <div className='relative'>
+                    <select
+                      value={filters.client || ''}
+                      onChange={(e) => setFilters({ ...filters, client: e.target.value || undefined })}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                    >
+                      <option value="">Todos los clientes</option>
+                      <option value="Acme Corporation">Acme Corporation</option>
+                      <option value="TechSolutions">TechSolutions México</option>
+                      <option value="Distribuidora">Distribuidora Nacional</option>
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -239,62 +333,43 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   Formato de salida *
                 </label>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <label
                   className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.formato === 'pdf'
+                    formData.format === 'pdf'
                       ? 'border-[#D0323A] bg-red-50'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                 >
                   <input
                     type="radio"
-                    name="formato"
+                    name="format"
                     value="pdf"
-                    checked={formData.formato === 'pdf'}
-                    onChange={(e) => setFormData({ ...formData, formato: e.target.value as Report['formato'] })}
+                    checked={formData.format === 'pdf'}
+                    onChange={(e) => setFormData({ ...formData, format: e.target.value as Report['format'] })}
                     className="sr-only"
                   />
-                  <FileText className={`w-8 h-8 mb-2 ${formData.formato === 'pdf' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
+                  <FileText className={`w-8 h-8 mb-2 ${formData.format === 'pdf' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
                   <span className="text-sm text-gray-900">PDF</span>
                 </label>
 
                 <label
                   className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.formato === 'excel'
+                    formData.format === 'excel'
                       ? 'border-[#D0323A] bg-red-50'
                       : 'border-gray-200 hover:border-gray-300 bg-white'
                   }`}
                 >
                   <input
                     type="radio"
-                    name="formato"
+                    name="format"
                     value="excel"
-                    checked={formData.formato === 'excel'}
-                    onChange={(e) => setFormData({ ...formData, formato: e.target.value as Report['formato'] })}
+                    checked={formData.format === 'excel'}
+                    onChange={(e) => setFormData({ ...formData, format: e.target.value as Report['format'] })}
                     className="sr-only"
                   />
-                  <Download className={`w-8 h-8 mb-2 ${formData.formato === 'excel' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
+                  <Download className={`w-8 h-8 mb-2 ${formData.format === 'excel' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
                   <span className="text-sm text-gray-900">Excel</span>
-                </label>
-
-                <label
-                  className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.formato === 'csv'
-                      ? 'border-[#D0323A] bg-red-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="formato"
-                    value="csv"
-                    checked={formData.formato === 'csv'}
-                    onChange={(e) => setFormData({ ...formData, formato: e.target.value as Report['formato'] })}
-                    className="sr-only"
-                  />
-                  <Download className={`w-8 h-8 mb-2 ${formData.formato === 'csv' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
-                  <span className="text-sm text-gray-900">CSV</span>
                 </label>
               </div>
             </div>
@@ -303,11 +378,11 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
               <h4 className="text-sm text-gray-900 mb-2">Vista previa de configuración</h4>
               <div className="space-y-1 text-xs text-gray-700">
-                <p><strong>Tipo:</strong> {tipoSeleccionado?.label}</p>
-                <p><strong>Periodo:</strong> {new Date(filters.fechaInicio!).toLocaleDateString('es-MX')} - {new Date(filters.fechaFin!).toLocaleDateString('es-MX')}</p>
-                {filters.sucursal && <p><strong>Sucursal:</strong> {filters.sucursal}</p>}
-                {filters.categoria && <p><strong>Categoría:</strong> {filters.categoria}</p>}
-                <p><strong>Formato:</strong> {formData.formato.toUpperCase()}</p>
+                <p><strong>Tipo:</strong> {selectedType?.label}</p>
+                <p><strong>Periodo:</strong> {formatDatePreview(filters.startDate || '')} - {formatDatePreview(filters.endDate || '')}</p>
+                {filters.branch && <p><strong>Sucursal:</strong> {filters.branch}</p>}
+                {filters.category && <p><strong>Categoría:</strong> {filters.category}</p>}
+                <p><strong>Formato:</strong> {formData.format.toUpperCase()}</p>
               </div>
             </div>
           </div>
