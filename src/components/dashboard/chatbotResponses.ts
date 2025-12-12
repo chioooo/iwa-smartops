@@ -68,7 +68,7 @@ const responseCatalog: Record<string, ResponseCategory> = {
     ],
   },
   crearProducto: {
-    keywords: ['crear producto', 'nuevo producto', 'agregar producto', 'añadir producto', 'registrar producto'],
+    keywords: ['crear un producto', 'nuevo producto', 'agregar un producto', 'añadir un producto', 'registrar un producto', 'crear producto'],
     responses: [
       () => ({ text: '¡Perfecto! Te llevo al inventario para crear un nuevo producto.', action: { type: 'trigger', section: 'inventory', elementId: 'btn-nuevo-producto', triggerAction: 'openCreateProduct' } }),
       () => ({ text: 'Claro, vamos a agregar un nuevo producto.', action: { type: 'trigger', section: 'inventory', elementId: 'btn-nuevo-producto', triggerAction: 'openCreateProduct' } }),
