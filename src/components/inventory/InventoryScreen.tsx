@@ -571,11 +571,16 @@ export function InventoryScreen({ user }: { user: User }) {
               )}
               {activeTab === 'supplies' && (
                 <button
+                    disabled={!hasPermission("inventory.createS")}
                   onClick={() => {
                   setEditingSupply(null);
                   setShowSupplyModal(true);
                 }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
+                    ${hasPermission("inventory.createP")
+                        ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                 >
                   <Layers className="w-5 h-5" />
                   Nuevo Insumo
