@@ -164,16 +164,55 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
 
       <div className="p-4 border-t border-gray-200">
         <strong className="text-sm text-gray-900">Detalle por tramo:</strong>
-        <ul className="mt-2 space-y-1 text-sm text-gray-700">
-          {legs.map((leg, index) => (
-            <li key={leg.id}>
-              Tramo {index + 1} → {leg.destination}: {leg.distanceKm} km, {leg.durationMin} min
-            </li>
-          ))}
-          {legs.length === 0 && !loading && (
-            <li className="text-gray-500">No hay tramos para mostrar.</li>
-          )}
-        </ul>
+
+        <div className="mt-3 overflow-x-auto border border-gray-200 rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tramo</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kilómetros</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tiempo estimado</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notificar</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {legs.map((leg, index) => (
+                <tr key={leg.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
+                  <td className="px-4 py-3 text-sm text-gray-900">{leg.destination}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{leg.distanceKm} km</td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{leg.durationMin} min</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {}}
+                        className="px-3 py-1.5 text-sm rounded-lg bg-green-500 text-white hover:bg-green-700 transition-colors"
+                      >
+                        Whatsapp
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {}}
+                        className="px-3 py-1.5 text-sm rounded-lg bg-blue-500 text-white hover:bg-gray-200 transition-colors"
+                      >
+                        SMS
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {legs.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={5} className="px-4 py-6 text-sm text-gray-500 text-center">
+                    No hay tramos para mostrar.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
