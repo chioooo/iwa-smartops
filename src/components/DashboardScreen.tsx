@@ -26,6 +26,7 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
         onToggle={() => setSidebarOpen(!sidebarOpen)}
         activeSection={activeSection}
         onNavigate={setActiveSection}
+        user={user}
       />
 
       {/* Main Content */}
@@ -73,7 +74,7 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
 
         {activeSection === 'deliveries' && <DeliveriesScreen />}
 
-        {activeSection === 'billing' && <BillingScreen />}
+        {activeSection === 'billing' && <BillingScreen user={user} />}
 
         {activeSection === 'reports' && <ReportsScreen />}
 

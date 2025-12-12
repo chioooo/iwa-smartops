@@ -6,6 +6,8 @@ import { CreateInvoiceForm } from './CreateInvoiceForm';
 import { InvoiceDetailPanel } from './InvoiceDetailPanel';
 import { CancelInvoiceModal } from './CancelInvoiceModal';
 import { PaymentComplementForm } from './PaymentComplementForm';
+import type {User} from "../../data/types/users.types.ts";
+import {usePermissions} from "../../hooks/usePermissions.tsx";
 
 export type Invoice = {
   id: string;
@@ -48,13 +50,14 @@ export type Client = {
   email?: string;
 };
 
-export function BillingScreen() {
+export function BillingScreen({ user }: { user: User }) {
   const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'settings' | 'dashboard'>('invoices');
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
+  const { hasPermission } = usePermissions(user);
 
   // Mock data - clientes
   const [clients] = useState<Client[]>([
@@ -227,11 +230,16 @@ export function BillingScreen() {
             </div>
             {activeTab === 'invoices' && (
               <button
+                  disabled={!hasPermission("billing.create")}
                 onClick={() => {
                   setEditingInvoice(null);
                   setShowCreateInvoice(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
+                    ${hasPermission("billing.create")
+                      ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
               >
                 <Plus className="w-5 h-5" />
                 Nueva Factura
