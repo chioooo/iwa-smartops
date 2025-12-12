@@ -222,20 +222,19 @@ export function UsersScreen() {
                       </div>
 
                         <div className="relative">
-                        <select
-                            value={filterRole}
-                            onChange={(e) => setFilterRole(e.target.value)}
-                            className="appearance-none px-4 py-2.5 border border-gray-300
-                              rounded-lg bg-white pr-10">
-                          <option value="all">Todos los roles</option>
-                          {roles.map((r) => (
-                              <option key={r.id} value={r.name}>
-                                {r.name}
-                              </option>
-                          ))}
-                        </select>
-
-                        <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          <select
+                              value={filterRole}
+                              onChange={(e) => setFilterRole(e.target.value)}
+                              className="appearance-none px-4 py-2.5 border border-gray-300
+                                rounded-lg bg-white pr-10">
+                            <option value="all">Todos los roles</option>
+                            {roles.map((r) => (
+                                <option key={r.id} value={r.name}>
+                                  {r.name}
+                                </option>
+                            ))}
+                          </select>
+                            <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
 
                         <div className="relative">

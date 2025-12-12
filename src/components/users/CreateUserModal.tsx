@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {X, User, Mail, Shield, Lock, AlertCircle} from 'lucide-react';
+import {X, User, Mail, Shield, Lock, AlertCircle, ChevronDown} from 'lucide-react';
 import type {Role} from "../../data/types/users.types.ts";
 
 type Props = {
@@ -14,7 +14,7 @@ export function CreateUserModal({roles, onClose, onCreate, onUpdate, initialData
     const [formData, setFormData] = useState({
         name: initialData?.name || '',
         email: initialData?.email || '',
-        role: initialData?.roleId || roles[0]?.id || '',
+        role: initialData?.roleId || '',
         status: initialData?.status || 'active',
         password: '',
         confirmPassword: ''
@@ -194,6 +194,7 @@ export function CreateUserModal({roles, onClose, onCreate, onUpdate, initialData
                                         </option>
                                     ))}
                                 </select>
+                                <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                             </div>
                             {errors.role && (
                                 <p className="mt-1.5 text-sm text-red-600 flex items-center gap-1">
