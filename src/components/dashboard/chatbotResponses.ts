@@ -31,7 +31,9 @@ const getInventoryData = () => {
       const totalValue = products.reduce((sum, p) => sum + (p.price * p.stock), 0);
       return { total: products.length, lowStock: lowStock.length, totalValue };
     }
-  } catch { }
+  } catch (error) {
+    console.error('Error in getInventoryData:', error);
+  }
   return { total: 5, lowStock: 3, totalValue: 25899.77 };
 };
 
