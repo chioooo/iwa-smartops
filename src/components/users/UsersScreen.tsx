@@ -102,8 +102,13 @@ export function UsersScreen() {
   };
 
   const handleUpdatePermissions = (roleId: string, permissions: string[]) => {
+    const role = roles.find(r => r.id === roleId);
+    if (!role) {
+      return;
+    }
+
     const updatedRole = {
-      ...roles.find(r => r.id === roleId)!,
+      ...role,
       permissions,
       permissionsCount: permissions.length,
     };
