@@ -301,7 +301,7 @@ export function InventoryScreen() {
   };
 
   const handleUpdateProduct = (productId: string, updates: Partial<Product>) => {
-    setProducts(products.map(p => p.id === productId ? { ...p, ...updates } : p));
+    setProducts(prevProducts  => prevProducts .map(p => p.id === productId ? { ...p, ...updates } : p));
     if (selectedProduct?.id === productId) {
       setSelectedProduct({ ...selectedProduct, ...updates });
     }
