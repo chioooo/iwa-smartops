@@ -51,10 +51,14 @@ export function PermissionsEditor({ role, onClose, onSave }: Props) {
       icon: <Package className="w-5 h-5" />,
       color: 'from-[#F6A016] to-[#E9540D]',
       permissions: [
-        { id: 'inventory.view', label: 'Ver inventario', description: 'Consultar productos y stock' },
-        { id: 'inventory.create', label: 'Crear productos', description: 'Agregar nuevos productos' },
-        { id: 'inventory.edit', label: 'Editar inventario', description: 'Modificar productos y stock' },
-        { id: 'inventory.delete', label: 'Eliminar productos', description: 'Borrar productos del inventario' },
+        { id: 'inventory.viewP', label: 'Ver productos', description: 'Consultar productos y stock' },
+        { id: 'inventory.createP', label: 'Crear productos', description: 'Agregar nuevos productos' },
+        { id: 'inventory.editP', label: 'Editar productos', description: 'Modificar productos y stock' },
+        { id: 'inventory.deleteP', label: 'Eliminar productos', description: 'Borrar productos del inventario' },
+        { id: 'inventory.viewS', label: 'Ver insumos', description: 'Consultar insumos y stock' },
+        { id: 'inventory.createS', label: 'Crear insumos', description: 'Agregar nuevos insumos' },
+        { id: 'inventory.editS', label: 'Editar insumos', description: 'Modificar insumos y stock' },
+        { id: 'inventory.deleteS', label: 'Eliminar insumos', description: 'Borrar insumos del inventario' },
       ]
     },
     {

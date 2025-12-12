@@ -62,7 +62,7 @@ export const DEMO_ROLES: Role[] = [
         usersCount: 2,
         permissions: [
             'users.view', 'users.create', 'users.edit', 'users.delete',
-            'inventory.view', 'inventory.create',
+            'inventory.viewP', 'inventory.createP',
             'billing.view', 'billing.create',
             'reports.view',
             'settings.edit'
@@ -76,7 +76,7 @@ export const DEMO_ROLES: Role[] = [
         usersCount: 2,
         permissions: [
             'users.view',
-            'inventory.view',
+            'inventory.viewP',
             'billing.view',
             'reports.view'
         ]
@@ -88,8 +88,8 @@ export const DEMO_ROLES: Role[] = [
         permissionsCount: 16,
         usersCount: 1,
         permissions: [
-            'inventory.view', 'inventory.create', 'inventory.edit',
-            'operations.view', 'operations.create',
+            'inventory.viewP', 'inventory.createP', 'inventory.editP',
+            'operations.viewP', 'operations.createP',
             'billing.view'
         ]
     },
