@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Shield, Search, Plus, Filter } from 'lucide-react';
+import {Users, Shield, Search, Plus, ChevronDown} from 'lucide-react';
 import { UserTable } from './UserTable';
 import { RolesSection } from './RolesSection';
 import { CreateUserModal } from './CreateUserModal';
@@ -221,32 +221,34 @@ export function UsersScreen() {
                         />
                       </div>
 
-                      <div className="flex items-center gap-2">
-                        <Filter className="w-5 h-5 text-gray-400" />
+                        <div className="relative">
                         <select
                             value={filterRole}
                             onChange={(e) => setFilterRole(e.target.value)}
-                            className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white"
-                        >
+                            className="appearance-none px-4 py-2.5 border border-gray-300
+                              rounded-lg bg-white pr-10">
                           <option value="all">Todos los roles</option>
-
                           {roles.map((r) => (
                               <option key={r.id} value={r.name}>
                                 {r.name}
                               </option>
                           ))}
                         </select>
-                      </div>
 
-                      <select
-                          value={filterStatus}
-                          onChange={(e) => setFilterStatus(e.target.value)}
-                          className="px-4 py-2.5 border border-gray-300 rounded-lg bg-white"
-                      >
-                        <option value="all">Todos los estados</option>
-                        <option value="active">Activos</option>
-                        <option value="inactive">Inactivos</option>
-                      </select>
+                        <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
+
+                        <div className="relative">
+                            <select
+                                value={filterStatus}
+                                onChange={(e) => setFilterStatus(e.target.value)}
+                                className="appearance-none px-4 py-2.5 border border-gray-300 rounded-lg bg-white pr-10 text-gray-700">
+                                <option value="all">Todos los estados</option>
+                                <option value="active">Activos</option>
+                                <option value="inactive">Inactivos</option>
+                            </select>
+                            <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        </div>
                     </div>
                   </div>
 
