@@ -129,6 +129,15 @@ export function InventoryScreen() {
     inventoryService.saveMovements(movements);
   }, [movements]);
 
+  useEffect(() => {
+    if (pendingAction === 'openCreateProduct') {
+      consumeAction();
+      setActiveTab('products');
+      setEditingProduct(null);
+      setShowProductModal(true);
+    }
+  }, [pendingAction, consumeAction]);
+
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       ...productData,
