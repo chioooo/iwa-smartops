@@ -126,6 +126,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
 
         if (computedLegs.length > 0) {
           map.fitBounds(bounds.pad(0.2));
+          setError(null);
         }
 
         setLegs(computedLegs);
