@@ -44,7 +44,9 @@ const getClientsData = () => {
       const clients = JSON.parse(stored);
       return { total: clients.length, active: clients.filter((c: { status: string }) => c.status === 'active').length };
     }
-  } catch { }
+  } catch (error) {
+    console.error('Error retrieving clients data:', error);
+  }
   return { total: 892, active: 756 };
 };
 
