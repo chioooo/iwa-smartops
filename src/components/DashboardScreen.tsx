@@ -10,6 +10,7 @@ import { InventoryScreen } from "./inventory/InventoryScreen";
 import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
 import { FinancesScreen } from "./finances/FinancesScreen";
+import { DeliveriesScreen } from "./deliveries/DeliveriesScreen";
 
 export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -68,6 +69,8 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
         {activeSection === 'users' && <UsersScreen />}
 
         {activeSection === 'inventory' && <InventoryScreen />}
+
+        {activeSection === 'deliveries' && <DeliveriesScreen />}
 
         {activeSection === 'billing' && <BillingScreen />}
 
