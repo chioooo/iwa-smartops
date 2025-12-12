@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Building2, FileText, Bot } from 'lucide-react';
+import { Building2, FileText, Bot, MessageSquare } from 'lucide-react';
+import { SmsSettings } from './settings/SmsSettings';
 
 import { settingsService } from '../services/settings/settingsService';
 import type { CompanySettings, CFDISettings, AISettings } from '../services/settings/settings.types';
@@ -126,6 +127,7 @@ const SettingsScreen: React.FC = () => {
     { id: 'company', label: 'Datos Fiscales', icon: Building2 },
     { id: 'cfdi', label: 'Proveedor CFDI', icon: FileText },
     { id: 'ai', label: 'Configuración IA', icon: Bot },
+    { id: 'sms', label: 'SMS', icon: MessageSquare },
   ];
 
   return (
@@ -501,6 +503,9 @@ const SettingsScreen: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* SMS */}
+          {activeTab === 'sms' && <SmsSettings />}
 
           {/* Footer con botones */}
           <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-center">
