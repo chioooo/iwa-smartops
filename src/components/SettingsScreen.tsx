@@ -1,31 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Building2, FileText, Bot, Settings } from 'lucide-react';
+import { Building2, FileText, Bot } from 'lucide-react';
 
-// Types for our settings
-interface CompanySettings {
-  rfc: string;
-  businessName: string;
-  taxRegime: string;
-  postalCode: string;
-  address: string;
-  phone: string;
-  email: string;
-}
-
-interface CFDISettings {
-  pac: string;
-  username: string;
-  password: string;
-  url: string;
-  testMode: boolean;
-}
-
-interface AISettings {
-  apiKey: string;
-  model: string;
-  temperature: number;
-  maxTokens: number;
-}
+import { settingsService } from '../services/settings/settingsService';
+import type { CompanySettings, CFDISettings, AISettings } from '../services/settings/settings.types';
 
 const SettingsScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState('company');
@@ -37,13 +14,10 @@ const SettingsScreen: React.FC = () => {
   useEffect(() => {
     const loadSettings = () => {
       try {
-        const savedSettings = localStorage.getItem('appSettings');
-        if (savedSettings) {
-          const parsed = JSON.parse(savedSettings);
-          if (parsed.company) setCompany(parsed.company);
-          if (parsed.cfdi) setCfdi(parsed.cfdi);
-          if (parsed.ai) setAi(parsed.ai);
-        }
+        const saved = settingsService.getSettings();
+        setCompany(saved.company);
+        setCfdi(saved.cfdi);
+        setAi(saved.ai);
       } catch (error) {
         console.error('Error loading settings:', error);
       }
@@ -82,7 +56,7 @@ const SettingsScreen: React.FC = () => {
   });
 
   const [ai, setAi] = useState<AISettings>({
-    apiKey: 'sk-proj-Pi3Khncc4a0p3Wuk3asRzEIeLhiEZk6Bob8T2kIaQ3I6YWrciK0KSTNOl6WxN2TrTN8ZlT3BlbkFJlL877Sp6FE2CD7kc3oPoiwXnVyRMy3CtXs1zr-yeQrKHYf01mYvjzybaosaYkMPgA',
+    apiKey: '',
     model: 'gpt-4',
     temperature: 0.7,
     maxTokens: 2000,
@@ -123,14 +97,12 @@ const SettingsScreen: React.FC = () => {
     setSaveStatus({ type: null, message: '' });
     
     try {
-      const settingsToSave = {
-        companySettings: company,
-        cfdiSettings: cfdi,
-        aiSettings: ai,
-        lastUpdated: new Date().toISOString()
-      };
-      
-      localStorage.setItem('appSettings', JSON.stringify(settingsToSave));
+      settingsService.updateSettings({
+        company,
+        cfdi,
+        ai,
+        lastUpdated: new Date().toISOString(),
+      });
       
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 800));
@@ -534,31 +506,25 @@ const SettingsScreen: React.FC = () => {
           <div className="mt-6 bg-white rounded-xl border border-gray-200 p-6 flex justify-between items-center">
               <div className="text-sm text-gray-500">
                 {(() => {
-                  const lastSaved = localStorage.getItem('appSettings');
-                  if (lastSaved) {
-                    try {
-                      const { lastUpdated } = JSON.parse(lastSaved);
-                      if (lastUpdated) {
-                        return `Último guardado: ${new Date(lastUpdated).toLocaleString()}`;
-                      }
-                    } catch (e) {
-                      console.error('Error parsing last saved date', e);
-                    }
+                  try {
+                    const { lastUpdated } = settingsService.getSettings();
+                    return lastUpdated
+                      ? `Último guardado: ${new Date(lastUpdated).toLocaleString()}`
+                      : 'Los cambios no se han guardado';
+                  } catch (e) {
+                    console.error('Error parsing last saved date', e);
+                    return 'Los cambios no se han guardado';
                   }
-                  return 'Los cambios no se han guardado';
                 })()}
               </div>
               <div className="flex space-x-3">
               <button
                 type="button"
                 onClick={() => {
-                  const savedSettings = localStorage.getItem('appSettings');
-                  if (savedSettings) {
-                    const parsed = JSON.parse(savedSettings);
-                    if (parsed.company) setCompany(parsed.company);
-                    if (parsed.cfdi) setCfdi(parsed.cfdi);
-                    if (parsed.ai) setAi(parsed.ai);
-                  }
+                  const saved = settingsService.getSettings();
+                  setCompany(saved.company);
+                  setCfdi(saved.cfdi);
+                  setAi(saved.ai);
                   setSaveStatus({ type: 'success', message: 'Cambios descartados' });
                   setTimeout(() => setSaveStatus({ type: null, message: '' }), 3000);
                 }}
