@@ -6,7 +6,7 @@ type Props = {
   supplies: Supply[];
   onCreateSupply: (supplyData: Omit<Supply, 'id'>) => void;
   onEditSupply: (supply: Supply) => void;
-  onDeleteSupply: (supplyId: string) => void;
+  onDeleteSupply: (supply: Supply) => void;
 };
 
 export function SuppliesTable({ supplies, onEditSupply, onDeleteSupply }: Props) {
@@ -165,9 +165,7 @@ export function SuppliesTable({ supplies, onEditSupply, onDeleteSupply }: Props)
                       </button>
                       <button
                         onClick={() => {
-                          if (window.confirm(`¿Estás seguro de eliminar el insumo "${supply.name}"?`)) {
-                            onDeleteSupply(supply.id);
-                          }
+                          onDeleteSupply(supply);
                         }}
                         className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         title="Eliminar"

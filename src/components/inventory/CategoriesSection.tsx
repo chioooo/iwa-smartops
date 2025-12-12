@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Grid3x3, Package, X, AlertCircle } from 'lucide-react';
 import type { Category, Product } from '../../services/inventory/inventory.types';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
+import { ConfirmModal } from '../common/ConfirmModal';
 
 type Props = {
   categories: Category[];
@@ -15,6 +16,14 @@ export function CategoriesSection({ categories, products, onUpdateCategories }: 
     products.filter(p => p.category === categoryName).length;
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const [confirmDelete, setConfirmDelete] = useState<
+    | {
+        id: string;
+        name: string;
+      }
+    | null
+  >(null);
 
   const totalProducts = products.length;
 
@@ -100,9 +109,7 @@ export function CategoriesSection({ categories, products, onUpdateCategories }: 
                     onClick={() => {
                       const productCount = getProductCount(category.name);
                       if (productCount === 0) {
-                        if (confirm(`¿Eliminar la categoría "${category.name}"?`)) {
-                          onUpdateCategories(categories.filter(c => c.id !== category.id));
-                        }
+                        setConfirmDelete({ id: category.id, name: category.name });
                       } else {
                         alert('No puedes eliminar una categoría con productos asignados');
                       }
@@ -220,6 +227,20 @@ export function CategoriesSection({ categories, products, onUpdateCategories }: 
           }}
         />
       )}
+
+      <ConfirmModal
+        open={confirmDelete !== null}
+        title="Confirmar eliminación"
+        message={confirmDelete ? `¿Eliminar la categoría "${confirmDelete.name}"?` : ''}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={() => {
+          if (!confirmDelete) return;
+          onUpdateCategories(categories.filter(c => c.id !== confirmDelete.id));
+          setConfirmDelete(null);
+        }}
+      />
     </div>
   );
 }

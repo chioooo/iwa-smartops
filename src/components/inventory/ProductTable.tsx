@@ -9,7 +9,7 @@ type Props = {
   onEditProduct: (product: Product) => void;
   onUpdateProduct: (productId: string, updates: Partial<Product>) => void;
   onOpenAdjustment: (product: Product) => void;
-  onDeleteProduct: (productId: string) => void;
+  onDeleteProduct: (product: Product) => void;
   selectedProductId?: string;
 };
 
@@ -274,9 +274,7 @@ export function ProductTable({
                                 <button
                                   onClick={() => {
                                     setOpenMenuId(null);
-                                    if (window.confirm(`¿Estás seguro de eliminar el producto "${product.name}"?`)) {
-                                      onDeleteProduct(product.id);
-                                    }
+                                    onDeleteProduct(product);
                                   }}
                                   className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                                 >
