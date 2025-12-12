@@ -1,6 +1,6 @@
 import  { useState } from 'react';
-import { Eye, Edit2, Settings, Power, MoreVertical, Search, Filter, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
-import type {Product, Category} from './InventoryScreen';
+import { Eye, Edit2, Settings, Power, MoreVertical, Search, Filter, ChevronLeft, ChevronRight, AlertTriangle, Trash2 } from 'lucide-react';
+import type { Product, Category } from '../../services/inventory/inventory.types';
 
 type Props = {
   products: Product[];
@@ -9,6 +9,7 @@ type Props = {
   onEditProduct: (product: Product) => void;
   onUpdateProduct: (productId: string, updates: Partial<Product>) => void;
   onOpenAdjustment: (product: Product) => void;
+  onDeleteProduct: (product: Product) => void;
   selectedProductId?: string;
 };
 
@@ -19,6 +20,7 @@ export function ProductTable({
   onEditProduct,
   onUpdateProduct,
   onOpenAdjustment,
+  onDeleteProduct,
   selectedProductId
 }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -268,6 +270,16 @@ export function ProductTable({
                                 >
                                   <Power className="w-4 h-4" />
                                   {product.status === 'active' ? 'Desactivar' : 'Activar'}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setOpenMenuId(null);
+                                    onDeleteProduct(product);
+                                  }}
+                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                  Eliminar
                                 </button>
                               </div>
                             </>
