@@ -1,6 +1,6 @@
 //import React from 'react';
 import { Package, Layers, Grid3x3, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import type {Product, Supply, Category} from "./InventoryScreen.tsx";
+import type { Product, Supply, Category } from '../../services/inventory/inventory.types';
 
 type Props = {
   products: Product[];

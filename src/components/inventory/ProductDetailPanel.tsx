@@ -1,5 +1,5 @@
 import { X, Package, DollarSign, Warehouse, Calendar, TrendingUp, TrendingDown, Edit2, AlertTriangle } from 'lucide-react';
-import type {Product, InventoryMovement} from './InventoryScreen';
+import type { Product, InventoryMovement } from '../../services/inventory/inventory.types';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {

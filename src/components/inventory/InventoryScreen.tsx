@@ -9,230 +9,8 @@ import { InventoryAdjustmentModal } from './InventoryAdjustmentModal';
 import { ProductDetailPanel } from './ProductDetailPanel';
 import { SupplyModal } from './SupplyModal';
 
-export type Product = {
-  id: string;
-  name: string;
-  sku: string;
-  category: string;
-  stock: number;
-  minStock: number;
-  price: number;
-  purchasePrice: number;
-  unit: string;
-  supplier: string;
-  description: string;
-  status: 'active' | 'inactive';
-  image?: string;
-  warehouse?: string;
-};
-
-export type Supply = {
-  id: string;
-  name: string;
-  unit: string;
-  stock: number;
-  category: string;
-  supplier: string;
-  status: 'active' | 'inactive';
-};
-
-export type Category = {
-  id: string;
-  name: string;
-  description: string;
-  productsCount: number;
-  color: string;
-};
-
-export type InventoryMovement = {
-  id: string;
-  productId: string;
-  type: 'entry' | 'exit' | 'adjustment' | 'transfer';
-  quantity: number;
-  date: string;
-  reason: string;
-  user: string;
-};
-
-// Claves para localStorage
-const STORAGE_KEYS = {
-  PRODUCTS: 'inventory_products',
-  SUPPLIES: 'inventory_supplies',
-  CATEGORIES: 'inventory_categories',
-  MOVEMENTS: 'inventory_movements',
-};
-
-// Datos iniciales por defecto
-const DEFAULT_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Laptop Dell XPS 15',
-    sku: 'TECH-001',
-    category: 'Tecnología',
-    stock: 15,
-    minStock: 5,
-    price: 1299.99,
-    purchasePrice: 999.99,
-    unit: 'pieza',
-    supplier: 'Dell Inc.',
-    description: 'Laptop de alto rendimiento',
-    status: 'active',
-    image: 'LP',
-    warehouse: 'Almacén Principal'
-  },
-  {
-    id: '2',
-    name: 'Silla Ergonómica Pro',
-    sku: 'FURN-002',
-    category: 'Mobiliario',
-    stock: 3,
-    minStock: 10,
-    price: 299.99,
-    purchasePrice: 199.99,
-    unit: 'pieza',
-    supplier: 'Office Supplies Co.',
-    description: 'Silla ergonómica con soporte lumbar',
-    status: 'active',
-    image: 'SE',
-    warehouse: 'Almacén Principal'
-  },
-  {
-    id: '3',
-    name: 'Papel Carta 500 hojas',
-    sku: 'OFF-003',
-    category: 'Papelería',
-    stock: 120,
-    minStock: 20,
-    price: 5.99,
-    purchasePrice: 3.99,
-    unit: 'paquete',
-    supplier: 'Papelería Moderna',
-    description: 'Papel carta tamaño estándar',
-    status: 'active',
-    image: 'PC',
-    warehouse: 'Almacén Secundario'
-  },
-  {
-    id: '4',
-    name: 'Monitor LG 27" 4K',
-    sku: 'TECH-004',
-    category: 'Tecnología',
-    stock: 8,
-    minStock: 5,
-    price: 399.99,
-    purchasePrice: 299.99,
-    unit: 'pieza',
-    supplier: 'LG Electronics',
-    description: 'Monitor 4K con HDR',
-    status: 'active',
-    image: 'ML',
-    warehouse: 'Almacén Principal'
-  },
-  {
-    id: '5',
-    name: 'Impresora HP LaserJet',
-    sku: 'TECH-005',
-    category: 'Tecnología',
-    stock: 2,
-    minStock: 3,
-    price: 249.99,
-    purchasePrice: 179.99,
-    unit: 'pieza',
-    supplier: 'HP Inc.',
-    description: 'Impresora láser monocromática',
-    status: 'inactive',
-    image: 'IH',
-    warehouse: 'Almacén Principal'
-  },
-];
-
-const DEFAULT_SUPPLIES: Supply[] = [
-  {
-    id: '1',
-    name: 'Tóner Negro HP',
-    unit: 'pieza',
-    stock: 15,
-    category: 'Consumibles',
-    supplier: 'HP Inc.',
-    status: 'active'
-  },
-  {
-    id: '2',
-    name: 'Cable HDMI 2m',
-    unit: 'pieza',
-    stock: 45,
-    category: 'Cables',
-    supplier: 'Tech Supplies',
-    status: 'active'
-  },
-  {
-    id: '3',
-    name: 'Clip Metálico',
-    unit: 'caja',
-    stock: 5,
-    category: 'Papelería',
-    supplier: 'Papelería Moderna',
-    status: 'active'
-  },
-];
-
-const DEFAULT_CATEGORIES: Category[] = [
-  { id: '1', name: 'Tecnología', description: 'Equipos electrónicos y tecnológicos', productsCount: 3, color: '#D0323A' },
-  { id: '2', name: 'Mobiliario', description: 'Muebles y equipamiento de oficina', productsCount: 1, color: '#F6A016' },
-  { id: '3', name: 'Papelería', description: 'Artículos de oficina y papelería', productsCount: 1, color: '#E9540D' },
-  { id: '4', name: 'Consumibles', description: 'Insumos y materiales consumibles', productsCount: 0, color: '#9F2743' },
-];
-
-const DEFAULT_MOVEMENTS: InventoryMovement[] = [
-  {
-    id: '1',
-    productId: '1',
-    type: 'entry',
-    quantity: 10,
-    date: '2024-11-20',
-    reason: 'Compra nueva',
-    user: 'Juan Pérez'
-  },
-  {
-    id: '2',
-    productId: '1',
-    type: 'exit',
-    quantity: 5,
-    date: '2024-11-22',
-    reason: 'Venta',
-    user: 'María González'
-  },
-  {
-    id: '3',
-    productId: '2',
-    type: 'adjustment',
-    quantity: -2,
-    date: '2024-11-23',
-    reason: 'Producto dañado',
-    user: 'Carlos Ruiz'
-  },
-];
-
-// Funciones de utilidad para localStorage
-function loadFromStorage<T>(key: string, defaultValue: T): T {
-  try {
-    const stored = localStorage.getItem(key);
-    if (stored) {
-      return JSON.parse(stored) as T;
-    }
-  } catch (error) {
-    console.error(`Error loading ${key} from localStorage:`, error);
-  }
-  return defaultValue;
-}
-
-function saveToStorage<T>(key: string, value: T): void {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (error) {
-    console.error(`Error saving ${key} to localStorage:`, error);
-  }
-}
+import { inventoryService } from '../../services/inventory/inventoryService';
+import type { Category, InventoryMovement, Product, Supply } from '../../services/inventory/inventory.types';
 
 export function InventoryScreen() {
   const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard'>('products');
@@ -243,41 +21,25 @@ export function InventoryScreen() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
 
-  // Estado inicializado desde localStorage
-  const [products, setProducts] = useState<Product[]>(() => 
-    loadFromStorage(STORAGE_KEYS.PRODUCTS, DEFAULT_PRODUCTS)
-  );
+  const [products, setProducts] = useState<Product[]>(() => inventoryService.getProducts());
+  const [supplies, setSupplies] = useState<Supply[]>(() => inventoryService.getSupplies());
+  const [categories, setCategories] = useState<Category[]>(() => inventoryService.getCategories());
+  const [movements, setMovements] = useState<InventoryMovement[]>(() => inventoryService.getMovements());
 
-  const [supplies, setSupplies] = useState<Supply[]>(() => 
-    loadFromStorage(STORAGE_KEYS.SUPPLIES, DEFAULT_SUPPLIES)
-  );
-
-  const [categories, setCategories] = useState<Category[]>(() => 
-    loadFromStorage(STORAGE_KEYS.CATEGORIES, DEFAULT_CATEGORIES)
-  );
-
-  const [movements, setMovements] = useState<InventoryMovement[]>(() => 
-    loadFromStorage(STORAGE_KEYS.MOVEMENTS, DEFAULT_MOVEMENTS)
-  );
-
-  // Sincronizar productos con localStorage
   useEffect(() => {
-    saveToStorage(STORAGE_KEYS.PRODUCTS, products);
+    inventoryService.saveProducts(products);
   }, [products]);
 
-  // Sincronizar insumos con localStorage
   useEffect(() => {
-    saveToStorage(STORAGE_KEYS.SUPPLIES, supplies);
+    inventoryService.saveSupplies(supplies);
   }, [supplies]);
 
-  // Sincronizar categorías con localStorage
   useEffect(() => {
-    saveToStorage(STORAGE_KEYS.CATEGORIES, categories);
+    inventoryService.saveCategories(categories);
   }, [categories]);
 
-  // Sincronizar movimientos con localStorage
   useEffect(() => {
-    saveToStorage(STORAGE_KEYS.MOVEMENTS, movements);
+    inventoryService.saveMovements(movements);
   }, [movements]);
 
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
@@ -367,7 +129,6 @@ export function InventoryScreen() {
   };
 
   const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
-  const totalStock = products.reduce((sum, p) => sum + p.stock, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">

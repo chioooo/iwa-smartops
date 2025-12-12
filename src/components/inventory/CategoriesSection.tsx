@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Grid3x3, Package, X, AlertCircle } from 'lucide-react';
-import type {Category, Product} from './InventoryScreen';
+import type { Category, Product } from '../../services/inventory/inventory.types';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {

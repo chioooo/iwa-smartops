@@ -1,6 +1,6 @@
 import  { useState } from 'react';
 import { Eye, Edit2, Settings, Power, MoreVertical, Search, Filter, ChevronLeft, ChevronRight, AlertTriangle, Trash2 } from 'lucide-react';
-import type {Product, Category} from './InventoryScreen';
+import type { Product, Category } from '../../services/inventory/inventory.types';
 
 type Props = {
   products: Product[];

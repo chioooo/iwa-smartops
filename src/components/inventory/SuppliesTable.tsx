@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Edit2, Package, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
-import type {Supply} from './InventoryScreen';
+import type { Supply } from '../../services/inventory/inventory.types';
 
 type Props = {
   supplies: Supply[];
