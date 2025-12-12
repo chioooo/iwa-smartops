@@ -3,10 +3,10 @@ import type {Role, User} from "./types/users.types.ts";
 export const DEMO_USERS: User[] = [
     {
         id: '1',
-        name: 'María González',
-        email: 'maria.gonzalez@iwa.com',
+        name: 'IWA Consolti',
+        email: 'iwa.consolti@iwa.com',
         roleId: '1',
-        role: 'Admin',
+        role: 'Administrador',
         status: 'active',
         createdAt: '2024-01-15',
         avatar: 'MG'
@@ -46,7 +46,7 @@ export const DEMO_USERS: User[] = [
         name: 'Patricia López',
         email: 'patricia.lopez@iwa.com',
         roleId: '1',
-        role: 'Admin',
+        role: 'Administrador',
         status: 'active',
         createdAt: '2024-01-20',
         avatar: 'PL'
@@ -56,7 +56,7 @@ export const DEMO_USERS: User[] = [
 export const DEMO_ROLES: Role[] = [
     {
         id: '1',
-        name: 'Admin',
+        name: 'Administrador',
         description: 'Acceso completo al sistema',
         permissionsCount: 24,
         usersCount: 2,
