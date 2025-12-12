@@ -577,7 +577,7 @@ export function InventoryScreen({ user }: { user: User }) {
                   setShowSupplyModal(true);
                 }}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
-                    ${hasPermission("inventory.createP")
+                    ${hasPermission("inventory.createS")
                         ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                     }`}
@@ -690,6 +690,7 @@ export function InventoryScreen({ user }: { user: User }) {
             onCreateSupply={handleCreateSupply}
             onEditSupply={handleEditSupply}
             onDeleteSupply={requestDeleteSupply}
+            user={user}
           />
         )}
 
