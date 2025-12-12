@@ -18,9 +18,10 @@ import { ConfirmModal } from '../common/ConfirmModal';
 
 import { inventoryService } from '../../services/inventory/inventoryService';
 import type { Category, InventoryMovement, Product, Supply } from '../../services/inventory/inventory.types';
+import type {User} from "../../data/types/users.types.ts";
+import { usePermissions } from "../../hooks/usePermissions";
 
-export function InventoryScreen() {
-  const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard'>('products');
+export function InventoryScreen({ user }: { user: User }) {
   const [showProductModal, setShowProductModal] = useState(false);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
@@ -37,6 +38,7 @@ export function InventoryScreen() {
   const [emailAddress, setEmailAddress] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const { hasPermission } = usePermissions(user);
 
   const [confirmDelete, setConfirmDelete] = useState<
     | {
@@ -182,10 +184,10 @@ export function InventoryScreen() {
     const product = products.find(p => p.id === productId);
     if (product) {
       const difference = physicalStock - product.stock;
-      
+
       // Actualizar stock del producto directamente
       handleUpdateProduct(productId, { stock: physicalStock });
-            
+
       // Registrar movimiento
       const newMovement: InventoryMovement = {
         id: String(movements.length + 1),
@@ -300,7 +302,7 @@ export function InventoryScreen() {
         // Detectar si es un encabezado de sección (tiene emoji al inicio)
         const sectionEmojis = ['📊', '⚠️', '⭐', '📉', '🔄', '🧠', '📋', '💡', '🎯', '🚀'];
         const isHeader = sectionEmojis.some(emoji => line.startsWith(emoji));
-        
+
         if (isHeader) {
           yPosition += 5;
           doc.setFontSize(12);
@@ -346,7 +348,7 @@ export function InventoryScreen() {
     doc.setFillColor(250, 245, 245);
     doc.setDrawColor(208, 50, 58);
     doc.setLineWidth(0.3);
-    
+
     // Calcular altura de la caja
     let tempY = 0;
     analysisDetail.bullets.forEach((bullet) => {
@@ -397,7 +399,7 @@ export function InventoryScreen() {
     if (!analysisDetail) return '';
 
     const fecha = getReportDate();
-    
+
     // Procesar el intro para convertir emojis y bullets en HTML
     const formatIntro = (text: string) => {
       return text
@@ -518,6 +520,16 @@ export function InventoryScreen() {
     setConfirmDelete({ kind: 'supply', id: supply.id, name: supply.name });
   };
 
+  const getDefaultTab = () => {
+    if (hasPermission("inventory.viewP")) return "products";
+    if (hasPermission("inventory.viewS")) return "supplies";
+    return "dashboard";
+  };
+
+  const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard' | null>(
+      getDefaultTab()
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -569,48 +581,58 @@ export function InventoryScreen() {
 
           {/* Tabs */}
           <div className="flex gap-1 border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'products'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Package className="w-5 h-5" />
-              Productos
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+            { hasPermission("inventory.viewP") && (
+                <button
+                    onClick={() => setActiveTab('products')}
+                    className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                        activeTab === 'products'
+                            ? 'border-[#D0323A] text-[#D0323A]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                >
+                  <Package className="w-5 h-5" />
+                  Productos
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {products.length}
               </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('supplies')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'supplies'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Layers className="w-5 h-5" />
-              Insumos
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+                </button>
+            ) }
+              { hasPermission("inventory.viewP") && (
+                  <button
+                      onClick={() => setActiveTab('supplies')}
+                      className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                          activeTab === 'supplies'
+                              ? 'border-[#D0323A] text-[#D0323A]'
+                              : 'border-transparent text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                      <Layers className="w-5 h-5" />
+                      Insumos
+                      <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {supplies.length}
               </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('categories')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'categories'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <TrendingDown className="w-5 h-5" />
-              Categorías
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+                  </button>
+                  )
+              }
+
+            { hasPermission("inventory.viewP") && (
+                <button
+                    onClick={() => setActiveTab('categories')}
+                    className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                        activeTab === 'categories'
+                            ? 'border-[#D0323A] text-[#D0323A]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                >
+                  <TrendingDown className="w-5 h-5" />
+                  Categorías
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {categories.length}
               </span>
-            </button>
+                </button>
+                )
+            }
+
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${

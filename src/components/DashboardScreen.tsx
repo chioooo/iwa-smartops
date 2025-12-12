@@ -69,7 +69,7 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
 
         {activeSection === 'users' && <UsersScreen user={user} />}
 
-        {activeSection === 'inventory' && <InventoryScreen />}
+        {activeSection === 'inventory' && <InventoryScreen user={user} />}
 
         {activeSection === 'deliveries' && <DeliveriesScreen />}
 
