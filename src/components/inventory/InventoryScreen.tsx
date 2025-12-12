@@ -670,6 +670,7 @@ export function InventoryScreen({ user }: { user: User }) {
             onDeleteProduct={requestDeleteProduct}
             onOpenAdjustment={handleOpenAdjustment}
             selectedProductId={selectedProduct?.id}
+            user={user}
           />
         )}
 
