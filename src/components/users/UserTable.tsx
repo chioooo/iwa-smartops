@@ -3,18 +3,20 @@ import {
   Eye,
   Edit2,
   Power,
-  MoreVertical,
   ChevronLeft,
-  ChevronRight,
+  ChevronRight, Trash2,
 } from "lucide-react";
 
 import type { User } from '../../data/types/users.types.ts'
+import {ConfirmModal} from "../common/ConfirmModal.tsx";
+import {Tooltip} from "../common/Tooltip.tsx";
 
 type Props = {
   users: User[];
   onUpdateUser: (userId: string, updates: Partial<User>) => void;
   selectedUserId?: string;
   onEditUser: (user: User) => void;
+  onDeleteUser: (userId: string) => void;
 };
 
 export function UserTable({
@@ -22,35 +24,36 @@ export function UserTable({
                             onUpdateUser,
                             selectedUserId,
                             onEditUser,
+                            onDeleteUser,
                           }: Props) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(users.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentUsers = users.slice(startIndex, endIndex);
 
-  const handleToggleStatus = (user: User) => {
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(users.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentUsers = users.slice(startIndex, endIndex);
+
+    const handleToggleStatus = (user: User) => {
     onUpdateUser(user.id, {
       status: user.status === "active" ? "inactive" : "active",
     });
+    };
 
-    setOpenMenuId(null);
-  };
-
-  const formatDate = (dateString: string) =>
+    const formatDate = (dateString: string) =>
       new Date(dateString).toLocaleDateString("es-ES", {
         year: "numeric",
         month: "short",
         day: "numeric",
       });
 
-  return (
+    return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         <div className="overflow-x-auto">
-          <div className="overflow-y-auto max-h-[500px]">
+          <div className="overflow-y-auto max-h-[550px]">
             <table className="w-full">
               <thead className="sticky top-0 bg-white z-10 shadow-sm">
               <tr className="border-b border-gray-200 bg-gray-50">
@@ -145,48 +148,42 @@ export function UserTable({
                       <div className="flex items-center justify-end gap-2">
 
                         {/* Editar */}
-                        <button
-                            title="Editar usuario"
-                            onClick={() => onEditUser(user)}
-                            className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
+                          <Tooltip text="Editar">
+                              <button
+                                  onClick={() => onEditUser(user)}
+                                  className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg"
+                              >
+                                  <Edit2 className="w-4 h-4" />
+                              </button>
+                          </Tooltip>
 
-                        {/* Menú */}
-                        <div className="relative">
-                          <button
-                              title="Más opciones"
-                              onClick={() =>
-                                  setOpenMenuId(
-                                      openMenuId === user.id ? null : user.id
-                                  )
-                              }
-                              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
+                        {/* Activar/Desactivar */}
+                          <Tooltip text={user.status !== "active" ? "Activar" : "Desactivar"}>
+                            <button
+                                onClick={() => handleToggleStatus(user)}
+                                className="p-2 text-gray-600 rounded-lg hover:bg-gray-100"
+                            >
+                                <Power className={`w-4 h-4 rounded-full ${
+                                    user.status !== "active"
+                                        ? "text-green-500"
+                                        : "text-gray-400"
+                                }`} />
+                            </button>
+                          </Tooltip>
 
-                          {openMenuId === user.id && (
-                              <>
-                                <div
-                                    className="fixed inset-0 z-10"
-                                    onClick={() => setOpenMenuId(null)}
-                                />
-                                <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20 animate-fade-in">
-                                  <button
-                                      onClick={() => handleToggleStatus(user)}
-                                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                  >
-                                    <Power className="w-4 h-4" />
-                                    {user.status === "active"
-                                        ? "Desactivar"
-                                        : "Activar"}
-                                  </button>
-                                </div>
-                              </>
-                          )}
-                        </div>
+                        {/* Eliminar */}
+                          <Tooltip text="Eliminar">
+                            <button
+                                title={"eliminar"}
+                                onClick={() => {
+                                    setUserToDelete(user);
+                                    setShowDeleteModal(true);
+                                }}
+                                className="p-2  rounded-lg text-red-600 hover:bg-red-50"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                          </Tooltip>
                       </div>
                     </td>
                   </tr>
@@ -261,6 +258,29 @@ export function UserTable({
               </p>
             </div>
         )}
+
+          <ConfirmModal
+              open={showDeleteModal}
+              title="¿Eliminar usuario?"
+              message={
+                  userToDelete
+                      ? `Se eliminará a "${userToDelete.name}". Esta acción no se puede deshacer.`
+                      : ""
+              }
+              confirmLabel="Eliminar"
+              cancelLabel="Cancelar"
+              onCancel={() => {
+                  setShowDeleteModal(false);
+                  setUserToDelete(null);
+              }}
+              onConfirm={() => {
+                  if (userToDelete) {
+                      onDeleteUser(userToDelete.id);
+                  }
+                  setShowDeleteModal(false);
+                  setUserToDelete(null);
+              }}
+          />
       </div>
   );
 }

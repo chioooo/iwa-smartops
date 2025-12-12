@@ -79,6 +79,12 @@ export function UsersScreen() {
     }
   };
 
+  const handleDeleteUser = (id: string) => {
+    demoDataService.deleteUser(id);
+    setUsers(demoDataService.getUsers());
+    setRoles(demoDataService.getRoles());
+  };
+
   //  ROLES
 
   const handleCreateRole = (roleData: Role) => {
@@ -244,6 +250,7 @@ export function UsersScreen() {
                       users={filteredUsers}
                       onUpdateUser={handleUpdateUser}
                       onEditUser={(user) => setEditUser(user)}
+                      onDeleteUser={handleDeleteUser}
                       selectedUserId={selectedUser?.id}
                   />
                 </div>
