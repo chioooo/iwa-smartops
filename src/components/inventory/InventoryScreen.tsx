@@ -287,7 +287,7 @@ export function InventoryScreen() {
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-gray-900 mb-2">Gestión de Inventario</h1>
+              <h1 className="text-gray-900 text-2xl font-semibold mb-2">Gestión de Inventario</h1>
               <p className="text-gray-600">Administra productos, insumos y control de stock</p>
             </div>
             {activeTab === 'products' && (
