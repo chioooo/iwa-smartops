@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Filter, Calendar, Building2, Package, User, Users, Trash2 } from 'lucide-react';
+import { X, Filter, Calendar, Building2, Package, User, Users, Trash2, ChevronDown } from 'lucide-react';
 import type {ReportFilters} from './ReportsScreen';
 
 type Props = {
@@ -16,10 +16,7 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
   };
 
   const handleClear = () => {
-    const clearedFilters: ReportFilters = {
-      fechaInicio: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-      fechaFin: new Date().toISOString().split('T')[0],
-    };
+    const clearedFilters: ReportFilters = {};
     setLocalFilters(clearedFilters);
   };
 
@@ -72,8 +69,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha inicio</label>
                   <input
                     type="date"
-                    value={localFilters.fechaInicio}
-                    onChange={(e) => setLocalFilters({ ...localFilters, fechaInicio: e.target.value })}
+                    value={localFilters.startDate || ''}
+                    onChange={(e) => setLocalFilters({ ...localFilters, startDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
                 </div>
@@ -81,8 +78,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   <label className="block text-xs text-gray-600 mb-2">Fecha fin</label>
                   <input
                     type="date"
-                    value={localFilters.fechaFin}
-                    onChange={(e) => setLocalFilters({ ...localFilters, fechaFin: e.target.value })}
+                    value={localFilters.endDate || ''}
+                    onChange={(e) => setLocalFilters({ ...localFilters, endDate: e.target.value })}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent"
                   />
                 </div>
@@ -95,8 +92,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const today = new Date();
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: today.toISOString().split('T')[0],
-                      fechaFin: today.toISOString().split('T')[0]
+                      startDate: today.toLocaleDateString('en-CA'),
+                      endDate: today.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -109,8 +106,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: firstDay.toISOString().split('T')[0],
-                      fechaFin: today.toISOString().split('T')[0]
+                      startDate: firstDay.toLocaleDateString('en-CA'),
+                      endDate: today.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -124,8 +121,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const lastDay = new Date(today.getFullYear(), today.getMonth(), 0);
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: lastMonth.toISOString().split('T')[0],
-                      fechaFin: lastDay.toISOString().split('T')[0]
+                      startDate: lastMonth.toLocaleDateString('en-CA'),
+                      endDate: lastDay.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -138,8 +135,8 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                     const firstDay = new Date(today.getFullYear(), 0, 1);
                     setLocalFilters({
                       ...localFilters,
-                      fechaInicio: firstDay.toISOString().split('T')[0],
-                      fechaFin: today.toISOString().split('T')[0]
+                      startDate: firstDay.toLocaleDateString('en-CA'),
+                      endDate: today.toLocaleDateString('en-CA')
                     });
                   }}
                   className="px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -155,17 +152,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <Building2 className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Sucursal / Almacén</label>
               </div>
-              <select
-                value={localFilters.sucursal || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, sucursal: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todas las sucursales</option>
-                <option value="Principal">Almacén Principal</option>
-                <option value="Secundario">Almacén Secundario</option>
-                <option value="Norte">Sucursal Norte</option>
-                <option value="Sur">Sucursal Sur</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.branch || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, branch: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todas las sucursales</option>
+                  <option value="Principal">Almacén Principal</option>
+                  <option value="Secundario">Almacén Secundario</option>
+                  <option value="Norte">Sucursal Norte</option>
+                  <option value="Sur">Sucursal Sur</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Categoría */}
@@ -174,17 +174,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <Package className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Categoría</label>
               </div>
-              <select
-                value={localFilters.categoria || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, categoria: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todas las categorías</option>
-                <option value="Tecnología">Tecnología</option>
-                <option value="Mobiliario">Mobiliario</option>
-                <option value="Papelería">Papelería</option>
-                <option value="Consumibles">Consumibles</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.category || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, category: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todas las categorías</option>
+                  <option value="Tecnología">Tecnología</option>
+                  <option value="Mobiliario">Mobiliario</option>
+                  <option value="Papelería">Papelería</option>
+                  <option value="Consumibles">Consumibles</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Usuario */}
@@ -193,17 +196,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <User className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Usuario / Operador</label>
               </div>
-              <select
-                value={localFilters.usuario || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, usuario: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todos los usuarios</option>
-                <option value="Juan Pérez">Juan Pérez</option>
-                <option value="María González">María González</option>
-                <option value="Carlos Ruiz">Carlos Ruiz</option>
-                <option value="Ana Martínez">Ana Martínez</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.user || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, user: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todos los usuarios</option>
+                  <option value="Juan Pérez">Juan Pérez</option>
+                  <option value="María González">María González</option>
+                  <option value="Carlos Ruiz">Carlos Ruiz</option>
+                  <option value="Ana Martínez">Ana Martínez</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Cliente */}
@@ -212,17 +218,20 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                 <Users className="w-5 h-5 text-gray-400" />
                 <label className="text-sm text-gray-900">Cliente</label>
               </div>
-              <select
-                value={localFilters.cliente || ''}
-                onChange={(e) => setLocalFilters({ ...localFilters, cliente: e.target.value || undefined })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
-              >
-                <option value="">Todos los clientes</option>
-                <option value="Acme Corporation">Acme Corporation S.A. de C.V.</option>
-                <option value="TechSolutions">TechSolutions México</option>
-                <option value="Distribuidora">Distribuidora Nacional</option>
-                <option value="GlobalTech">GlobalTech Industries</option>
-              </select>
+              <div className='relative'>
+                <select
+                  value={localFilters.client || ''}
+                  onChange={(e) => setLocalFilters({ ...localFilters, client: e.target.value || undefined })}
+                  className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
+                >
+                  <option value="">Todos los clientes</option>
+                  <option value="Acme Corporation">Acme Corporation S.A. de C.V.</option>
+                  <option value="TechSolutions">TechSolutions México</option>
+                  <option value="Distribuidora">Distribuidora Nacional</option>
+                  <option value="GlobalTech">GlobalTech Industries</option>
+                </select>
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
+              </div>
             </div>
 
             {/* Active Filters Display */}
@@ -238,36 +247,36 @@ export function FiltersPanel({ filters, onClose, onApply }: Props) {
                   </button>
                 </div>
                 <div className="space-y-2">
-                  {localFilters.fechaInicio && localFilters.fechaFin && (
+                {localFilters.startDate && localFilters.endDate && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Calendar className="w-3 h-3" />
-                      <span>
-                        {new Date(localFilters.fechaInicio).toLocaleDateString('es-MX')} - {new Date(localFilters.fechaFin).toLocaleDateString('es-MX')}
+                        <span>
+                          {localFilters.startDate!.split('-').reverse().join('/')} - {localFilters.endDate!.split('-').reverse().join('/')}
                       </span>
                     </div>
                   )}
-                  {localFilters.sucursal && (
+                  {localFilters.branch && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Building2 className="w-3 h-3" />
-                      <span>{localFilters.sucursal}</span>
+                      <span>{localFilters.branch}</span>
                     </div>
                   )}
-                  {localFilters.categoria && (
+                  {localFilters.category && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Package className="w-3 h-3" />
-                      <span>{localFilters.categoria}</span>
+                      <span>{localFilters.category}</span>
                     </div>
                   )}
-                  {localFilters.usuario && (
+                  {localFilters.user && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <User className="w-3 h-3" />
-                      <span>{localFilters.usuario}</span>
+                      <span>{localFilters.user}</span>
                     </div>
                   )}
-                  {localFilters.cliente && (
+                  {localFilters.client && (
                     <div className="flex items-center gap-2 text-xs text-blue-700">
                       <Users className="w-3 h-3" />
-                      <span>{localFilters.cliente}</span>
+                      <span>{localFilters.client}</span>
                     </div>
                   )}
                 </div>
