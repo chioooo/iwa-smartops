@@ -23,6 +23,31 @@ function getStatusLabel(status: DeliveryStop['status']) {
   return 'pendiente';
 }
 
+function normalizeMexicanPhone(raw: string) {
+  const digitsOnly = raw.replace(/\D/g, '');
+
+  if (!digitsOnly) return null;
+
+  if (digitsOnly.startsWith('52') && digitsOnly.length >= 12) {
+    return {
+      withPlus: `+${digitsOnly}`,
+      waNumber: digitsOnly,
+    };
+  }
+
+  if (digitsOnly.length === 10) {
+    return {
+      withPlus: `+52${digitsOnly}`,
+      waNumber: `52${digitsOnly}`,
+    };
+  }
+
+  return {
+    withPlus: `+52${digitsOnly}`,
+    waNumber: `52${digitsOnly}`,
+  };
+}
+
 export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
   const mapRef = useRef<any>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
@@ -32,6 +57,20 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [phoneByLegId, setPhoneByLegId] = useState<Record<string, string>>({});
+
+  const notifyCustomerByWhatsApp = (legId: string, customer: string) => {
+    const rawPhone = phoneByLegId[legId] ?? '2720000000';
+    const normalized = normalizeMexicanPhone(rawPhone);
+
+    if (!normalized) {
+      alert('Ingresa un número de teléfono válido.');
+      return;
+    }
+
+    const message = `Su orden ha sido entregada ${customer}`;
+    const url = `https://wa.me/${normalized.waNumber}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+  };
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -126,7 +165,6 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
 
         if (computedLegs.length > 0) {
           map.fitBounds(bounds.pad(0.2));
-          setError(null);
         }
 
         setLegs(computedLegs);
@@ -211,7 +249,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => {}}
+                        onClick={() => notifyCustomerByWhatsApp(leg.id, leg.destination)}
                         className="px-3 py-1.5 text-sm rounded-lg bg-green-500 text-white hover:bg-green-700 transition-colors"
                       >
                         Whatsapp

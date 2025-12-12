@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Package, DollarSign, AlertCircle, Upload, Hash, Layers } from 'lucide-react';
-import type {Product, Category} from './InventoryScreen';
+import type { Product, Category } from '../../services/inventory/inventory.types';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   categories: Category[];
@@ -101,29 +102,33 @@ export function ProductModal({ categories, product, onClose, onCreate, onUpdate 
 
   const isFormValid = formData.name && formData.sku && formData.price > 0;
 
+  useModalScrollLock();
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col my-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
-          <div>
-            <h2 className="text-gray-900">
-              {isEditing ? 'Editar Producto' : 'Crear Nuevo Producto'}
-            </h2>
-            <p className="text-gray-600 text-sm mt-1">
-              {isEditing ? 'Actualiza la información del producto' : 'Completa los datos del nuevo producto'}
-            </p>
+        <div className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 rounded-t-2xl text-white flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-white mb-1">
+                {isEditing ? 'Editar Producto' : 'Crear Nuevo Producto'}
+              </h2>
+              <p className="text-white/90 text-sm">
+                {isEditing ? 'Actualiza la información del producto' : 'Completa los datos del nuevo producto'}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Nombre */}
             <div className="md:col-span-2">
@@ -292,7 +297,7 @@ export function ProductModal({ categories, product, onClose, onCreate, onUpdate 
               <select
                 value={formData.unit}
                 onChange={(e) => handleChange('unit', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
               >
                 <option value="pieza">Pieza</option>
                 <option value="paquete">Paquete</option>
@@ -312,7 +317,7 @@ export function ProductModal({ categories, product, onClose, onCreate, onUpdate 
               <select
                 value={formData.warehouse}
                 onChange={(e) => handleChange('warehouse', e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent appearance-none bg-white"
               >
                 <option value="Almacén Principal">Almacén Principal</option>
                 <option value="Almacén Secundario">Almacén Secundario</option>
