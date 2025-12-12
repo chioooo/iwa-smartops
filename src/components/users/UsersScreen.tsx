@@ -11,7 +11,7 @@ import type { User, Role } from "../../data/types/users.types.ts";
 import {CreateRoleModal} from "./CreateRoleModal.tsx";
 import { usePermissions } from "../../hooks/usePermissions";
 
-export function UsersScreen({ user }: { user: any }) {
+export function UsersScreen({ user }: { user: User }) {
   const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
@@ -202,8 +202,8 @@ export function UsersScreen({ user }: { user: any }) {
                     <Shield className="w-5 h-5" />
                     Roles y Permisos
                     <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
-                {roles.length}
-              </span>
+                      {roles.length}
+                    </span>
                   </button>
               ) }
             </div>
@@ -267,6 +267,7 @@ export function UsersScreen({ user }: { user: any }) {
                       onEditUser={(user) => setEditUser(user)}
                       onDeleteUser={handleDeleteUser}
                       selectedUserId={selectedUser?.id}
+                      user={user}
                   />
                 </div>
 
