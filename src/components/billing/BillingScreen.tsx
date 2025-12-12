@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Plus, Receipt, Settings as SettingsIcon } from 'lucide-react';
 import { useChatbot } from '../../contexts/ChatbotContext';
-import React, { useState } from 'react';
-import { FileText, Plus, Receipt } from 'lucide-react';
 import { BillingDashboard } from './BillingDashboard';
 import { InvoiceTable } from './InvoiceTable';
 import { CreateInvoiceForm } from './CreateInvoiceForm';
