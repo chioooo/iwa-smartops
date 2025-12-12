@@ -14,51 +14,11 @@ import {
   type InventoryAIOption,
   type InventoryAIResponse,
 } from './InventoryResponsesIA';
+import { SupplyModal } from './SupplyModal';
+import { ConfirmModal } from '../common/ConfirmModal';
 
-export type Product = {
-  id: string;
-  name: string;
-  sku: string;
-  category: string;
-  stock: number;
-  minStock: number;
-  price: number;
-  purchasePrice: number;
-  unit: string;
-  supplier: string;
-  description: string;
-  status: 'active' | 'inactive';
-  image?: string;
-  warehouse?: string;
-};
-
-export type Supply = {
-  id: string;
-  name: string;
-  unit: string;
-  stock: number;
-  category: string;
-  supplier: string;
-  status: 'active' | 'inactive';
-};
-
-export type Category = {
-  id: string;
-  name: string;
-  description: string;
-  productsCount: number;
-  color: string;
-};
-
-export type InventoryMovement = {
-  id: string;
-  productId: string;
-  type: 'entry' | 'exit' | 'adjustment' | 'transfer';
-  quantity: number;
-  date: string;
-  reason: string;
-  user: string;
-};
+import { inventoryService } from '../../services/inventory/inventoryService';
+import type { Category, InventoryMovement, Product, Supply } from '../../services/inventory/inventory.types';
 
 export function InventoryScreen() {
   const { pendingAction, consumeAction, highlightedElement } = useChatbot();
@@ -70,7 +30,6 @@ export function InventoryScreen() {
   const [showAnalysisDetailModal, setShowAnalysisDetailModal] = useState(false);
   const [analysisDetail, setAnalysisDetail] = useState<InventoryAIResponse | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedSupply, setSelectedSupply] = useState<Supply | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const [typedIntro, setTypedIntro] = useState('');
@@ -81,15 +40,14 @@ export function InventoryScreen() {
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
-  // Escuchar acciones del chatbot
-  useEffect(() => {
-    if (pendingAction === 'openCreateProduct') {
-      consumeAction();
-      setActiveTab('products');
-      setEditingProduct(null);
-      setShowProductModal(true);
-    }
-  }, [pendingAction, consumeAction]);
+  const [confirmDelete, setConfirmDelete] = useState<
+    | {
+        kind: 'product' | 'supply';
+        id: string;
+        name: string;
+      }
+    | null
+  >(null);
 
   useEffect(() => {
     if (!analysisDetail || !showAnalysisDetailModal) {
@@ -148,159 +106,28 @@ export function InventoryScreen() {
     };
   }, [analysisDetail, showAnalysisDetailModal]);
 
-  // Mock data - productos
-  const [products, setProducts] = useState<Product[]>([
-    {
-      id: '1',
-      name: 'Laptop Dell XPS 15',
-      sku: 'TECH-001',
-      category: 'Tecnología',
-      stock: 15,
-      minStock: 5,
-      price: 1299.99,
-      purchasePrice: 999.99,
-      unit: 'pieza',
-      supplier: 'Dell Inc.',
-      description: 'Laptop de alto rendimiento',
-      status: 'active',
-      image: 'LP',
-      warehouse: 'Almacén Principal'
-    },
-    {
-      id: '2',
-      name: 'Silla Ergonómica Pro',
-      sku: 'FURN-002',
-      category: 'Mobiliario',
-      stock: 3,
-      minStock: 10,
-      price: 299.99,
-      purchasePrice: 199.99,
-      unit: 'pieza',
-      supplier: 'Office Supplies Co.',
-      description: 'Silla ergonómica con soporte lumbar',
-      status: 'active',
-      image: 'SE',
-      warehouse: 'Almacén Principal'
-    },
-    {
-      id: '3',
-      name: 'Papel Carta 500 hojas',
-      sku: 'OFF-003',
-      category: 'Papelería',
-      stock: 120,
-      minStock: 20,
-      price: 5.99,
-      purchasePrice: 3.99,
-      unit: 'paquete',
-      supplier: 'Papelería Moderna',
-      description: 'Papel carta tamaño estándar',
-      status: 'active',
-      image: 'PC',
-      warehouse: 'Almacén Secundario'
-    },
-    {
-      id: '4',
-      name: 'Monitor LG 27" 4K',
-      sku: 'TECH-004',
-      category: 'Tecnología',
-      stock: 8,
-      minStock: 5,
-      price: 399.99,
-      purchasePrice: 299.99,
-      unit: 'pieza',
-      supplier: 'LG Electronics',
-      description: 'Monitor 4K con HDR',
-      status: 'active',
-      image: 'ML',
-      warehouse: 'Almacén Principal'
-    },
-    {
-      id: '5',
-      name: 'Impresora HP LaserJet',
-      sku: 'TECH-005',
-      category: 'Tecnología',
-      stock: 2,
-      minStock: 3,
-      price: 249.99,
-      purchasePrice: 179.99,
-      unit: 'pieza',
-      supplier: 'HP Inc.',
-      description: 'Impresora láser monocromática',
-      status: 'inactive',
-      image: 'IH',
-      warehouse: 'Almacén Principal'
-    },
-  ]);
+  const [editingSupply, setEditingSupply] = useState<Supply | null>(null);
 
-  // Mock data - insumos
-  const [supplies, setSupplies] = useState<Supply[]>([
-    {
-      id: '1',
-      name: 'Tóner Negro HP',
-      unit: 'pieza',
-      stock: 15,
-      category: 'Consumibles',
-      supplier: 'HP Inc.',
-      status: 'active'
-    },
-    {
-      id: '2',
-      name: 'Cable HDMI 2m',
-      unit: 'pieza',
-      stock: 45,
-      category: 'Cables',
-      supplier: 'Tech Supplies',
-      status: 'active'
-    },
-    {
-      id: '3',
-      name: 'Clip Metálico',
-      unit: 'caja',
-      stock: 5,
-      category: 'Papelería',
-      supplier: 'Papelería Moderna',
-      status: 'active'
-    },
-  ]);
+  const [products, setProducts] = useState<Product[]>(() => inventoryService.getProducts());
+  const [supplies, setSupplies] = useState<Supply[]>(() => inventoryService.getSupplies());
+  const [categories, setCategories] = useState<Category[]>(() => inventoryService.getCategories());
+  const [movements, setMovements] = useState<InventoryMovement[]>(() => inventoryService.getMovements());
 
-  // Mock data - categorías
-  const [categories, setCategories] = useState<Category[]>([
-    { id: '1', name: 'Tecnología', description: 'Equipos electrónicos y tecnológicos', productsCount: 3, color: '#D0323A' },
-    { id: '2', name: 'Mobiliario', description: 'Muebles y equipamiento de oficina', productsCount: 1, color: '#F6A016' },
-    { id: '3', name: 'Papelería', description: 'Artículos de oficina y papelería', productsCount: 1, color: '#E9540D' },
-    { id: '4', name: 'Consumibles', description: 'Insumos y materiales consumibles', productsCount: 0, color: '#9F2743' },
-  ]);
+  useEffect(() => {
+    inventoryService.saveProducts(products);
+  }, [products]);
 
-  // Mock data - movimientos
-  const [movements, setMovements] = useState<InventoryMovement[]>([
-    {
-      id: '1',
-      productId: '1',
-      type: 'entry',
-      quantity: 10,
-      date: '2024-11-20',
-      reason: 'Compra nueva',
-      user: 'Juan Pérez'
-    },
-    {
-      id: '2',
-      productId: '1',
-      type: 'exit',
-      quantity: 5,
-      date: '2024-11-22',
-      reason: 'Venta',
-      user: 'María González'
-    },
-    {
-      id: '3',
-      productId: '2',
-      type: 'adjustment',
-      quantity: -2,
-      date: '2024-11-23',
-      reason: 'Producto dañado',
-      user: 'Carlos Ruiz'
-    },
-  ]);
+  useEffect(() => {
+    inventoryService.saveSupplies(supplies);
+  }, [supplies]);
+
+  useEffect(() => {
+    inventoryService.saveCategories(categories);
+  }, [categories]);
+
+  useEffect(() => {
+    inventoryService.saveMovements(movements);
+  }, [movements]);
 
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
@@ -313,7 +140,7 @@ export function InventoryScreen() {
   };
 
   const handleUpdateProduct = (productId: string, updates: Partial<Product>) => {
-    setProducts(products.map(p => p.id === productId ? { ...p, ...updates } : p));
+    setProducts(prevProducts  => prevProducts .map(p => p.id === productId ? { ...p, ...updates } : p));
     if (selectedProduct?.id === productId) {
       setSelectedProduct({ ...selectedProduct, ...updates });
     }
@@ -330,14 +157,37 @@ export function InventoryScreen() {
     setShowSupplyModal(false);
   };
 
+  const handleUpdateSupply = (supplyId: string, updates: Partial<Supply>) => {
+    setSupplies(prevSupplies => prevSupplies.map(s => s.id === supplyId ? { ...s, ...updates } : s));
+    setShowSupplyModal(false);
+    setEditingSupply(null);
+  };
+
+  const handleEditSupply = (supply: Supply) => {
+    setEditingSupply(supply);
+    setShowSupplyModal(true);
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+    // Limpiar selección si el producto eliminado estaba seleccionado
+    if (selectedProduct?.id === productId) {
+      setSelectedProduct(null);
+    }
+  };
+
+  const handleDeleteSupply = (supplyId: string) => {
+    setSupplies(prevSupplies => prevSupplies.filter(s => s.id !== supplyId));
+  };
+
   const handleInventoryAdjustment = (productId: string, physicalStock: number, reason: string) => {
     const product = products.find(p => p.id === productId);
     if (product) {
       const difference = physicalStock - product.stock;
       
-      // Actualizar stock del producto
+      // Actualizar stock del producto directamente
       handleUpdateProduct(productId, { stock: physicalStock });
-      
+
       // Registrar movimiento
       const newMovement: InventoryMovement = {
         id: String(movements.length + 1),
@@ -350,7 +200,9 @@ export function InventoryScreen() {
       };
       setMovements([...movements, newMovement]);
     }
+    // Cerrar modal y limpiar selección
     setShowAdjustmentModal(false);
+    setSelectedProduct(null);
   };
 
   const handleEditProduct = (product: Product) => {
@@ -660,6 +512,14 @@ export function InventoryScreen() {
 
   const lowStockCount = products.filter(p => p.stock <= p.minStock).length;
 
+  const requestDeleteProduct = (product: Product) => {
+    setConfirmDelete({ kind: 'product', id: product.id, name: product.name });
+  };
+
+  const requestDeleteSupply = (supply: Supply) => {
+    setConfirmDelete({ kind: 'supply', id: supply.id, name: supply.name });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -697,7 +557,10 @@ export function InventoryScreen() {
               )}
               {activeTab === 'supplies' && (
                 <button
-                  onClick={() => setShowSupplyModal(true)}
+                  onClick={() => {
+                  setEditingSupply(null);
+                  setShowSupplyModal(true);
+                }}
                   className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
                 >
                   <Layers className="w-5 h-5" />
@@ -785,6 +648,7 @@ export function InventoryScreen() {
             onSelectProduct={setSelectedProduct}
             onEditProduct={handleEditProduct}
             onUpdateProduct={handleUpdateProduct}
+            onDeleteProduct={requestDeleteProduct}
             onOpenAdjustment={handleOpenAdjustment}
             selectedProductId={selectedProduct?.id}
           />
@@ -794,19 +658,22 @@ export function InventoryScreen() {
           <SuppliesTable
             supplies={supplies}
             onCreateSupply={handleCreateSupply}
+            onEditSupply={handleEditSupply}
+            onDeleteSupply={requestDeleteSupply}
           />
         )}
 
         {activeTab === 'categories' && (
           <CategoriesSection
             categories={categories}
+            products={products}
             onUpdateCategories={setCategories}
           />
         )}
       </div>
 
       {/* Product Detail Modal */}
-      {selectedProduct && (
+      {selectedProduct && !showAdjustmentModal && (
         <ProductDetailPanel
           product={selectedProduct}
           movements={movements.filter(m => m.productId === selectedProduct.id)}
@@ -829,282 +696,320 @@ export function InventoryScreen() {
         />
       )}
 
-    {/* Inventory Adjustment Modal */}
-    {showAdjustmentModal && selectedProduct && (
-      <InventoryAdjustmentModal
-        product={selectedProduct}
-        onClose={() => {
-          setShowAdjustmentModal(false);
-          setSelectedProduct(null);
-        }}
-        onAdjust={handleInventoryAdjustment}
-      />
-    )}
+      {/* Inventory Adjustment Modal */}
+      {showAdjustmentModal && selectedProduct && (
+        <InventoryAdjustmentModal
+          product={selectedProduct}
+          onClose={() => {
+            setShowAdjustmentModal(false);
+            setSelectedProduct(null);
+          }}
+          onAdjust={handleInventoryAdjustment}
+        />
+      )}
 
-    {showAnalysisModal && (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
-            <div>
-              <h2 className="text-gray-900">Analisis de inventario</h2>
-              <p className="text-gray-600 text-sm mt-1">
-                Selecciona el tipo de análisis que deseas realizar
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAnalysisModal(false)}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-6">
-            <div className="space-y-3">
-              <div
-                className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
-                onClick={() => handleAnalysisOption('inventory')}
-              >
-                <p className="text-gray-900">Analisis de inventario</p>
+      {/* Supply Modal */}
+      {showSupplyModal && (
+        <SupplyModal
+          supply={editingSupply}
+          categories={categories}
+          onClose={() => {
+            setShowSupplyModal(false);
+            setEditingSupply(null);
+          }}
+          onCreate={handleCreateSupply}
+          onUpdate={handleUpdateSupply}
+        />
+      )}
+
+      {showAnalysisModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+              <div>
+                <h2 className="text-gray-900">Analisis de inventario</h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  Selecciona el tipo de análisis que deseas realizar
+                </p>
               </div>
-              <div
-                className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
-                onClick={() => handleAnalysisOption('lowStock')}
-              >
-                <p className="text-gray-900">Stock bajo</p>
-              </div>
-              <div
-                className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
-                onClick={() => handleAnalysisOption('highMargin')}
-              >
-                <p className="text-gray-900">Mayor utilidad</p>
-              </div>
-              <div
-                className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
-                onClick={() => handleAnalysisOption('unsold')}
-              >
-                <p className="text-gray-900">Productos no vendidos</p>
-              </div>
-              <div
-                className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
-                onClick={() => handleAnalysisOption('noMovement')}
-              >
-                <p className="text-gray-900">Estrategias de venta a productos sin movimiento</p>
-              </div>
-            </div>
-            <div className="mt-6 flex justify-end">
               <button
-                type="button"
                 onClick={() => setShowAnalysisModal(false)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Cerrar
+                <X className="w-5 h-5" />
               </button>
             </div>
-          </div>
-        </div>
-      </div>
-    )}
-
-    {showAnalysisDetailModal && analysisDetail && (
-      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
-            <div>
-              <p className="text-xs font-medium text-[#D0323A] mb-1">Respuesta generada por IA</p>
-              <h2 className="text-gray-900">{analysisDetail.title}</h2>
-            </div>
-            <button
-              onClick={() => setShowAnalysisDetailModal(false)}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="px-6 pt-4 pb-6 space-y-4">
-            {!isTypingComplete && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <span className="inline-flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-                <span>IA analizando tu inventario...</span>
-              </div>
-            )}
-            <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-line">
-              {typedIntro}
-            </p>
-            <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
-              {analysisDetail.bullets.slice(0, visibleBulletCount).map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-            {isTypingComplete && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-sm text-gray-600 mb-3">
-                  ✅ Análisis completado. ¿Deseas exportar este reporte?
-                </p>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleExportPDF}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm"
-                  >
-                    <FileDown className="w-4 h-4" />
-                    Exportar PDF
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setEmailAddress('');
-                      setEmailSent(false);
-                      setShowEmailModal(true);
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 border border-[#D0323A] text-[#D0323A] rounded-lg hover:bg-red-50 transition-colors text-sm"
-                  >
-                    <Mail className="w-4 h-4" />
-                    Enviar por correo
-                  </button>
+            <div className="p-6">
+              <div className="space-y-3">
+                <div
+                  className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
+                  onClick={() => handleAnalysisOption('inventory')}
+                >
+                  <p className="text-gray-900">Analisis de inventario</p>
+                </div>
+                <div
+                  className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
+                  onClick={() => handleAnalysisOption('lowStock')}
+                >
+                  <p className="text-gray-900">Stock bajo</p>
+                </div>
+                <div
+                  className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
+                  onClick={() => handleAnalysisOption('highMargin')}
+                >
+                  <p className="text-gray-900">Mayor utilidad</p>
+                </div>
+                <div
+                  className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
+                  onClick={() => handleAnalysisOption('unsold')}
+                >
+                  <p className="text-gray-900">Productos no vendidos</p>
+                </div>
+                <div
+                  className="px-4 py-3 rounded-lg border border-gray-200 hover:border-[#D0323A] hover:bg-red-50 cursor-pointer transition-colors"
+                  onClick={() => handleAnalysisOption('noMovement')}
+                >
+                  <p className="text-gray-900">Estrategias de venta a productos sin movimiento</p>
                 </div>
               </div>
-            )}
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAnalysisDetailModal(false);
-                  setShowAnalysisModal(true);
-                }}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-              >
-                Ver otras opciones
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAnalysisDetailModal(false)}
-                className="px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
-
-    {showEmailModal && (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
-            <div>
-              <h2 className="text-gray-900">Enviar análisis por correo</h2>
-              <p className="text-gray-600 text-sm mt-1">
-                Ingresa el correo electrónico del destinatario
-              </p>
-            </div>
-            <button
-              onClick={() => setShowEmailModal(false)}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="p-6">
-            {emailSent ? (
-              <div className="text-center py-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Mail className="w-6 h-6 text-green-600" />
-                </div>
-                <p className="text-gray-900 font-medium mb-1">¡Correo enviado!</p>
-                <p className="text-gray-600 text-sm">
-                  El análisis ha sido enviado a {emailAddress}
-                </p>
+              <div className="mt-6 flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowEmailModal(false)}
-                  className="mt-4 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm"
+                  onClick={() => setShowAnalysisModal(false)}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Cerrar
                 </button>
               </div>
-            ) : (
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!emailAddress.trim() || !analysisDetail) return;
-                  setEmailSending(true);
-                  
-                  try {
-                    const htmlContent = generateEmailHTML();
-                    const response = await fetch('http://localhost:3001/api/send-email', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        to: emailAddress,
-                        subject: `SmartOps - ${analysisDetail.title}`,
-                        body: htmlContent,
-                        provider: 'microsoft'
-                      }),
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                      setEmailSent(true);
-                    } else {
-                      alert(`Error al enviar: ${result.error}`);
-                    }
-                  } catch (error) {
-                    console.error('Error enviando correo:', error);
-                    alert('Error de conexión con el servidor de correo');
-                  } finally {
-                    setEmailSending(false);
-                  }
-                }}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showAnalysisDetailModal && analysisDetail && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+              <div>
+                <p className="text-xs font-medium text-[#D0323A] mb-1">Respuesta generada por IA</p>
+                <h2 className="text-gray-900">{analysisDetail.title}</h2>
+              </div>
+              <button
+                onClick={() => setShowAnalysisDetailModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Correo electrónico
-                </label>
-                <input
-                  type="email"
-                  value={emailAddress}
-                  onChange={(e) => setEmailAddress(e.target.value)}
-                  placeholder="ejemplo@correo.com"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D0323A] focus:border-[#D0323A] outline-none transition-colors"
-                  required
-                  disabled={emailSending}
-                />
-                <div className="mt-6 flex justify-end gap-2">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="px-6 pt-4 pb-6 space-y-4">
+              {!isTypingComplete && (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+                  <span>IA analizando tu inventario...</span>
+                </div>
+              )}
+
+              <p className="text-gray-800 text-sm leading-relaxed whitespace-pre-line">{typedIntro}</p>
+
+              <ul className="list-disc pl-5 space-y-2 text-sm text-gray-700">
+                {analysisDetail.bullets.slice(0, visibleBulletCount).map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+
+              {isTypingComplete && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm text-gray-600 mb-3">✅ Análisis completado. ¿Deseas exportar este reporte?</p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleExportPDF}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm"
+                    >
+                      <FileDown className="w-4 h-4" />
+                      Exportar PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmailAddress('');
+                        setEmailSent(false);
+                        setShowEmailModal(true);
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 border border-[#D0323A] text-[#D0323A] rounded-lg hover:bg-red-50 transition-colors text-sm"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Enviar por correo
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAnalysisDetailModal(false);
+                    setShowAnalysisModal(true);
+                  }}
+                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                >
+                  Ver otras opciones
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAnalysisDetailModal(false)}
+                  className="px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+              <div>
+                <h2 className="text-gray-900">Enviar análisis por correo</h2>
+                <p className="text-gray-600 text-sm mt-1">
+                  Ingresa el correo electrónico del destinatario
+                </p>
+              </div>
+              <button
+                onClick={() => setShowEmailModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6">
+              {emailSent ? (
+                <div className="text-center py-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Mail className="w-6 h-6 text-green-600" />
+                  </div>
+                  <p className="text-gray-900 font-medium mb-1">¡Correo enviado!</p>
+                  <p className="text-gray-600 text-sm">
+                    El análisis ha sido enviado a {emailAddress}
+                  </p>
                   <button
                     type="button"
                     onClick={() => setShowEmailModal(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
-                    disabled={emailSending}
+                    className="mt-4 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm"
                   >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={emailSending || !emailAddress.trim()}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {emailSending ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Enviando...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-4 h-4" />
-                        Enviar
-                      </>
-                    )}
+                    Cerrar
                   </button>
                 </div>
-              </form>
-            )}
+              ) : (
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!emailAddress.trim() || !analysisDetail) return;
+                    setEmailSending(true);
+
+                    try {
+                      const htmlContent = generateEmailHTML();
+                      const response = await fetch('http://localhost:3001/api/send-email', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          to: emailAddress,
+                          subject: `SmartOps - ${analysisDetail.title}`,
+                          body: htmlContent,
+                          provider: 'microsoft'
+                        }),
+                      });
+
+                      const result = await response.json();
+
+                      if (result.success) {
+                        setEmailSent(true);
+                      } else {
+                        alert(`Error al enviar: ${result.error}`);
+                      }
+                    } catch (error) {
+                      console.error('Error enviando correo:', error);
+                      alert('Error de conexión con el servidor de correo');
+                    } finally {
+                      setEmailSending(false);
+                    }
+                  }}
+                >
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Correo electrónico
+                  </label>
+                  <input
+                    type="email"
+                    value={emailAddress}
+                    onChange={(e) => setEmailAddress(e.target.value)}
+                    placeholder="ejemplo@correo.com"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D0323A] focus:border-[#D0323A] outline-none transition-colors"
+                    required
+                    disabled={emailSending}
+                  />
+                  <div className="mt-6 flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailModal(false)}
+                      className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+                      disabled={emailSending}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={emailSending || !emailAddress.trim()}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {emailSending ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Enviando...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="w-4 h-4" />
+                          Enviar
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    )}
-  </div>
-);
-}
+      )}
+      <ConfirmModal
+        open={confirmDelete !== null}
+        title="Confirmar eliminación"
+        message={
+          confirmDelete?.kind === 'product'
+            ? `¿Estás seguro de eliminar el producto "${confirmDelete.name}"?`
+            : confirmDelete?.kind === 'supply'
+              ? `¿Estás seguro de eliminar el insumo "${confirmDelete.name}"?`
+              : ''
+        }
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onCancel={() => setConfirmDelete(null)}
+        onConfirm={() => {
+          if (!confirmDelete) return;
+          if (confirmDelete.kind === 'product') {
+            handleDeleteProduct(confirmDelete.id);
+          } else {
+            handleDeleteSupply(confirmDelete.id);
+          }
+          setConfirmDelete(null);
+        }}
+      />
+    </div>
+  );
+ }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Package, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
-import type {Product} from './InventoryScreen';
+import type { Product } from '../../services/inventory/inventory.types';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 
 type Props = {
   product: Product;
@@ -21,6 +22,8 @@ export function InventoryAdjustmentModal({ product, onClose, onAdjust }: Props) 
   const [physicalStock, setPhysicalStock] = useState<number>(product.stock);
   const [reason, setReason] = useState('');
   const [customReason, setCustomReason] = useState('');
+
+  useModalScrollLock();
 
   const difference = physicalStock - product.stock;
   const isDifferent = difference !== 0;
@@ -47,10 +50,10 @@ export function InventoryAdjustmentModal({ product, onClose, onAdjust }: Props) 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col my-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 rounded-t-2xl text-white">
+        <div className="bg-gradient-to-r from-[#D0323A] to-[#E9540D] px-6 py-5 rounded-t-2xl text-white flex-shrink-0">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-white mb-1">Ajuste de Inventario</h2>
@@ -68,7 +71,7 @@ export function InventoryAdjustmentModal({ product, onClose, onAdjust }: Props) 
         </div>
 
         {/* Product Info */}
-        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-[#D0323A] to-[#9F2743] rounded-xl flex items-center justify-center text-white text-xl">
               {product.image}
@@ -81,7 +84,7 @@ export function InventoryAdjustmentModal({ product, onClose, onAdjust }: Props) 
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
           <div className="space-y-6">
             {/* Current Stock */}
             <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
