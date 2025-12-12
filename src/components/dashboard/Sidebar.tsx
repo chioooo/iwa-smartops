@@ -6,6 +6,7 @@ import {
   Settings,
   BarChart3,
   Wallet,
+  Truck,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const menuItems = [
   { id: 'dashboard', icon: LayoutDashboard, label: "Inicio" },
   { id: 'users', icon: Users, label: "Usuarios" },
   { id: 'inventory', icon: Package, label: "Inventario" },
+  { id: 'deliveries', icon: Truck, label: "Entregas" },
   { id: 'billing', icon: FileText, label: "Facturación" },
   { id: 'reports', icon: BarChart3, label: "Reportes" },
   { id: 'finances', icon: Wallet, label: "Finanzas" },
