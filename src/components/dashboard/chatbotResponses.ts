@@ -58,7 +58,9 @@ const getInvoicesData = () => {
       const pending = invoices.filter((i: { status: string }) => i.status === 'pending');
       return { total: invoices.length, pending: pending.length };
     }
-  } catch { }
+  } catch (err) {
+    console.error('Error retrieving invoices data:', err);
+  }
   return { total: 156, pending: 23 };
 };
 
