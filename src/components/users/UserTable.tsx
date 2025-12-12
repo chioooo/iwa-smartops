@@ -105,7 +105,7 @@ export function UserTable({
                     <td className="px-6 py-4">
                   <span
                       className={`px-3 py-1 rounded-full text-sm ${
-                          user.role === "Admin"
+                          user.role === "Administrador"
                               ? "bg-[#D0323A] text-white"
                               : user.role === "Operador"
                                   ? "bg-[#F6A016] text-white"

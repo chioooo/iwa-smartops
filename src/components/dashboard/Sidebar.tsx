@@ -38,7 +38,7 @@ export function Sidebar({ isOpen, onToggle, activeSection, onNavigate }: Sidebar
       {/* Logo Section */}
       <div className="h-20 flex items-center justify-between px-6 border-b border-gray-200">
         {isOpen ? (
-          <img src={logoImage} alt="iWA SmartOps" className="h-10" />
+          <img src={logoImage} alt="iWA SmartOps" className="h-20" />
         ) : (
           <div className="w-8 h-8 bg-gradient-to-br from-[#D0323A] to-[#E9540D] rounded-lg"></div>
         )}

@@ -11,7 +11,7 @@ import { BillingScreen } from "./billing/BillingScreen";
 import { ReportsScreen } from "./reports/ReportsScreen";
 import { FinancesScreen } from "./finances/FinancesScreen";
 
-export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
+export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [chatbotOpen, setChatbotOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
@@ -29,7 +29,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
       {/* Main Content */}
       <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         {/* Header */}
-        <DashboardHeader onLogout={onLogout} />
+        <DashboardHeader user={user} onLogout={onLogout} />
 
         {/* Render content based on active section */}
         {activeSection === 'dashboard' && (
@@ -39,7 +39,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
               {/* Welcome Section */}
               <div className="mb-8">
                 <h1 className="text-gray-900 text-3xl mb-2">
-                  Bienvenido, Juan Pérez
+                  Bienvenid@, {user?.name}
                 </h1>
                 <p className="text-gray-600">
                   Aquí está el resumen de tus operaciones de hoy
@@ -65,7 +65,7 @@ export function DashboardScreen({ onLogout }: { onLogout: () => void }) {
           </>
         )}
 
-        {activeSection === 'users' && <UsersScreen />}
+        {activeSection === 'users' && <UsersScreen user={user} />}
 
         {activeSection === 'inventory' && <InventoryScreen />}
 

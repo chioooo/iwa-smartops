@@ -4,7 +4,7 @@ import logoImage from "../assets/logo.png";
 
 interface LoginScreenProps {
   onGoToRegister: () => void;
-  onLogin: () => void;
+  onLogin: (email: string) => void;
 }
 
 export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
@@ -14,9 +14,8 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    onLogin(email);
     console.log("Login attempt:", { email, password });
-    // Simulate successful login - redirect to dashboard
-    onLogin();
   };
 
   return (
@@ -58,7 +57,7 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
           {/* Form Header */}
           <div className="mb-8">
             <h2 className="text-3xl text-gray-900 mb-2">
-              Bienvenido de vuelta
+              Bienvenid@ de vuelta
             </h2>
             <p className="text-gray-600">
               Ingresa tus credenciales para continuar
