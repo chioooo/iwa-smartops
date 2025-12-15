@@ -63,6 +63,10 @@ export function Sidebar({ isOpen, onToggle, activeSection, onNavigate, user }: S
               return null; // no mostrar si no tiene permiso
             }
 
+            if (item.id === 'users' && !hasPermission('users.view')) {
+              return null; // no mostrar si no tiene permiso
+            }
+
             return (
                 <li key={item.id}>
                   <button

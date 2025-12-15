@@ -63,9 +63,10 @@ export const DEMO_ROLES: Role[] = [
         permissions: [
             'users.view', 'users.create', 'users.edit', 'users.delete',
             'inventory.viewP', 'inventory.createP',
+            'inventory.viewS', 'inventory.createS',
             'billing.view', 'billing.create',
             'reports.view',
-            'settings.edit'
+            'settings.view','settings.edit'
         ]
     },
     {

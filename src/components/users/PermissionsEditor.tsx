@@ -67,7 +67,6 @@ export function PermissionsEditor({ role, onClose, onSave }: Props) {
       permissions: [
         { id: 'billing.view', label: 'Ver facturas', description: 'Consultar facturas generadas' },
         { id: 'billing.create', label: 'Crear facturas', description: 'Generar nuevas facturas' },
-        { id: 'billing.edit', label: 'Editar facturas', description: 'Modificar facturas existentes' },
         { id: 'billing.delete', label: 'Anular facturas', description: 'Cancelar o anular facturas' },
       ]
     },
