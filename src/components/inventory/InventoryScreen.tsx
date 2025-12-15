@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Layers, Grid3x3, TrendingDown, X, Star, FileDown, Mail } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { useChatbot } from '../../contexts/ChatbotContext';
 import { InventoryDashboard } from './InventoryDashboard';
 import { ProductTable } from './ProductTable';
 import { SuppliesTable } from './SuppliesTable';
@@ -22,6 +23,7 @@ import type {User} from "../../data/types/users.types.ts";
 import { usePermissions } from "../../hooks/usePermissions";
 
 export function InventoryScreen({ user }: { user: User }) {
+  const { pendingAction, consumeAction, highlightedElement } = useChatbot();
   const [showProductModal, setShowProductModal] = useState(false);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
@@ -129,6 +131,15 @@ export function InventoryScreen({ user }: { user: User }) {
     inventoryService.saveMovements(movements);
   }, [movements]);
 
+  useEffect(() => {
+    if (pendingAction === 'openCreateProduct') {
+      consumeAction();
+      setActiveTab('products');
+      setEditingProduct(null);
+      setShowProductModal(true);
+    }
+  }, [pendingAction, consumeAction]);
+
   const handleCreateProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       ...productData,
@@ -184,10 +195,10 @@ export function InventoryScreen({ user }: { user: User }) {
     const product = products.find(p => p.id === productId);
     if (product) {
       const difference = physicalStock - product.stock;
-
+      
       // Actualizar stock del producto directamente
       handleUpdateProduct(productId, { stock: physicalStock });
-
+            
       // Registrar movimiento
       const newMovement: InventoryMovement = {
         id: String(movements.length + 1),
@@ -302,7 +313,7 @@ export function InventoryScreen({ user }: { user: User }) {
         // Detectar si es un encabezado de sección (tiene emoji al inicio)
         const sectionEmojis = ['📊', '⚠️', '⭐', '📉', '🔄', '🧠', '📋', '💡', '🎯', '🚀'];
         const isHeader = sectionEmojis.some(emoji => line.startsWith(emoji));
-
+        
         if (isHeader) {
           yPosition += 5;
           doc.setFontSize(12);
@@ -348,7 +359,7 @@ export function InventoryScreen({ user }: { user: User }) {
     doc.setFillColor(250, 245, 245);
     doc.setDrawColor(208, 50, 58);
     doc.setLineWidth(0.3);
-
+    
     // Calcular altura de la caja
     let tempY = 0;
     analysisDetail.bullets.forEach((bullet) => {
@@ -399,7 +410,7 @@ export function InventoryScreen({ user }: { user: User }) {
     if (!analysisDetail) return '';
 
     const fecha = getReportDate();
-
+    
     // Procesar el intro para convertir emojis y bullets en HTML
     const formatIntro = (text: string) => {
       return text
@@ -555,15 +566,18 @@ export function InventoryScreen({ user }: { user: User }) {
               {activeTab === 'products' && (
                 <button
                     disabled={!hasPermission("inventory.createP")}
+                  id="btn-nuevo-producto"
                   onClick={() => {
                     setEditingProduct(null);
                     setShowProductModal(true);
                   }}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
-                    ${hasPermission("inventory.createP")
+  ${hasPermission("inventory.createP")
                         ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                    } 
+  ${highlightedElement === 'btn-nuevo-producto' ? 'chatbot-highlight' : ''}`}
+
                 >
                   <Package className="w-5 h-5" />
                   Nuevo Producto

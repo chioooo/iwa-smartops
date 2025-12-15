@@ -12,6 +12,7 @@ import { ReportsScreen } from "./reports/ReportsScreen";
 import { FinancesScreen } from "./finances/FinancesScreen";
 import { DeliveriesScreen } from "./deliveries/DeliveriesScreen";
 import SettingsScreen from "./SettingsScreen";
+import { ChatbotProvider } from "../contexts/ChatbotContext";
 
 export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,6 +20,7 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
   const [activeSection, setActiveSection] = useState('dashboard');
 
   return (
+    <ChatbotProvider onNavigate={setActiveSection}>
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar */}
       <Sidebar
@@ -80,7 +82,7 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
 
         {activeSection === 'finances' && <FinancesScreen />}
 
-        {activeSection === 'settings' && <SettingsScreen />}
+        {activeSection === 'settings' && <SettingsScreen user={user} />}
 
         {/* Footer */}
         <footer className="mt-auto border-t border-gray-200 bg-white py-4">
@@ -96,5 +98,6 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
       <Chatbot isOpen={chatbotOpen} onClose={() => setChatbotOpen(false)} />
       {!chatbotOpen && <ChatbotButton onClick={() => setChatbotOpen(true)} hasNotification={true} />}
     </div>
+    </ChatbotProvider>
   );
 }
