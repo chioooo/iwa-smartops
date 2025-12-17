@@ -4,6 +4,8 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { deliveriesService } from '../../services/deliveries/deliveriesService';
+import { sendSmsToSingle } from '../../services/sms/smsService';
+import { AlertModal } from '../common/AlertModal';
 import type { DeliveryStop, RouteLeg, RouteTotals } from '../../services/deliveries/deliveries.types';
 
 function formatReportDate() {
@@ -57,6 +59,21 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [phoneByLegId, setPhoneByLegId] = useState<Record<string, string>>({});
+  const [sendingSmsLegId, setSendingSmsLegId] = useState<string | null>(null);
+  const [alertModal, setAlertModal] = useState<{
+    open: boolean;
+    type: 'success' | 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+  }>({ open: false, type: 'info', title: '', message: '' });
+
+  const showAlert = (type: 'success' | 'error' | 'warning' | 'info', title: string, message: string) => {
+    setAlertModal({ open: true, type, title, message });
+  };
+
+  const closeAlert = () => {
+    setAlertModal((prev) => ({ ...prev, open: false }));
+  };
 
   const notifyCustomerByWhatsApp = (legId: string, customer: string) => {
     const rawPhone = phoneByLegId[legId] ?? '2720000000';
@@ -70,6 +87,39 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
     const message = `Su orden ha sido entregada ${customer}`;
     const url = `https://wa.me/${normalized.waNumber}?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
+  };
+
+  const notifyCustomerBySms = async (legId: string, customer: string) => {
+    const rawPhone = phoneByLegId[legId] ?? '2720000000';
+    const digitsOnly = rawPhone.replace(/\D/g, '');
+
+    if (!digitsOnly || digitsOnly.length < 10) {
+      showAlert('warning', 'Número inválido', 'Ingresa un número de teléfono válido.');
+      return;
+    }
+
+    const message = `Su orden ha sido entregada ${customer}`;
+
+    setSendingSmsLegId(legId);
+    try {
+      const response = await sendSmsToSingle(digitsOnly, message);
+      
+      if (response.responses && response.responses.length > 0) {
+        const firstResponse = response.responses[0];
+        if (firstResponse.response.active) {
+          showAlert('success', 'SMS Enviado', `SMS enviado exitosamente a ${firstResponse.phoneNumber}`);
+        } else {
+          showAlert('warning', 'SMS Procesado', 'El SMS fue procesado pero el dispositivo no está activo.');
+        }
+      } else {
+        showAlert('success', 'SMS Enviado', 'SMS enviado correctamente.');
+      }
+    } catch (err) {
+      console.error('Error sending SMS:', err);
+      showAlert('error', 'Error de envío', 'Error al enviar el SMS. Verifica que el servicio esté disponible.');
+    } finally {
+      setSendingSmsLegId(null);
+    }
   };
 
   useEffect(() => {
@@ -210,7 +260,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
         {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
       </div>
 
-      <div ref={mapContainerRef} className="w-full h-[60vh]" />
+      <div ref={mapContainerRef} className="w-full h-[60vh]" style={{ isolation: 'isolate' }} />
 
       <div className="p-4 border-t border-gray-200">
         <strong className="text-sm text-gray-900">Detalle por tramo:</strong>
@@ -256,10 +306,11 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => {}}
-                        className="px-3 py-1.5 text-sm rounded-lg bg-blue-500 text-white hover:bg-gray-200 transition-colors"
+                        onClick={() => notifyCustomerBySms(leg.id, leg.destination)}
+                        disabled={sendingSmsLegId === leg.id}
+                        className="px-3 py-1.5 text-sm rounded-lg bg-blue-500 text-white hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        SMS
+                        {sendingSmsLegId === leg.id ? 'Enviando...' : 'SMS'}
                       </button>
                     </div>
                   </td>
@@ -276,6 +327,14 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
           </table>
         </div>
       </div>
+
+      <AlertModal
+        open={alertModal.open}
+        type={alertModal.type}
+        title={alertModal.title}
+        message={alertModal.message}
+        onClose={closeAlert}
+      />
     </div>
   );
 }
