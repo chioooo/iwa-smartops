@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare, CheckCircle, AlertTriangle, XCircle, RefreshCw } from 'lucide-react';
 
 import type { SmsStatusResponse } from '../../services/sms/sms.types';
@@ -9,7 +9,7 @@ export function SmsSettings() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const checkStatus = async () => {
+  const checkStatus = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -21,11 +21,11 @@ export function SmsSettings() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     checkStatus();
-  }, []);
+  }, [checkStatus]);
 
   const getFlagIcon = (flag: SmsStatusResponse['flag']) => {
     switch (flag) {

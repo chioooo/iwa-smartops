@@ -47,8 +47,6 @@ export async function sendSms(phoneNumbers: string[], message: string): Promise<
  * @param phoneNumber - Número de teléfono destino
  * @param message - Mensaje a enviar
  */
-export async function sendSmsToSingle(phoneNumber: string, message: string): Promise<SmsSendResponse> {
+export function sendSmsToSingle(phoneNumber: string, message: string): Promise<SmsSendResponse> {
   return sendSms([phoneNumber], message);
 }
-
-export { SMS_API_BASE_URL };
