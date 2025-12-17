@@ -26,8 +26,6 @@ class BusinessesService {
     if (lines.length < 2) return [];
 
     const headers = this.parseCSVLine(lines[0]).map((h) => h.replace(/^"|"$/g, '').trim());
-    console.log('CSV Headers:', headers);
-    console.log('Total lines:', lines.length);
     const idIndex = headers.indexOf('id');
     const nomEstabIndex = headers.indexOf('nom_estab');
     const nombreActIndex = headers.indexOf('nombre_act');
@@ -65,7 +63,6 @@ class BusinessesService {
       });
     }
 
-    console.log('Parsed businesses:', businesses.length);
     return businesses;
   }
 
