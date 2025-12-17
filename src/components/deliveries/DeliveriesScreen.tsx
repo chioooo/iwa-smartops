@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { deliveriesService } from '../../services/deliveries/deliveriesService';
 import { DeliveriesTab } from './DeliveriesTab';
 import { BranchesTab } from './BranchesTab';
+import { BusinessesTab } from './BusinessesTab';
 
 export function DeliveriesScreen() {
-  const [activeTab, setActiveTab] = useState<'deliveries' | 'branches'>('deliveries');
+  const [activeTab, setActiveTab] = useState<'deliveries' | 'branches' | 'businesses'>('deliveries');
   const center = deliveriesService.getBranchCenter();
   const deliveryStops = deliveriesService.getDeliveryStops();
 
@@ -38,16 +39,31 @@ export function DeliveriesScreen() {
             >
               Sucursales
             </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('businesses')}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                activeTab === 'businesses'
+                  ? 'border-[#D0323A] text-[#D0323A]'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Negocios
+            </button>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-          {activeTab === 'deliveries' ? (
+          {activeTab === 'deliveries' && (
             <DeliveriesTab key="deliveries" stops={deliveryStops} />
-          ) : (
+          )}
+          {activeTab === 'branches' && (
             <BranchesTab key="branches" center={center} popupText="Entregas: Sucursal principal" />
+          )}
+          {activeTab === 'businesses' && (
+            <BusinessesTab key="businesses" />
           )}
         </div>
       </div>
