@@ -144,48 +144,12 @@ export function SmsSettings() {
           {/* Información adicional */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-blue-800">
-              <strong>Nota:</strong> Este servicio utiliza Pushbullet para enviar mensajes SMS.
+              <strong>Nota:</strong> Este servicio utiliza una API externa para enviar mensajes SMS.
               Asegúrate de tener configurado correctamente el token de acceso y el dispositivo objetivo.
             </p>
           </div>
         </div>
       )}
-
-      {/* Placeholder para configuración futura */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <h3 className="text-sm font-medium text-gray-900 mb-4">Configuración del servicio</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label htmlFor="smsApiUrl" className="block text-sm font-medium text-gray-700 mb-2">
-              URL de la API
-            </label>
-            <input
-              type="url"
-              id="smsApiUrl"
-              name="smsApiUrl"
-              placeholder="https://api.pushbullet.com"
-              disabled
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
-            />
-            <p className="mt-1 text-xs text-gray-500">Próximamente disponible</p>
-          </div>
-
-          <div>
-            <label htmlFor="smsDeviceIden" className="block text-sm font-medium text-gray-700 mb-2">
-              ID del Dispositivo
-            </label>
-            <input
-              type="text"
-              id="smsDeviceIden"
-              name="smsDeviceIden"
-              placeholder="device_iden"
-              disabled
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-500 cursor-not-allowed"
-            />
-            <p className="mt-1 text-xs text-gray-500">Próximamente disponible</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
