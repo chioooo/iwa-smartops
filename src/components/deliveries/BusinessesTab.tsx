@@ -160,7 +160,7 @@ export function BusinessesTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[70vh]">
+      <div className="flex items-center justify-center h-[85vh]">
         <div className="text-gray-600">Cargando negocios...</div>
       </div>
     );
@@ -168,15 +168,15 @@ export function BusinessesTab() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-[70vh]">
+      <div className="flex items-center justify-center h-[85vh]">
         <div className="text-red-600">{error}</div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-[70vh]">
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+    <div className="flex flex-col h-[85vh]">
+      <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
         <div className="flex flex-wrap items-center gap-3">
           <select
             value={selectedMunicipio}
@@ -223,7 +223,7 @@ export function BusinessesTab() {
           )}
         </div>
 
-        <div className="mt-3 flex items-center justify-between">
+        <div className="mt-1 flex items-center justify-between">
           <span className="text-sm text-gray-600">
             {hasFilters
               ? `${displayCount.toLocaleString()} negocios encontrados${displayCount > MAX_MARKERS ? ` (mostrando ${MAX_MARKERS.toLocaleString()})` : ''}`
