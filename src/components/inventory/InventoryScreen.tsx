@@ -7,8 +7,8 @@ import { ProductTable } from './ProductTable';
 import { SuppliesTable } from './SuppliesTable';
 import { CategoriesSection } from './CategoriesSection';
 import { ProductModal } from './ProductModal';
-import { ProductDetailPanel } from './ProductDetailPanel';
 import { InventoryAdjustmentModal } from './InventoryAdjustmentModal';
+import { ProductDetailPanel } from './ProductDetailPanel';
 import {
   buildInventoryAIResponse,
   type InventoryAIOption,
@@ -19,10 +19,11 @@ import { ConfirmModal } from '../common/ConfirmModal';
 
 import { inventoryService } from '../../services/inventory/inventoryService';
 import type { Category, InventoryMovement, Product, Supply } from '../../services/inventory/inventory.types';
+import type {User} from "../../data/types/users.types.ts";
+import { usePermissions } from "../../hooks/usePermissions";
 
-export function InventoryScreen() {
+export function InventoryScreen({ user }: { user: User }) {
   const { pendingAction, consumeAction, highlightedElement } = useChatbot();
-  const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard'>('products');
   const [showProductModal, setShowProductModal] = useState(false);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showAdjustmentModal, setShowAdjustmentModal] = useState(false);
@@ -39,6 +40,7 @@ export function InventoryScreen() {
   const [emailAddress, setEmailAddress] = useState('');
   const [emailSending, setEmailSending] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const { hasPermission } = usePermissions(user);
 
   const [confirmDelete, setConfirmDelete] = useState<
     | {
@@ -196,7 +198,7 @@ export function InventoryScreen() {
       
       // Actualizar stock del producto directamente
       handleUpdateProduct(productId, { stock: physicalStock });
-
+            
       // Registrar movimiento
       const newMovement: InventoryMovement = {
         id: String(movements.length + 1),
@@ -529,6 +531,16 @@ export function InventoryScreen() {
     setConfirmDelete({ kind: 'supply', id: supply.id, name: supply.name });
   };
 
+  const getDefaultTab = () => {
+    if (hasPermission("inventory.viewP")) return "products";
+    if (hasPermission("inventory.viewS")) return "supplies";
+    return "dashboard";
+  };
+
+  const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard' | null>(
+      getDefaultTab()
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -553,12 +565,19 @@ export function InventoryScreen() {
               )}
               {activeTab === 'products' && (
                 <button
+                    disabled={!hasPermission("inventory.createP")}
                   id="btn-nuevo-producto"
                   onClick={() => {
                     setEditingProduct(null);
                     setShowProductModal(true);
                   }}
-                  className={`flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors ${highlightedElement === 'btn-nuevo-producto' ? 'chatbot-highlight' : ''}`}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
+  ${hasPermission("inventory.createP")
+                        ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    } 
+  ${highlightedElement === 'btn-nuevo-producto' ? 'chatbot-highlight' : ''}`}
+
                 >
                   <Package className="w-5 h-5" />
                   Nuevo Producto
@@ -566,11 +585,16 @@ export function InventoryScreen() {
               )}
               {activeTab === 'supplies' && (
                 <button
+                    disabled={!hasPermission("inventory.createS")}
                   onClick={() => {
                   setEditingSupply(null);
                   setShowSupplyModal(true);
                 }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
+                    ${hasPermission("inventory.createS")
+                        ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                 >
                   <Layers className="w-5 h-5" />
                   Nuevo Insumo
@@ -581,48 +605,58 @@ export function InventoryScreen() {
 
           {/* Tabs */}
           <div className="flex gap-1 border-b border-gray-200">
-            <button
-              onClick={() => setActiveTab('products')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'products'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Package className="w-5 h-5" />
-              Productos
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+            { hasPermission("inventory.viewP") && (
+                <button
+                    onClick={() => setActiveTab('products')}
+                    className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                        activeTab === 'products'
+                            ? 'border-[#D0323A] text-[#D0323A]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                >
+                  <Package className="w-5 h-5" />
+                  Productos
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {products.length}
               </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('supplies')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'supplies'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <Layers className="w-5 h-5" />
-              Insumos
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+                </button>
+            ) }
+              { hasPermission("inventory.viewS") && (
+                  <button
+                      onClick={() => setActiveTab('supplies')}
+                      className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                          activeTab === 'supplies'
+                              ? 'border-[#D0323A] text-[#D0323A]'
+                              : 'border-transparent text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                      <Layers className="w-5 h-5" />
+                      Insumos
+                      <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {supplies.length}
               </span>
-            </button>
-            <button
-              onClick={() => setActiveTab('categories')}
-              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                activeTab === 'categories'
-                  ? 'border-[#D0323A] text-[#D0323A]'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <TrendingDown className="w-5 h-5" />
-              Categorías
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+                  </button>
+                  )
+              }
+
+            { hasPermission("inventory.viewP") && (
+                <button
+                    onClick={() => setActiveTab('categories')}
+                    className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                        activeTab === 'categories'
+                            ? 'border-[#D0323A] text-[#D0323A]'
+                            : 'border-transparent text-gray-600 hover:text-gray-900'
+                    }`}
+                >
+                  <TrendingDown className="w-5 h-5" />
+                  Categorías
+                  <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
                 {categories.length}
               </span>
-            </button>
+                </button>
+                )
+            }
+
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
@@ -660,6 +694,7 @@ export function InventoryScreen() {
             onDeleteProduct={requestDeleteProduct}
             onOpenAdjustment={handleOpenAdjustment}
             selectedProductId={selectedProduct?.id}
+            user={user}
           />
         )}
 
@@ -669,6 +704,7 @@ export function InventoryScreen() {
             onCreateSupply={handleCreateSupply}
             onEditSupply={handleEditSupply}
             onDeleteSupply={requestDeleteSupply}
+            user={user}
           />
         )}
 

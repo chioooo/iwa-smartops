@@ -10,6 +10,7 @@ import {
 import type { User } from '../../data/types/users.types.ts'
 import {ConfirmModal} from "../common/ConfirmModal.tsx";
 import {Tooltip} from "../common/Tooltip.tsx";
+import { usePermissions } from "../../hooks/usePermissions";
 
 type Props = {
   users: User[];
@@ -17,6 +18,7 @@ type Props = {
   selectedUserId?: string;
   onEditUser: (user: User) => void;
   onDeleteUser: (userId: string) => void;
+  user: User;
 };
 
 export function UserTable({
@@ -25,6 +27,7 @@ export function UserTable({
                             selectedUserId,
                             onEditUser,
                             onDeleteUser,
+                            user
                           }: Props) {
     const [currentPage, setCurrentPage] = useState(1);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -36,6 +39,7 @@ export function UserTable({
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const currentUsers = users.slice(startIndex, endIndex);
+    const { hasPermission } = usePermissions(user);
 
     const handleToggleStatus = (user: User) => {
     onUpdateUser(user.id, {
@@ -105,7 +109,7 @@ export function UserTable({
                     <td className="px-6 py-4">
                   <span
                       className={`px-3 py-1 rounded-full text-sm ${
-                          user.role === "Admin"
+                          user.role === "Administrador"
                               ? "bg-[#D0323A] text-white"
                               : user.role === "Operador"
                                   ? "bg-[#F6A016] text-white"
@@ -148,42 +152,48 @@ export function UserTable({
                       <div className="flex items-center justify-end gap-2">
 
                         {/* Editar */}
-                          <Tooltip text="Editar">
-                              <button
-                                  onClick={() => onEditUser(user)}
-                                  className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg"
-                              >
-                                  <Edit2 className="w-4 h-4" />
-                              </button>
-                          </Tooltip>
-
+                          {hasPermission("users.edit") && (
+                              <Tooltip text="Editar">
+                                  <button
+                                      onClick={() => onEditUser(user)}
+                                      className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg"
+                                  >
+                                      <Edit2 className="w-4 h-4" />
+                                  </button>
+                              </Tooltip>
+                          )}
                         {/* Activar/Desactivar */}
-                          <Tooltip text={user.status !== "active" ? "Activar" : "Desactivar"}>
-                            <button
-                                onClick={() => handleToggleStatus(user)}
-                                className="p-2 text-gray-600 rounded-lg hover:bg-gray-100"
-                            >
-                                <Power className={`w-4 h-4 rounded-full ${
-                                    user.status !== "active"
-                                        ? "text-green-500"
-                                        : "text-gray-400"
-                                }`} />
-                            </button>
-                          </Tooltip>
-
+                          {hasPermission("users.edit") && (
+                              <Tooltip text={user.status !== "active" ? "Activar" : "Desactivar"}>
+                                  <button
+                                      onClick={() => handleToggleStatus(user)}
+                                      className="p-2 text-gray-600 rounded-lg hover:bg-gray-100"
+                                  >
+                                      <Power
+                                          className={`w-4 h-4 rounded-full ${
+                                              user.status !== "active"
+                                                  ? "text-green-500"
+                                                  : "text-gray-400"
+                                          }`}
+                                      />
+                                  </button>
+                              </Tooltip>
+                          )}
                         {/* Eliminar */}
-                          <Tooltip text="Eliminar">
-                            <button
-                                title={"eliminar"}
-                                onClick={() => {
-                                    setUserToDelete(user);
-                                    setShowDeleteModal(true);
-                                }}
-                                className="p-2  rounded-lg text-red-600 hover:bg-red-50"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                          </Tooltip>
+                          {hasPermission("users.delete") && (
+                              <Tooltip text="Eliminar">
+                                  <button
+                                      title="eliminar"
+                                      onClick={() => {
+                                          setUserToDelete(user);
+                                          setShowDeleteModal(true);
+                                      }}
+                                      className="p-2 rounded-lg text-red-600 hover:bg-red-50"
+                                  >
+                                      <Trash2 className="w-4 h-4" />
+                                  </button>
+                              </Tooltip>
+                          )}
                       </div>
                     </td>
                   </tr>

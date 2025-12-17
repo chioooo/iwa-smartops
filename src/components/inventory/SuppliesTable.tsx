@@ -1,18 +1,22 @@
 import { useState } from 'react';
 import { Search, Edit2, Package, ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import type { Supply } from '../../services/inventory/inventory.types';
+import type {User} from "../../data/types/users.types.ts";
+import { usePermissions } from "../../hooks/usePermissions";
 
 type Props = {
   supplies: Supply[];
   onCreateSupply: (supplyData: Omit<Supply, 'id'>) => void;
   onEditSupply: (supply: Supply) => void;
   onDeleteSupply: (supply: Supply) => void;
+  user: User;
 };
 
-export function SuppliesTable({ supplies, onEditSupply, onDeleteSupply }: Props) {
+export function SuppliesTable({ supplies, onEditSupply, onDeleteSupply, user }: Props) {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const { hasPermission } = usePermissions(user);
 
   // Filtrado
   const filteredSupplies = supplies.filter(supply =>
@@ -156,22 +160,27 @@ export function SuppliesTable({ supplies, onEditSupply, onDeleteSupply }: Props)
                   {/* Acciones */}
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => onEditSupply(supply)}
-                        className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Editar"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          onDeleteSupply(supply);
-                        }}
-                        className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Eliminar"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      { hasPermission("inventory.editS") && (
+                          <button
+                              onClick={() => onEditSupply(supply)}
+                              className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg transition-colors"
+                              title="Editar"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                      )}
+                      { hasPermission("inventory.deleteS") && (
+                          <button
+                              onClick={() => {
+                                onDeleteSupply(supply);
+                              }}
+                              className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Eliminar"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                      )}
+
                     </div>
                   </td>
                 </tr>
