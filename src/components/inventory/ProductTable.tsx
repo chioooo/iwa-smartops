@@ -1,6 +1,8 @@
 import  { useState } from 'react';
 import { Eye, Edit2, Settings, Power, MoreVertical, Search, Filter, ChevronLeft, ChevronRight, AlertTriangle, Trash2 } from 'lucide-react';
 import type { Product, Category } from '../../services/inventory/inventory.types';
+import type {User} from "../../data/types/users.types.ts";
+import { usePermissions } from "../../hooks/usePermissions";
 
 type Props = {
   products: Product[];
@@ -11,6 +13,7 @@ type Props = {
   onOpenAdjustment: (product: Product) => void;
   onDeleteProduct: (product: Product) => void;
   selectedProductId?: string;
+  user: User;
 };
 
 export function ProductTable({
@@ -21,7 +24,8 @@ export function ProductTable({
   onUpdateProduct,
   onOpenAdjustment,
   onDeleteProduct,
-  selectedProductId
+  selectedProductId,
+    user
 }: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
@@ -29,6 +33,7 @@ export function ProductTable({
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterStock, setFilterStock] = useState('all');
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const { hasPermission } = usePermissions(user);
 
   const itemsPerPage = 10;
 
@@ -234,28 +239,36 @@ export function ProductTable({
                         >
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() => onEditProduct(product)}
-                          className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Editar"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => onOpenAdjustment(product)}
-                          className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Ajuste de inventario"
-                        >
-                          <Settings className="w-4 h-4" />
-                        </button>
+                        { hasPermission("inventory.editP") && (
+                            <button
+                                onClick={() => onEditProduct(product)}
+                                className="p-2 text-gray-600 hover:text-[#F6A016] hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Editar"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            )
+                        }
+
+                        { hasPermission("inventory.editP") && (
+                            <button
+                                onClick={() => onOpenAdjustment(product)}
+                                className="p-2 text-gray-600 hover:text-blue-600 hover:bg-gray-100 rounded-lg transition-colors"
+                                title="Ajuste de inventario"
+                            >
+                              <Settings className="w-4 h-4" />
+                            </button>
+                        ) }
 
                         <div className="relative">
-                          <button
-                            onClick={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
-                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
+                          { (hasPermission("inventory.editP") || hasPermission("inventory.deleteP")) && (
+                              <button
+                                  onClick={() => setOpenMenuId(openMenuId === product.id ? null : product.id)}
+                                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                              >
+                                <MoreVertical className="w-4 h-4" />
+                              </button>
+                          ) }
 
                           {openMenuId === product.id && (
                             <>
@@ -264,23 +277,28 @@ export function ProductTable({
                                 onClick={() => setOpenMenuId(null)}
                               />
                               <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
-                                <button
-                                  onClick={() => handleToggleStatus(product)}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                                >
-                                  <Power className="w-4 h-4" />
-                                  {product.status === 'active' ? 'Desactivar' : 'Activar'}
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setOpenMenuId(null);
-                                    onDeleteProduct(product);
-                                  }}
-                                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                  Eliminar
-                                </button>
+                                { hasPermission("inventory.editP") && (
+                                    <button
+                                        onClick={() => handleToggleStatus(product)}
+                                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                                    >
+                                      <Power className="w-4 h-4" />
+                                      {product.status === 'active' ? 'Desactivar' : 'Activar'}
+                                    </button>
+                                ) }
+
+                                { hasPermission("inventory.deleteP") && (
+                                    <button
+                                        onClick={() => {
+                                          setOpenMenuId(null);
+                                          onDeleteProduct(product);
+                                        }}
+                                        className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                      Eliminar
+                                    </button>
+                                ) }
                               </div>
                             </>
                           )}

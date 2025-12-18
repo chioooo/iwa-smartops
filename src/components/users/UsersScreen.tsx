@@ -9,8 +9,9 @@ import { PermissionsEditor } from './PermissionsEditor';
 import { demoDataService } from '../../services/usersService.tsx'
 import type { User, Role } from "../../data/types/users.types.ts";
 import {CreateRoleModal} from "./CreateRoleModal.tsx";
+import { usePermissions } from "../../hooks/usePermissions";
 
-export function UsersScreen() {
+export function UsersScreen({ user }: { user: User }) {
   const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
@@ -26,6 +27,7 @@ export function UsersScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const { hasPermission } = usePermissions(user);
 
   // Cargar datos desde localStorage (una sola vez)
   useEffect(() => {
@@ -154,12 +156,17 @@ export function UsersScreen() {
               </div>
 
               <button
+                  disabled={!hasPermission("users.create")}
                   onClick={() =>
                       activeTab === 'users'
                           ? setShowCreateModal(true)
                           : setShowCreateRoleModal(true)
                   }
-                  className="flex items-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
+                    ${hasPermission("users.create")
+                      ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
               >
                 <Plus className="w-5 h-5" />
                 {activeTab === 'users' ? 'Nuevo Usuario' : 'Nuevo Rol'}
@@ -183,20 +190,22 @@ export function UsersScreen() {
               </span>
               </button>
 
-              <button
-                  onClick={() => setActiveTab('roles')}
-                  className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
-                      activeTab === 'roles'
-                          ? 'border-[#D0323A] text-[#D0323A]'
-                          : 'border-transparent text-gray-600 hover:text-gray-900'
-                  }`}
-              >
-                <Shield className="w-5 h-5" />
-                Roles y Permisos
-                <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
-                {roles.length}
-              </span>
-              </button>
+              { hasPermission("users.create") && (
+                  <button
+                      onClick={() => setActiveTab('roles')}
+                      className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                          activeTab === 'roles'
+                              ? 'border-[#D0323A] text-[#D0323A]'
+                              : 'border-transparent text-gray-600 hover:text-gray-900'
+                      }`}
+                  >
+                    <Shield className="w-5 h-5" />
+                    Roles y Permisos
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full text-sm">
+                      {roles.length}
+                    </span>
+                  </button>
+              ) }
             </div>
           </div>
         </div>
@@ -258,6 +267,7 @@ export function UsersScreen() {
                       onEditUser={(user) => setEditUser(user)}
                       onDeleteUser={handleDeleteUser}
                       selectedUserId={selectedUser?.id}
+                      user={user}
                   />
                 </div>
 

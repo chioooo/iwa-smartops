@@ -10,7 +10,7 @@ type Props = {
 // Helpers visuales
 const getRoleColor = (roleName: string) => {
     switch (roleName) {
-        case "Admin":
+        case "Administrador":
             return {
                 bg: "bg-gradient-to-br from-[#D0323A] to-[#9F2743]",
                 badge: "bg-[#D0323A]",

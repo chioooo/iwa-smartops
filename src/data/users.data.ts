@@ -3,10 +3,10 @@ import type {Role, User} from "./types/users.types.ts";
 export const DEMO_USERS: User[] = [
     {
         id: '1',
-        name: 'María González',
-        email: 'maria.gonzalez@iwa.com',
+        name: 'IWA Consolti',
+        email: 'iwa.consolti@iwa.com',
         roleId: '1',
-        role: 'Admin',
+        role: 'Administrador',
         status: 'active',
         createdAt: '2024-01-15',
         avatar: 'MG'
@@ -46,7 +46,7 @@ export const DEMO_USERS: User[] = [
         name: 'Patricia López',
         email: 'patricia.lopez@iwa.com',
         roleId: '1',
-        role: 'Admin',
+        role: 'Administrador',
         status: 'active',
         createdAt: '2024-01-20',
         avatar: 'PL'
@@ -56,16 +56,17 @@ export const DEMO_USERS: User[] = [
 export const DEMO_ROLES: Role[] = [
     {
         id: '1',
-        name: 'Admin',
+        name: 'Administrador',
         description: 'Acceso completo al sistema',
         permissionsCount: 24,
         usersCount: 2,
         permissions: [
             'users.view', 'users.create', 'users.edit', 'users.delete',
-            'inventory.view', 'inventory.create',
+            'inventory.viewP', 'inventory.createP',
+            'inventory.viewS', 'inventory.createS',
             'billing.view', 'billing.create',
             'reports.view',
-            'settings.edit'
+            'settings.view','settings.edit'
         ]
     },
     {
@@ -76,7 +77,7 @@ export const DEMO_ROLES: Role[] = [
         usersCount: 2,
         permissions: [
             'users.view',
-            'inventory.view',
+            'inventory.viewP',
             'billing.view',
             'reports.view'
         ]
@@ -88,8 +89,8 @@ export const DEMO_ROLES: Role[] = [
         permissionsCount: 16,
         usersCount: 1,
         permissions: [
-            'inventory.view', 'inventory.create', 'inventory.edit',
-            'operations.view', 'operations.create',
+            'inventory.viewP', 'inventory.createP', 'inventory.editP',
+            'operations.viewP', 'operations.createP',
             'billing.view'
         ]
     },

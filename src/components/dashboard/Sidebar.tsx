@@ -11,12 +11,15 @@ import {
   ChevronRight,
 } from "lucide-react";
 import logoImage from "../../assets/logo.png";
+import {usePermissions} from "../../hooks/usePermissions.tsx";
+import type {User} from "../../data/types/users.types.ts";
 
 interface SidebarProps {
   isOpen: boolean;
   onToggle: () => void;
   activeSection: string;
   onNavigate: (section: string) => void;
+  user: User
 }
 
 const menuItems = [
@@ -30,7 +33,8 @@ const menuItems = [
   { id: 'settings', icon: Settings, label: "Configuración" },
 ];
 
-export function Sidebar({ isOpen, onToggle, activeSection, onNavigate }: SidebarProps) {
+export function Sidebar({ isOpen, onToggle, activeSection, onNavigate, user }: SidebarProps) {
+  const { hasPermission } = usePermissions(user);
   return (
     <aside
       className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 transition-all duration-300 z-40 ${
@@ -40,7 +44,7 @@ export function Sidebar({ isOpen, onToggle, activeSection, onNavigate }: Sidebar
       {/* Logo Section */}
       <div className="h-20 flex items-center justify-between px-6 border-b border-gray-200">
         {isOpen ? (
-          <img src={logoImage} alt="iWA SmartOps" className="h-10" />
+          <img src={logoImage} alt="iWA SmartOps" className="h-20" />
         ) : (
           <div className="w-8 h-8 bg-gradient-to-br from-[#D0323A] to-[#E9540D] rounded-lg"></div>
         )}
@@ -49,22 +53,38 @@ export function Sidebar({ isOpen, onToggle, activeSection, onNavigate }: Sidebar
       {/* Navigation Menu */}
       <nav className="py-6 px-3">
         <ul className="space-y-2">
-          {menuItems.map((item) => (
-            <li key={item.id}>
-              <button
-                onClick={() => onNavigate(item.id)}
-                className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all group ${
-                  activeSection === item.id
-                    ? "bg-gradient-to-r from-[#D0323A] to-[#E9540D] text-white shadow-lg shadow-[#D0323A]/20"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-              >
-                <item.icon className={`w-5 h-5 ${isOpen ? "" : "mx-auto"}`} />
-                {isOpen && <span className="text-sm">{item.label}</span>}
-              </button>
-            </li>
-          ))}
+          {menuItems.map((item) => {
+            // Solo chequeamos permiso para Facturación
+            if (item.id === 'billing' && !hasPermission('billing.view')) {
+              return null; // no mostrar si no tiene permiso
+            }
+
+            if (item.id === 'settings' && !hasPermission('settings.view')) {
+              return null; // no mostrar si no tiene permiso
+            }
+
+            if (item.id === 'users' && !hasPermission('users.view')) {
+              return null; // no mostrar si no tiene permiso
+            }
+
+            return (
+                <li key={item.id}>
+                  <button
+                      onClick={() => onNavigate(item.id)}
+                      className={`w-full flex items-center gap-4 px-3 py-3 rounded-xl transition-all group ${
+                          activeSection === item.id
+                              ? "bg-gradient-to-r from-[#D0323A] to-[#E9540D] text-white shadow-lg shadow-[#D0323A]/20"
+                              : "text-gray-700 hover:bg-gray-100"
+                      }`}
+                  >
+                    <item.icon className={`w-5 h-5 ${isOpen ? "" : "mx-auto"}`} />
+                    {isOpen && <span className="text-sm">{item.label}</span>}
+                  </button>
+                </li>
+            );
+          })}
         </ul>
+
       </nav>
 
       {/* Toggle Button */}

@@ -1,22 +1,23 @@
 import { useState } from "react";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import {Eye, EyeOff, Mail, Lock, ChevronDown} from "lucide-react";
 import logoImage from "../assets/logo.png";
+import {demoDataService} from "../services/usersService.tsx";
 
 interface LoginScreenProps {
   onGoToRegister: () => void;
-  onLogin: () => void;
+  onLogin: (email: string) => void;
 }
 
-export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin }: LoginScreenProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const users = demoDataService.getUsers();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    onLogin(email);
     console.log("Login attempt:", { email, password });
-    // Simulate successful login - redirect to dashboard
-    onLogin();
   };
 
   return (
@@ -58,7 +59,7 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
           {/* Form Header */}
           <div className="mb-8">
             <h2 className="text-3xl text-gray-900 mb-2">
-              Bienvenido de vuelta
+              Bienvenid@ de vuelta
             </h2>
             <p className="text-gray-600">
               Ingresa tus credenciales para continuar
@@ -70,21 +71,28 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm text-gray-700 mb-2">
-                Usuario o correo electrónico
+                Usuario
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                   <Mail className="w-5 h-5" />
                 </div>
-                <input
-                  id="email"
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent transition-all"
-                  placeholder="usuario@empresa.com"
-                  required
-                />
+                <select
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#D0323A] bg-white appearance-none"
+                    required
+                >
+                  <option value="">Selecciona un usuario</option>
+
+                  {users.map((u) => (
+                      <option key={u.id} value={u.email}>
+                        {u.name} — {u.role}
+                      </option>
+                  ))}
+                </select>
+                <ChevronDown className="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               </div>
             </div>
 
@@ -131,12 +139,6 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
                   Recordarme
                 </span>
               </label>
-              <a
-                href="#"
-                className="text-sm text-[#D0323A] hover:text-[#9F2743] transition-colors"
-              >
-                ¿Olvidaste tu contraseña?
-              </a>
             </div>
 
             {/* Submit Button */}
@@ -148,18 +150,6 @@ export function LoginScreen({ onGoToRegister, onLogin }: LoginScreenProps) {
             </button>
           </form>
 
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-600">
-              ¿No tienes una cuenta?{" "}
-              <button
-                onClick={onGoToRegister}
-                className="text-[#D0323A] hover:text-[#9F2743] transition-colors"
-              >
-                Solicita acceso
-              </button>
-            </p>
-          </div>
 
           {/* Version */}
           <div className="mt-8 text-center text-xs text-gray-400">
