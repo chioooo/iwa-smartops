@@ -4,8 +4,16 @@ import { SmsSettings } from './settings/SmsSettings';
 
 import { settingsService } from '../services/settings/settingsService';
 import type { CompanySettings, CFDISettings, AISettings } from '../services/settings/settings.types';
+import { usePermissions } from "../hooks/usePermissions.tsx";
+import type {User} from "../data/types/users.types.ts";
 
-const SettingsScreen: React.FC = () => {
+type SettingsScreenProps = {
+  user: User;
+};
+
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ user }) => {
+  const { hasPermission } = usePermissions(user);
+
   const [activeTab, setActiveTab] = useState('company');
   const [isSaving, setIsSaving] = useState(false);
   const apiKeyRef = useRef<HTMLInputElement>(null);
@@ -524,6 +532,7 @@ const SettingsScreen: React.FC = () => {
               </div>
               <div className="flex space-x-3">
               <button
+                  disabled={!hasPermission('settings.edit')}
                 type="button"
                 onClick={() => {
                   const saved = settingsService.getSettings();
@@ -539,8 +548,12 @@ const SettingsScreen: React.FC = () => {
               </button>
               <button
                 type="submit"
-                disabled={isSaving}
-                className="px-6 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors disabled:opacity-50 flex items-center gap-2"
+                disabled={isSaving || !hasPermission('settings.edit')}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors
+                    ${hasPermission("inventory.createP")
+                    ? "bg-[#D0323A] text-white hover:bg-[#9F2743]"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
               >
                 {isSaving ? (
                   <>

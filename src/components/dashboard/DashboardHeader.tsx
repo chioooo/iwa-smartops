@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Bell, Settings, User, LogOut } from "lucide-react";
 
-export function DashboardHeader({ onLogout }: { onLogout: () => void }) {
+export function DashboardHeader({ user, onLogout }: { user: any; onLogout: () => void }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -49,8 +49,8 @@ export function DashboardHeader({ onLogout }: { onLogout: () => void }) {
                 <User className="w-5 h-5" />
               </div>
               <div className="text-left hidden md:block">
-                <p className="text-sm text-gray-900">Juan Pérez</p>
-                <p className="text-xs text-gray-500">Administrador</p>
+                <p className="text-sm text-gray-900">{ user?.name }</p>
+                <p className="text-xs text-gray-500">{ user?.role }</p>
               </div>
             </button>
 

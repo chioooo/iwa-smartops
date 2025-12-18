@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, X, Maximize2, Minimize2, Sparkles } from "lucide-react";
+import { Send, Bot, X, Maximize2, Minimize2, Sparkles, RotateCcw } from "lucide-react";
+import { getAIResponse } from "./chatbotResponses";
+import { useChatbot } from "../../contexts/ChatbotContext";
 
 interface Message {
   id: number;
@@ -14,6 +16,7 @@ interface ChatbotProps {
 }
 
 export function Chatbot({ isOpen, onClose }: ChatbotProps) {
+  const { executeAction } = useChatbot();
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -26,6 +29,18 @@ export function Chatbot({ isOpen, onClose }: ChatbotProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const initialMessage: Message = {
+    id: 1,
+    text: "¡Hola! Soy tu asistente SmartOps IA. ¿En qué puedo ayudarte hoy?",
+    sender: "ai",
+    timestamp: new Date(),
+  };
+
+  const handleNewChat = () => {
+    setMessages([{ ...initialMessage, id: 1, timestamp: new Date() }]);
+    setInputValue("");
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -49,46 +64,23 @@ export function Chatbot({ isOpen, onClose }: ChatbotProps) {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response
     setTimeout(() => {
+      const response = getAIResponse(inputValue);
       const aiResponse: Message = {
         id: messages.length + 2,
-        text: getAIResponse(inputValue),
+        text: response.text,
         sender: "ai",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, aiResponse]);
       setIsTyping(false);
+
+      if (response.action) {
+        executeAction(response.action);
+      }
     }, 1500);
   };
 
-  const getAIResponse = (userInput: string): string => {
-    const input = userInput.toLowerCase();
-    
-    if (input.includes("factura") || input.includes("facturación")) {
-      return "Puedo ayudarte con la facturación. Actualmente tienes 156 facturas generadas este mes. ¿Deseas crear una nueva factura, ver las pendientes o exportar un reporte?";
-    }
-    if (input.includes("inventario") || input.includes("stock")) {
-      return "El inventario muestra 7 productos con stock bajo. Te recomiendo revisar la sección de Inventario para realizar pedidos. ¿Quieres que te muestre los detalles?";
-    }
-    if (input.includes("cliente") || input.includes("clientes")) {
-      return "Tienes 892 clientes activos en el sistema. El último cliente registrado fue Tech Solutions Inc. hace 1 hora. ¿Necesitas buscar o agregar un cliente?";
-    }
-    if (input.includes("ingreso") || input.includes("ventas") || input.includes("dinero")) {
-      return "Los ingresos del mes actual son de $45,280, con un incremento del 8.5% respecto al mes anterior. ¿Deseas ver un análisis detallado o exportar un reporte financiero?";
-    }
-    if (input.includes("reporte") || input.includes("análisis")) {
-      return "Puedo generar reportes de ventas, inventario, clientes o finanzas. ¿Qué tipo de reporte necesitas?";
-    }
-    if (input.includes("hola") || input.includes("hi") || input.includes("buenos")) {
-      return "¡Hola! ¿En qué puedo asistirte hoy? Puedo ayudarte con facturación, inventario, clientes, reportes y más.";
-    }
-    if (input.includes("gracias") || input.includes("thank")) {
-      return "¡De nada! Estoy aquí para ayudarte cuando lo necesites. 😊";
-    }
-    
-    return "Entiendo tu consulta. Puedo ayudarte con facturación, inventario, gestión de clientes, reportes financieros y análisis de datos. ¿Sobre cuál de estos temas necesitas información?";
-  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -122,6 +114,13 @@ export function Chatbot({ isOpen, onClose }: ChatbotProps) {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleNewChat}
+            className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+            title="Nuevo chat"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-all"
