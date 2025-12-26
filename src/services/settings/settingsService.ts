@@ -1,87 +1,43 @@
-import { DEMO_APP_SETTINGS } from './settings.data';
-import type { AppSettings, AISettings, CFDISettings, CompanySettings } from './settings.types';
+/**
+ * Settings Service - Refactored with SOLID Principles
+ * 
+ * This file now acts as a facade that delegates to the new architecture:
+ * - SRP: Settings repository handles only data persistence
+ * - OCP: Can extend storage providers without modifying existing code
+ * - DIP: Depends on abstractions, not concrete implementations
+ */
+
+import { settingsRepository } from './settingsServiceInstance';
+import type { AppSettings } from './settings.types';
 
 const SETTINGS_KEY = 'appSettings';
 
-function normalizeStoredSettings(raw: unknown): AppSettings {
-  if (!raw || typeof raw !== 'object') {
-    return DEMO_APP_SETTINGS;
-  }
-
-  const record = raw as Record<string, unknown>;
-
-  const company = (record.company ?? record.companySettings) as CompanySettings | undefined;
-  const cfdi = (record.cfdi ?? record.cfdiSettings) as CFDISettings | undefined;
-  const ai = (record.ai ?? record.aiSettings) as AISettings | undefined;
-
-  const lastUpdated = typeof record.lastUpdated === 'string'
-    ? record.lastUpdated
-    : DEMO_APP_SETTINGS.lastUpdated;
-
-  return {
-    company: company ?? DEMO_APP_SETTINGS.company,
-    cfdi: cfdi ?? DEMO_APP_SETTINGS.cfdi,
-    ai: ai ?? DEMO_APP_SETTINGS.ai,
-    lastUpdated,
-  };
-}
-
-class SettingsService {
-  constructor() {
-    if (typeof localStorage === 'undefined') return;
-
-    if (!localStorage.getItem(SETTINGS_KEY)) {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(DEMO_APP_SETTINGS));
-    } else {
-      const normalized = this.getSettings();
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(normalized));
-    }
-  }
-
+/**
+ * Legacy adapter class for backwards compatibility
+ * Delegates all operations to the new SettingsRepository
+ * @deprecated Use settingsRepository directly from './settingsServiceInstance'
+ */
+class SettingsServiceAdapter {
   getSettings(): AppSettings {
-    if (typeof localStorage === 'undefined') return DEMO_APP_SETTINGS;
-
-    const data = localStorage.getItem(SETTINGS_KEY);
-    if (!data) return DEMO_APP_SETTINGS;
-
-    try {
-      const parsed = JSON.parse(data) as unknown;
-      return normalizeStoredSettings(parsed);
-    } catch {
-      return DEMO_APP_SETTINGS;
-    }
+    return settingsRepository.get();
   }
 
-  saveSettings(settings: AppSettings) {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  saveSettings(settings: AppSettings): void {
+    settingsRepository.save(settings);
   }
 
   updateSettings(partial: Partial<AppSettings>): AppSettings {
-    const current = this.getSettings();
-
-    const next: AppSettings = {
-      ...current,
-      ...partial,
-      company: { ...current.company, ...(partial.company ?? {}) },
-      cfdi: { ...current.cfdi, ...(partial.cfdi ?? {}) },
-      ai: { ...current.ai, ...(partial.ai ?? {}) },
-      lastUpdated: partial.lastUpdated ?? new Date().toISOString(),
-    };
-
-    this.saveSettings(next);
-    return next;
+    return settingsRepository.update(partial);
   }
 
   resetSettings(): AppSettings {
-    const next: AppSettings = {
-      ...DEMO_APP_SETTINGS,
-      lastUpdated: new Date().toISOString(),
-    };
-    this.saveSettings(next);
-    return next;
+    return settingsRepository.reset();
   }
 }
 
-export const settingsService = new SettingsService();
+/**
+ * @deprecated Use settingsRepository from './settingsServiceInstance' instead
+ * Maintained for backwards compatibility
+ */
+export const settingsService = new SettingsServiceAdapter();
 export { SETTINGS_KEY };
