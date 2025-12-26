@@ -1,126 +1,58 @@
-import { DEMO_USERS, DEMO_ROLES } from "../data/users.data";
+/**
+ * Users Service - Refactored with SOLID Principles
+ * 
+ * This file now acts as a facade that delegates to the new architecture:
+ * - SRP: User and Role operations are in separate repositories
+ * - OCP: Can extend storage providers without modifying existing code
+ * - LSP: All repositories follow the same base contract
+ * - ISP: Interfaces are segregated by domain (IUserRepository, IRoleRepository)
+ * - DIP: Depends on abstractions, not concrete implementations
+ */
+
+import { userService } from "./users/userServiceInstance";
 import type { User, Role } from "../data/types/users.types";
 
-const USERS_KEY = "demo-users";
-const ROLES_KEY = "demo-roles";
-
-class UsersService {
-
-    constructor() {
-        if (!localStorage.getItem(USERS_KEY)) {
-            localStorage.setItem(USERS_KEY, JSON.stringify(DEMO_USERS));
-        }
-        if (!localStorage.getItem(ROLES_KEY)) {
-            localStorage.setItem(ROLES_KEY, JSON.stringify(DEMO_ROLES));
-        }
-    }
-
+/**
+ * Legacy adapter class for backwards compatibility
+ * Delegates all operations to the new UserService
+ * @deprecated Use userService directly from './users/userServiceInstance'
+ */
+class UsersServiceAdapter {
     getUsers(): User[] {
-        const data = localStorage.getItem(USERS_KEY);
-        return data ? JSON.parse(data) : [];
+        return userService.getUsers();
     }
 
-    saveUsers(users: User[]) {
-        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    addUser(user: User): void {
+        userService.addUser(user);
     }
 
-    addUser(user: User) {
-        const currentUsers = this.getUsers();
-        const currentRoles = this.getRoles();
-
-        // Encontrar el rol asignado (roleId o por nombre)
-        const assignedRole = currentRoles.find(r =>
-            r.id === user.roleId || r.name === user.role
-        );
-
-        if (assignedRole) {
-            assignedRole.usersCount = (assignedRole.usersCount || 0) + 1;
-            this.saveRoles(currentRoles);
-        }
-
-        this.saveUsers([...currentUsers, user]);
+    updateUser(updatedUser: User): void {
+        userService.updateUser(updatedUser);
     }
 
-    updateUser(updatedUser: User) {
-        const users = this.getUsers();
-        const roles = this.getRoles();
-
-        const oldUser = users.find(u => u.id === updatedUser.id);
-
-        if (!oldUser) {
-            console.warn("Usuario no encontrado para actualizar");
-            return;
-        }
-
-        const oldRole = roles.find(r =>
-            r.id === oldUser.roleId || r.name === oldUser.role
-        );
-
-        const newRole = roles.find(r =>
-            r.id === updatedUser.roleId || r.name === updatedUser.role
-        );
-
-        // actualizar contadores
-        if (oldRole && newRole && oldRole.id !== newRole.id) {
-            oldRole.usersCount = Math.max(0, (oldRole.usersCount || 0) - 1);
-            newRole.usersCount = (newRole.usersCount || 0) + 1;
-            console.log("ROLES: ",roles)
-            this.saveRoles(roles);
-        }
-
-        const updatedUsers = users.map(u =>
-            u.id === updatedUser.id ? updatedUser : u
-        );
-
-        this.saveUsers(updatedUsers);
-    }
-
-    deleteUser(id: string) {
-        const users = this.getUsers();
-        const roles = this.getRoles();
-
-        const userToDelete = users.find(u => u.id === id);
-
-        if (userToDelete) {
-            const role = roles.find(r =>
-                r.id === userToDelete.roleId || r.name === userToDelete.role
-            );
-
-            if (role) {
-                role.usersCount = Math.max(0, (role.usersCount || 0) - 1);
-                this.saveRoles(roles);
-            }
-        }
-
-        const updatedUsers = users.filter(u => u.id !== id);
-        this.saveUsers(updatedUsers);
+    deleteUser(id: string): void {
+        userService.deleteUser(id);
     }
 
     getRoles(): Role[] {
-        const data = localStorage.getItem(ROLES_KEY);
-        return data ? JSON.parse(data) : [];
+        return userService.getRoles();
     }
 
-    saveRoles(roles: Role[]) {
-        localStorage.setItem(ROLES_KEY, JSON.stringify(roles));
+    addRole(role: Role): void {
+        userService.addRole(role);
     }
 
-    addRole(role: Role) {
-        const current = this.getRoles();
-        this.saveRoles([...current, role]);
+    updateRole(updatedRole: Role): void {
+        userService.updateRole(updatedRole);
     }
 
-    updateRole(updatedRole: Role) {
-        const roles = this.getRoles().map(r =>
-            r.id === updatedRole.id ? updatedRole : r
-        );
-        this.saveRoles(roles);
-    }
-
-    deleteRole(id: string) {
-        const roles = this.getRoles().filter(r => r.id !== id);
-        this.saveRoles(roles);
+    deleteRole(id: string): void {
+        userService.deleteRole(id);
     }
 }
 
-export const demoDataService = new UsersService();
+/**
+ * @deprecated Use userService from './users/userServiceInstance' instead
+ * Maintained for backwards compatibility
+ */
+export const demoDataService = new UsersServiceAdapter();
