@@ -8,9 +8,8 @@
  */
 
 import { settingsRepository } from './settingsServiceInstance';
+import { SETTINGS_KEY } from './SettingsRepository';
 import type { AppSettings } from './settings.types';
-
-const SETTINGS_KEY = 'appSettings';
 
 /**
  * Legacy adapter class for backwards compatibility

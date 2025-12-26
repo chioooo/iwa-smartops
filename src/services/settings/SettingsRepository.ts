@@ -3,7 +3,7 @@ import type { ISettingsRepository } from './interfaces/ISettingsRepository';
 import type { IStorageProvider } from '../core/interfaces/IStorageProvider';
 import { DEMO_APP_SETTINGS } from './settings.data';
 
-const SETTINGS_KEY = 'appSettings';
+export const SETTINGS_KEY = 'appSettings';
 
 /**
  * Normalizes stored settings to ensure all required fields exist
