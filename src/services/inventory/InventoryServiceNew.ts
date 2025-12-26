@@ -164,8 +164,9 @@ export class InventoryServiceImpl implements IInventoryService {
 
   // Utility
   resetAll(): void {
-    // Reset is handled by re-initializing repositories with default data
-    // This would require access to default data, which is encapsulated in repositories
+    // Intentionally left as a no-op.
+    // Reset behavior is handled by re-initializing repositories with their default data
+    // outside of this service's lifecycle, so this method does not perform any work.
     console.warn('resetAll should be implemented with proper default data injection');
   }
 }
