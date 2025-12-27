@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Layers, Grid3x3, TrendingDown, X, Star, FileDown, Mail } from 'lucide-react';
+import { Package, Layers, Grid3x3, TrendingDown, X, Star, FileDown, Mail, FileText } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { useChatbot } from '../../contexts/ChatbotContext';
 import { InventoryDashboard } from './InventoryDashboard';
@@ -16,6 +16,7 @@ import {
 } from './InventoryResponsesIA';
 import { SupplyModal } from './SupplyModal';
 import { ConfirmModal } from '../common/ConfirmModal';
+import { InventoryReports } from './InventoryReports';
 
 import { inventoryService } from '../../services/inventory/inventoryService';
 import type { Category, InventoryMovement, Product, Supply } from '../../services/inventory/inventory.types';
@@ -537,7 +538,7 @@ export function InventoryScreen({ user }: { user: User }) {
     return "dashboard";
   };
 
-  const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard' | null>(
+  const [activeTab, setActiveTab] = useState<'products' | 'supplies' | 'categories' | 'dashboard' | 'reports' | null>(
       getDefaultTab()
   );
 
@@ -668,6 +669,18 @@ export function InventoryScreen({ user }: { user: User }) {
               <Grid3x3 className="w-5 h-5" />
               Vista General
             </button>
+
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                activeTab === 'reports'
+                  ? 'border-[#D0323A] text-[#D0323A]'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              Reportes
+            </button>
           </div>
         </div>
       </div>
@@ -713,6 +726,13 @@ export function InventoryScreen({ user }: { user: User }) {
             categories={categories}
             products={products}
             onUpdateCategories={setCategories}
+          />
+        )}
+
+        {activeTab === 'reports' && (
+          <InventoryReports
+            products={products}
+            supplies={supplies}
           />
         )}
       </div>
