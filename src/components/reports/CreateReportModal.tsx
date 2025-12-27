@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, FileText, Calendar, Filter, Download, ChevronDown } from 'lucide-react';
+import { X, FileText, Calendar, Download } from 'lucide-react';
 import type {Report, ReportFilters} from './ReportsScreen';
 
 type Props = {
@@ -11,7 +11,7 @@ const getDateString = (date: Date) => date.toLocaleDateString('en-CA');
 
 export function CreateReportModal({ onClose, onCreate }: Props) {
   const [formData, setFormData] = useState({
-    tipo: 'ventas' as Report['tipo'],
+    tipo: 'inventario' as Report['tipo'],
     format: 'pdf' as Report['format'],
     generatedBy: 'Juan Pérez'
   });
@@ -24,12 +24,10 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
   const [dateError, setDateError] = useState<string>('');
 
   const reportTypes = [
-    { value: 'ventas', label: 'Reporte de Ventas', description: 'Análisis de ventas, ingresos y tendencias' },
-    { value: 'inventario', label: 'Reporte de Inventario', description: 'Stock, rotación y movimientos de productos' },
+    { value: 'inventario', label: 'Reporte de Inventario', description: 'Stock, productos, insumos y alertas' },
+    { value: 'usuarios', label: 'Reporte de Usuarios', description: 'Usuarios, roles y permisos del sistema' },
     { value: 'facturacion', label: 'Reporte de Facturación', description: 'Facturas emitidas, CFDI y totales fiscales' },
-    { value: 'servicios', label: 'Reporte de Servicios', description: 'Servicios realizados, órdenes y tiempos' },
-    { value: 'clientes', label: 'Reporte de Clientes', description: 'Análisis de clientes y frecuencia de compra' },
-    { value: 'utilidades', label: 'Reporte de Utilidades', description: 'Ingresos, egresos y margen de ganancia' }
+    { value: 'finanzas', label: 'Reporte Financiero', description: 'Valoración de inventario y márgenes' }
   ];
 
   const todayDate = getDateString(new Date());
@@ -240,91 +238,6 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
               )}
             </div>
 
-            {/* Filtros específicos */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Filter className="w-5 h-5 text-gray-400" />
-                <label className="block text-sm text-gray-700">
-                  Filtros específicos (opcional)
-                </label>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Sucursal */}
-                <div>
-                    <label className="block text-xs text-gray-600 mb-2">Sucursal</label>
-                  <div className='relative'>
-                    <select
-                      value={filters.branch || ''}
-                      onChange={(e) => setFilters({ ...filters, branch: e.target.value || undefined })}
-                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
-                    >
-                      <option value="">Todas las sucursales</option>
-                      <option value="Principal">Almacén Principal</option>
-                      <option value="Secundario">Almacén Secundario</option>
-                      <option value="Norte">Sucursal Norte</option>
-                      <option value="Sur">Sucursal Sur</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Categoría */}
-                <div>
-                  <label className="block text-xs text-gray-600 mb-2">Categoría</label>
-                  <div className='relative'>
-                    <select
-                      value={filters.category || ''}
-                      onChange={(e) => setFilters({ ...filters, category: e.target.value || undefined })}
-                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
-                    >
-                      <option value="">Todas las categorías</option>
-                      <option value="Tecnología">Tecnología</option>
-                      <option value="Mobiliario">Mobiliario</option>
-                      <option value="Papelería">Papelería</option>
-                      <option value="Consumibles">Consumibles</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Usuario */}
-                <div>
-                  <label className="block text-xs text-gray-600 mb-2">Usuario / Operador</label>
-                  <div className='relative'>
-                    <select
-                      value={filters.user || ''}
-                      onChange={(e) => setFilters({ ...filters, user: e.target.value || undefined })}
-                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
-                    >
-                      <option value="">Todos los usuarios</option>
-                      <option value="Juan Pérez">Juan Pérez</option>
-                      <option value="María González">María González</option>
-                      <option value="Carlos Ruiz">Carlos Ruiz</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
-                  </div>
-                </div>
-
-                {/* Cliente */}
-                <div>
-                  <label className="block text-xs text-gray-600 mb-2">Cliente</label>
-                  <div className='relative'>
-                    <select
-                      value={filters.client || ''}
-                      onChange={(e) => setFilters({ ...filters, client: e.target.value || undefined })}
-                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
-                    >
-                      <option value="">Todos los clientes</option>
-                      <option value="Acme Corporation">Acme Corporation</option>
-                      <option value="TechSolutions">TechSolutions México</option>
-                      <option value="Distribuidora">Distribuidora Nacional</option>
-                    </select>
-                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Formato de salida */}
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -353,24 +266,14 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
                   <span className="text-sm text-gray-900">PDF</span>
                 </label>
 
-                <label
-                  className={`relative flex flex-col items-center p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                    formData.format === 'excel'
-                      ? 'border-[#D0323A] bg-red-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
+                <div
+                  className="relative flex flex-col items-center p-4 rounded-lg border-2 border-gray-200 bg-gray-100 cursor-not-allowed opacity-50"
+                  title="Próximamente disponible"
                 >
-                  <input
-                    type="radio"
-                    name="format"
-                    value="excel"
-                    checked={formData.format === 'excel'}
-                    onChange={(e) => setFormData({ ...formData, format: e.target.value as Report['format'] })}
-                    className="sr-only"
-                  />
-                  <Download className={`w-8 h-8 mb-2 ${formData.format === 'excel' ? 'text-[#D0323A]' : 'text-gray-400'}`} />
-                  <span className="text-sm text-gray-900">Excel</span>
-                </label>
+                  <Download className="w-8 h-8 mb-2 text-gray-400" />
+                  <span className="text-sm text-gray-500">Excel</span>
+                  <span className="absolute top-1 right-1 text-xs bg-gray-300 text-gray-600 px-1.5 py-0.5 rounded">Próximamente</span>
+                </div>
               </div>
             </div>
 
@@ -380,8 +283,6 @@ export function CreateReportModal({ onClose, onCreate }: Props) {
               <div className="space-y-1 text-xs text-gray-700">
                 <p><strong>Tipo:</strong> {selectedType?.label}</p>
                 <p><strong>Periodo:</strong> {formatDatePreview(filters.startDate || '')} - {formatDatePreview(filters.endDate || '')}</p>
-                {filters.branch && <p><strong>Sucursal:</strong> {filters.branch}</p>}
-                {filters.category && <p><strong>Categoría:</strong> {filters.category}</p>}
                 <p><strong>Formato:</strong> {formData.format.toUpperCase()}</p>
               </div>
             </div>

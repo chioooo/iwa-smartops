@@ -67,25 +67,21 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
   };
 
   const getTypeLabel = (tipo: Report['tipo']) => {
-    const labels = {
-      ventas: 'Ventas',
+    const labels: Record<Report['tipo'], string> = {
       inventario: 'Inventario',
+      usuarios: 'Usuarios',
       facturacion: 'Facturación',
-      servicios: 'Servicios',
-      clientes: 'Clientes',
-      utilidades: 'Utilidades'
+      finanzas: 'Finanzas'
     };
     return labels[tipo];
   };
 
   const getTypeBadge = (tipo: Report['tipo']) => {
-    const badges = {
-      ventas: 'bg-green-50 text-green-700 border-green-200',
+    const badges: Record<Report['tipo'], string> = {
       inventario: 'bg-blue-50 text-blue-700 border-blue-200',
+      usuarios: 'bg-green-50 text-green-700 border-green-200',
       facturacion: 'bg-purple-50 text-purple-700 border-purple-200',
-      servicios: 'bg-orange-50 text-orange-700 border-orange-200',
-      clientes: 'bg-pink-50 text-pink-700 border-pink-200',
-      utilidades: 'bg-yellow-50 text-yellow-700 border-yellow-200'
+      finanzas: 'bg-yellow-50 text-yellow-700 border-yellow-200'
     };
     return badges[tipo];
   };
@@ -137,12 +133,10 @@ export function ReportsList({ reports, onSelectReport, selectedReportId, onOpenF
               className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D0323A] focus:border-transparent bg-white appearance-none"
             >
               <option value="all">Todos los tipos</option>
-              <option value="ventas">Ventas</option>
               <option value="inventario">Inventario</option>
+              <option value="usuarios">Usuarios</option>
               <option value="facturacion">Facturación</option>
-              <option value="servicios">Servicios</option>
-              <option value="clientes">Clientes</option>
-              <option value="utilidades">Utilidades</option>
+              <option value="finanzas">Finanzas</option>
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" />
           </div>

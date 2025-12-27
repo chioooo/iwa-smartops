@@ -1,6 +1,6 @@
-//import React from 'react';
 import {X, Download, FileText, Calendar, User, Filter, CheckCircle, Clock, AlertCircle} from 'lucide-react';
 import type {Report} from './ReportsScreen';
+import { reportGeneratorService } from '../../services/reports/reportGeneratorService';
 
 type Props = {
     report: Report;
@@ -200,7 +200,37 @@ export function ReportDetailView({report, onClose}: Props) {
                 <div className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
                     {report.status === 'disponible' && (
                         <button
-                            onClick={() => alert(`Descargando reporte: ${report.name} (${report.format.toUpperCase()})`)}
+                            onClick={() => {
+                                if (report.blob) {
+                                    // Descargar el blob real
+                                    const url = URL.createObjectURL(report.blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `${report.name.replace(/\s+/g, '-').toLowerCase()}.pdf`;
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                    URL.revokeObjectURL(url);
+                                } else {
+                                    // Regenerar el reporte si no hay blob
+                                    const realReportTypes = ['inventario', 'usuarios', 'facturacion', 'finanzas'];
+                                    if (realReportTypes.includes(report.tipo)) {
+                                        reportGeneratorService.generateReport({
+                                            tipo: report.tipo as 'inventario' | 'usuarios' | 'facturacion' | 'finanzas',
+                                            startDate: report.parameters.startDate,
+                                            endDate: report.parameters.endDate,
+                                            format: report.format,
+                                            generatedBy: report.generatedBy
+                                        }).then(generated => {
+                                            if (generated.blob) {
+                                                reportGeneratorService.downloadReport(generated);
+                                            }
+                                        });
+                                    } else {
+                                        alert(`Descargando reporte: ${report.name} (${report.format.toUpperCase()})`);
+                                    }
+                                }
+                            }}
                             className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors"
                         >
                             <Download className="w-4 h-4"/>
