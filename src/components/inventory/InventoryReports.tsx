@@ -77,7 +77,7 @@ export function InventoryReports({ products, supplies }: InventoryReportsProps) 
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.text(`Generado el ${dateStr}`, pageWidth / 2, 23, { align: 'center' });
-      doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+      doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
       
       // Resumen Ejecutivo
       let yPos = 45;
@@ -135,7 +135,7 @@ export function InventoryReports({ products, supplies }: InventoryReportsProps) 
 
         autoTable(doc, {
           startY: yPos,
-          head: [['Producto', 'SKU', 'Categoria', 'Stock', 'Min', 'Precio', 'Estado']],
+          head: [['Producto', 'SKU', 'Categoría', 'Stock', 'Min', 'Precio', 'Estado']],
           body: productsTableData,
           theme: 'striped',
           headStyles: { fillColor: primaryColor, fontSize: 8 },
@@ -182,7 +182,7 @@ export function InventoryReports({ products, supplies }: InventoryReportsProps) 
 
         autoTable(doc, {
           startY: yPos,
-          head: [['Insumo', 'Categoria', 'Stock', 'Unidad', 'Proveedor', 'Estado']],
+          head: [['Insumo', 'Categoría', 'Stock', 'Unidad', 'Proveedor', 'Estado']],
           body: suppliesTableData,
           theme: 'striped',
           headStyles: { fillColor: primaryColor, fontSize: 9 },
@@ -210,7 +210,7 @@ export function InventoryReports({ products, supplies }: InventoryReportsProps) 
         doc.setTextColor(...primaryColor);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('Productos con Stock Bajo (Requieren Atencion)', 14, yPos);
+        doc.text('Productos con Stock Bajo (Requieren Atención)', 14, yPos);
         yPos += 5;
 
         if (lowStockProducts.length > 0) {
@@ -225,7 +225,7 @@ export function InventoryReports({ products, supplies }: InventoryReportsProps) 
 
           autoTable(doc, {
             startY: yPos,
-            head: [['Producto', 'SKU', 'Stock Actual', 'Stock Minimo', 'Faltante', 'Proveedor']],
+            head: [['Producto', 'SKU', 'Stock Actual', 'Stock Mínimo', 'Faltante', 'Proveedor']],
             body: lowStockData,
             theme: 'striped',
             headStyles: { fillColor: warningColor, fontSize: 9, textColor: [0, 0, 0] },
@@ -253,7 +253,7 @@ export function InventoryReports({ products, supplies }: InventoryReportsProps) 
         doc.setFontSize(8);
         doc.setTextColor(...grayColor);
         doc.text(
-          `Pagina ${i} de ${pageCount} | iWA SmartOps - Reporte generado automaticamente`,
+          `Página ${i} de ${pageCount} | iWA SmartOps - Reporte generado automáticamente`,
           pageWidth / 2,
           doc.internal.pageSize.getHeight() - 10,
           { align: 'center' }

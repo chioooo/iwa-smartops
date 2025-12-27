@@ -96,12 +96,12 @@ export function BillingReports({ invoices }: BillingReportsProps) {
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
-      doc.text('Reporte de Facturacion', pageWidth / 2, 15, { align: 'center' });
+      doc.text('Reporte de Facturación', pageWidth / 2, 15, { align: 'center' });
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.text(`Generado el ${dateStr}`, pageWidth / 2, 23, { align: 'center' });
-      doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+      doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
       
       // Resumen Ejecutivo
       let yPos = 45;
@@ -241,7 +241,7 @@ export function BillingReports({ invoices }: BillingReportsProps) {
 
           autoTable(doc, {
             startY: yPos,
-            head: [['Folio', 'Cliente', 'RFC', 'Fecha Emision', 'Total']],
+            head: [['Folio', 'Cliente', 'RFC', 'Fecha Emisión', 'Total']],
             body: cancelledData,
             theme: 'striped',
             headStyles: { fillColor: redColor, fontSize: 9 },
@@ -268,7 +268,7 @@ export function BillingReports({ invoices }: BillingReportsProps) {
         doc.setFontSize(8);
         doc.setTextColor(...grayColor);
         doc.text(
-          `Pagina ${i} de ${pageCount} | iWA SmartOps - Reporte generado automaticamente`,
+          `Página ${i} de ${pageCount} | iWA SmartOps - Reporte generado automáticamente`,
           pageWidth / 2,
           doc.internal.pageSize.getHeight() - 10,
           { align: 'center' }

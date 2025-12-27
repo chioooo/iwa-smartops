@@ -135,7 +135,7 @@ class ReportGeneratorService {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Generado el ${this.formatDate(now)}`, pageWidth / 2, 23, { align: 'center' });
-    doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+    doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
 
     // Resumen
     let yPos = 45;
@@ -181,7 +181,7 @@ class ReportGeneratorService {
 
     autoTable(doc, {
       startY: yPos,
-      head: [['Producto', 'SKU', 'Categoria', 'Stock', 'Precio', 'Estado']],
+      head: [['Producto', 'SKU', 'Categoría', 'Stock', 'Precio', 'Estado']],
       body: productsData,
       theme: 'striped',
       headStyles: { fillColor: primaryColor, fontSize: 8 },
@@ -215,7 +215,7 @@ class ReportGeneratorService {
 
     autoTable(doc, {
       startY: yPos,
-      head: [['Insumo', 'Categoria', 'Stock', 'Unidad', 'Proveedor', 'Estado']],
+      head: [['Insumo', 'Categoría', 'Stock', 'Unidad', 'Proveedor', 'Estado']],
       body: suppliesData,
       theme: 'striped',
       headStyles: { fillColor: primaryColor, fontSize: 9 },
@@ -251,7 +251,7 @@ class ReportGeneratorService {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Generado el ${this.formatDate(now)}`, pageWidth / 2, 23, { align: 'center' });
-    doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+    doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
 
     // Resumen
     let yPos = 45;
@@ -293,7 +293,7 @@ class ReportGeneratorService {
 
     autoTable(doc, {
       startY: yPos,
-      head: [['Nombre', 'Email', 'Rol', 'Estado', 'Fecha Creacion']],
+      head: [['Nombre', 'Email', 'Rol', 'Estado', 'Fecha Creación']],
       body: usersData,
       theme: 'striped',
       headStyles: { fillColor: primaryColor, fontSize: 9 },
@@ -325,7 +325,7 @@ class ReportGeneratorService {
 
     autoTable(doc, {
       startY: yPos,
-      head: [['Rol', 'Descripcion', 'Permisos', 'Usuarios']],
+      head: [['Rol', 'Descripción', 'Permisos', 'Usuarios']],
       body: rolesData,
       theme: 'striped',
       headStyles: { fillColor: primaryColor, fontSize: 9 },
@@ -360,12 +360,12 @@ class ReportGeneratorService {
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
-    doc.text('Reporte de Facturacion', pageWidth / 2, 15, { align: 'center' });
+    doc.text('Reporte de Facturación', pageWidth / 2, 15, { align: 'center' });
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Generado el ${this.formatDate(now)}`, pageWidth / 2, 23, { align: 'center' });
-    doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+    doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
 
     // Resumen
     let yPos = 45;
@@ -451,7 +451,7 @@ class ReportGeneratorService {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Generado el ${this.formatDate(now)}`, pageWidth / 2, 23, { align: 'center' });
-    doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+    doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
 
     // Resumen
     let yPos = 45;
@@ -477,7 +477,7 @@ class ReportGeneratorService {
     doc.setTextColor(...primaryColor);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
-    doc.text('Valoracion de Inventario por Producto', 14, yPos);
+    doc.text('Valoración de Inventario por Producto', 14, yPos);
     yPos += 5;
 
     const financeData = products.map(p => {
@@ -522,7 +522,7 @@ class ReportGeneratorService {
       doc.setFontSize(8);
       doc.setTextColor(...grayColor);
       doc.text(
-        `Pagina ${i} de ${pageCount} | iWA SmartOps - Reporte generado automaticamente`,
+        `Pagina ${i} de ${pageCount} | iWA SmartOps - Reporte generado automáticamente`,
         pageWidth / 2,
         doc.internal.pageSize.getHeight() - 10,
         { align: 'center' }

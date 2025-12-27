@@ -73,7 +73,7 @@ export function UserReports({ users, roles }: UserReportsProps) {
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.text(`Generado el ${dateStr}`, pageWidth / 2, 23, { align: 'center' });
-      doc.text('iWA SmartOps - Sistema de Gestion Empresarial', pageWidth / 2, 30, { align: 'center' });
+      doc.text('iWA SmartOps - Sistema de Gestión Empresarial', pageWidth / 2, 30, { align: 'center' });
       
       // Resumen Ejecutivo
       let yPos = 45;
@@ -129,7 +129,7 @@ export function UserReports({ users, roles }: UserReportsProps) {
 
         autoTable(doc, {
           startY: yPos,
-          head: [['Nombre', 'Email', 'Rol', 'Estado', 'Fecha Creacion']],
+          head: [['Nombre', 'Email', 'Rol', 'Estado', 'Fecha Creación']],
           body: usersTableData,
           theme: 'striped',
           headStyles: { fillColor: primaryColor, fontSize: 9 },
@@ -172,7 +172,7 @@ export function UserReports({ users, roles }: UserReportsProps) {
 
         autoTable(doc, {
           startY: yPos,
-          head: [['Rol', 'Descripcion', 'Permisos', 'Usuarios']],
+          head: [['Rol', 'Descripción', 'Permisos', 'Usuarios']],
           body: rolesTableData,
           theme: 'striped',
           headStyles: { fillColor: primaryColor, fontSize: 9 },
@@ -198,7 +198,7 @@ export function UserReports({ users, roles }: UserReportsProps) {
         doc.setTextColor(...primaryColor);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('Distribucion de Usuarios por Rol', 14, yPos);
+        doc.text('Distribución de Usuarios por Rol', 14, yPos);
         yPos += 5;
 
         const distributionData = usersByRole.map(item => [
@@ -231,7 +231,7 @@ export function UserReports({ users, roles }: UserReportsProps) {
         doc.setFontSize(8);
         doc.setTextColor(...grayColor);
         doc.text(
-          `Pagina ${i} de ${pageCount} | iWA SmartOps - Reporte generado automaticamente`,
+          `Página ${i} de ${pageCount} | iWA SmartOps - Reporte generado automáticamente`,
           pageWidth / 2,
           doc.internal.pageSize.getHeight() - 10,
           { align: 'center' }
