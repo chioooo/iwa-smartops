@@ -1,6 +1,6 @@
-//import React from 'react';
 import { X, Download, Mail, XCircle, FileText, Calendar, DollarSign, User } from 'lucide-react';
 import type {Invoice} from './BillingScreen';
+import { invoiceGeneratorService } from '../../services/billing/invoiceGeneratorService';
 
 type Props = {
   invoice: Invoice;
@@ -195,14 +195,14 @@ export function InvoiceDetailPanel({ invoice, onClose, onCancel }: Props) {
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0 space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <button
-              onClick={() => alert('Descargando PDF...')}
+              onClick={() => invoiceGeneratorService.downloadPDF(invoice)}
               className="flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
             >
               <Download className="w-4 h-4" />
               PDF
             </button>
             <button
-              onClick={() => alert('Descargando XML...')}
+              onClick={() => invoiceGeneratorService.downloadXML(invoice)}
               className="flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm"
             >
               <FileText className="w-4 h-4" />
