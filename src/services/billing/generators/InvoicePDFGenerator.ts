@@ -10,6 +10,8 @@ import type { IInvoicePDFGenerator } from '../interfaces/IInvoiceGenerator';
 export class InvoicePDFGenerator implements IInvoicePDFGenerator {
   private readonly primaryColor: [number, number, number] = [208, 50, 58];
   private readonly grayColor: [number, number, number] = [100, 100, 100];
+  private readonly MAX_DESCRIPTION_LENGTH = 40;
+  private readonly MAX_Y_POS_FOR_SEALS = 250;
 
   generate(invoice: Invoice): Blob {
     const doc = new jsPDF();
@@ -146,7 +148,7 @@ export class InvoicePDFGenerator implements IInvoicePDFGenerator {
 
     const conceptosData = invoice.conceptos.map(c => [
       c.claveProdServ,
-      c.descripcion.length > 40 ? c.descripcion.substring(0, 40) + '...' : c.descripcion,
+      c.descripcion.length > 40 ? c.descripcion.substring(0, this.MAX_DESCRIPTION_LENGTH) + '...' : c.descripcion,
       c.cantidad.toString(),
       c.unidad,
       this.formatCurrency(c.precioUnitario),
@@ -201,7 +203,7 @@ export class InvoicePDFGenerator implements IInvoicePDFGenerator {
   }
 
   private renderSellosDemo(doc: jsPDF, invoice: Invoice, pageWidth: number, yPos: number): void {
-    if (yPos < 250) {
+    if (yPos < this.MAX_Y_POS_FOR_SEALS) {
       doc.setFillColor(250, 250, 250);
       doc.rect(14, yPos, pageWidth - 28, 30, 'F');
       doc.setTextColor(...this.grayColor);

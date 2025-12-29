@@ -9,11 +9,38 @@ export class InvoiceXMLGenerator implements IInvoiceXMLGenerator {
   generate(invoice: Invoice): Blob {
     const now = new Date().toISOString();
     const uuid = invoice.uuid || crypto.randomUUID();
+    const { serie, folio } = this.parseFolio(invoice.folio);
     
     const conceptosXML = this.generateConceptosXML(invoice);
-    const xml = this.buildXMLDocument(invoice, uuid, now, conceptosXML);
+    const xml = this.buildXMLDocument(invoice, uuid, now, conceptosXML, serie, folio);
 
     return new Blob([xml], { type: 'application/xml' });
+  }
+
+  /**
+   * Parsea el folio de la factura para extraer Serie y Folio.
+   * Formatos soportados:
+   * - "A-001" -> Serie: "A", Folio: "001"
+   * - "FAC-2024-001" -> Serie: "FAC", Folio: "2024-001"
+   * - "12345" (sin guión) -> Serie: "", Folio: "12345"
+   */
+  private parseFolio(folioCompleto: string): { serie: string; folio: string } {
+    if (!folioCompleto || folioCompleto.trim() === '') {
+      return { serie: '', folio: '1' };
+    }
+
+    const dashIndex = folioCompleto.indexOf('-');
+    
+    if (dashIndex === -1) {
+      // Sin guión: todo es el folio, serie vacía
+      return { serie: '', folio: folioCompleto };
+    }
+
+    // Con guión: primera parte es serie, resto es folio
+    const serie = folioCompleto.substring(0, dashIndex);
+    const folio = folioCompleto.substring(dashIndex + 1) || '1';
+    
+    return { serie, folio };
   }
 
   private generateConceptosXML(invoice: Invoice): string {
@@ -34,15 +61,18 @@ export class InvoiceXMLGenerator implements IInvoiceXMLGenerator {
     ).join('\n');
   }
 
-  private buildXMLDocument(invoice: Invoice, uuid: string, now: string, conceptosXML: string): string {
+  private buildXMLDocument(invoice: Invoice, uuid: string, now: string, conceptosXML: string, serie: string, folio: string): string {
+    // Solo incluir Serie si tiene valor
+    const serieAttr = serie ? `Serie="${serie}"` : '';
+    
     return `<?xml version="1.0" encoding="UTF-8"?>
 <cfdi:Comprobante 
   xmlns:cfdi="http://www.sat.gob.mx/cfd/4" 
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.sat.gob.mx/cfd/4 http://www.sat.gob.mx/sitio_internet/cfd/4/cfdv40.xsd"
   Version="4.0"
-  Serie="${invoice.folio.split('-')[0]}"
-  Folio="${invoice.folio.split('-')[1] || invoice.folio}"
+  ${serieAttr}
+  Folio="${folio}"
   Fecha="${invoice.fechaEmision}"
   FormaPago="${invoice.formaPago}"
   NoCertificado="00001000000500000001"
@@ -105,8 +135,7 @@ export class InvoiceXMLGenerator implements IInvoiceXMLGenerator {
       UUID="${uuid}"
       FechaTimbrado="${now}"
       RfcProvCertif="SAT970701NN3"
-      SelloCFD="DEMO_SEAL_NOT_VALID_FOR_PRODUCTION_${this.generateDemoSeal(invoice.folio + String(invoice.total))}"
-      NoCertificadoSAT="00001000000500000001"
+      SelloCFD="DEMO_SEAL_NOT_VALID_FOR_PRODUCTION_${this.generateDemoSeal(invoice.folio + '-' + uuid)}"      NoCertificadoSAT="00001000000500000001"
       SelloSAT="DEMO_SAT_SEAL_FROM_PAC_RESPONSE_${this.generateDemoSeal(uuid + invoice.rfc)}"/>
   </cfdi:Complemento>
   
