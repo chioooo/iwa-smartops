@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Receipt, Settings as SettingsIcon } from 'lucide-react';
+import { FileText, Plus, Receipt, Settings as SettingsIcon, BarChart3 } from 'lucide-react';
 import { useChatbot } from '../../contexts/ChatbotContext';
 import { BillingDashboard } from './BillingDashboard';
 import { InvoiceTable } from './InvoiceTable';
@@ -7,6 +7,7 @@ import { CreateInvoiceForm } from './CreateInvoiceForm';
 import { InvoiceDetailPanel } from './InvoiceDetailPanel';
 import { CancelInvoiceModal } from './CancelInvoiceModal';
 import { PaymentComplementForm } from './PaymentComplementForm';
+import { BillingReports } from './BillingReports';
 import type {User} from "../../data/types/users.types.ts";
 import {usePermissions} from "../../hooks/usePermissions.tsx";
 
@@ -53,7 +54,7 @@ export type Client = {
 
 export function BillingScreen({ user }: { user: User }) {
   const { pendingAction, consumeAction, highlightedElement } = useChatbot();
-  const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'settings' | 'dashboard'>('invoices');
+  const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'settings' | 'dashboard' | 'reports'>('invoices');
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
@@ -309,6 +310,17 @@ export function BillingScreen({ user }: { user: User }) {
               <FileText className="w-5 h-5" />
               Vista General
             </button>
+            <button
+              onClick={() => setActiveTab('reports')}
+              className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                activeTab === 'reports'
+                  ? 'border-[#D0323A] text-[#D0323A]'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <BarChart3 className="w-5 h-5" />
+              Reportes
+            </button>
           </div>
         </div>
       </div>
@@ -347,6 +359,9 @@ export function BillingScreen({ user }: { user: User }) {
           />
         )}
 
+        {activeTab === 'reports' && (
+          <BillingReports invoices={invoices} />
+        )}
       </div>
 
       {/* Invoice Detail Modal */}

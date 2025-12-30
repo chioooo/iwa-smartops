@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import {Users, Shield, Search, Plus, ChevronDown} from 'lucide-react';
+import {Users, Shield, Search, Plus, ChevronDown, FileText} from 'lucide-react';
 import { UserTable } from './UserTable';
 import { RolesSection } from './RolesSection';
 import { CreateUserModal } from './CreateUserModal';
 import { UserDetailsPanel } from './UserDetailsPanel';
 import { PermissionsEditor } from './PermissionsEditor';
+import { UserReports } from './UserReports';
 
 import { demoDataService } from '../../services/usersService.tsx'
 import type { User, Role } from "../../data/types/users.types.ts";
@@ -12,7 +13,7 @@ import {CreateRoleModal} from "./CreateRoleModal.tsx";
 import { usePermissions } from "../../hooks/usePermissions";
 
 export function UsersScreen({ user }: { user: User }) {
-  const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'roles' | 'reports'>('users');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
 
@@ -206,6 +207,18 @@ export function UsersScreen({ user }: { user: User }) {
                     </span>
                   </button>
               ) }
+
+              <button
+                  onClick={() => setActiveTab('reports')}
+                  className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
+                      activeTab === 'reports'
+                          ? 'border-[#D0323A] text-[#D0323A]'
+                          : 'border-transparent text-gray-600 hover:text-gray-900'
+                  }`}
+              >
+                <FileText className="w-5 h-5" />
+                Reportes
+              </button>
             </div>
           </div>
         </div>
@@ -280,7 +293,7 @@ export function UsersScreen({ user }: { user: User }) {
                     />
                 )}
               </div>
-          ) : (
+          ) : activeTab === 'roles' ? (
               <RolesSection
                   roles={roles}
                   onEditPermissions={(role) => {
@@ -289,6 +302,8 @@ export function UsersScreen({ user }: { user: User }) {
                   }}
                   onOpenCreateRoleModal={() => setShowCreateRoleModal(true)}
               />
+          ) : (
+              <UserReports users={users} roles={roles} />
           )}
         </div>
 
