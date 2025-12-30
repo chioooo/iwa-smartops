@@ -3,6 +3,7 @@ import { sendEmail, getEmailProviders } from '../../services/azure';
 import type { EmailProvider, EmailProviderInfo } from '../../services/azure';
 import { Search, Download, Mail, Eye, XCircle, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import type {Invoice} from './BillingScreen';
+import { invoiceGeneratorService } from '../../services/billing/invoiceGeneratorService';
 
 type Props = {
   invoices: Invoice[];
@@ -92,12 +93,12 @@ export function InvoiceTable({ invoices, onSelectInvoice, onCancelInvoice, selec
 
   const handleDownloadPDF = (invoice: Invoice, e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Descargando PDF de factura ${invoice.folio}`);
+    invoiceGeneratorService.downloadPDF(invoice);
   };
 
   const handleDownloadXML = (invoice: Invoice, e: React.MouseEvent) => {
     e.stopPropagation();
-    alert(`Descargando XML de factura ${invoice.folio}`);
+    invoiceGeneratorService.downloadXML(invoice);
   };
 
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);

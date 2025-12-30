@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { X, User, FileText, Package, Plus, Trash2, Save, Send } from 'lucide-react';
+import { X, User, FileText, Package, Plus, Trash2, Save, Send, Loader2, CheckCircle } from 'lucide-react';
 import type {Invoice, InvoiceConcept, Client} from './BillingScreen';
+import { invoiceGeneratorService } from '../../services/billing/invoiceGeneratorService';
 
 type Props = {
   clients: Client[];
@@ -8,6 +9,8 @@ type Props = {
   onClose: () => void;
   onCreate: (invoiceData: Omit<Invoice, 'id'>) => void;
 };
+
+type TimbradoState = 'idle' | 'timbrado' | 'success' | 'error';
 
 export function CreateInvoiceForm({ clients, invoice, onClose, onCreate }: Props) {
   const isEditing = !!invoice;
@@ -44,6 +47,9 @@ export function CreateInvoiceForm({ clients, invoice, onClose, onCreate }: Props
     precioUnitario: 0,
     iva: 16
   });
+
+  const [timbradoState, setTimbradoState] = useState<TimbradoState>('idle');
+  const [timbradoMessage, setTimbradoMessage] = useState('');
 
   const filteredClients = clients.filter(client =>
     client.nombre.toLowerCase().includes(searchClient.toLowerCase()) ||
@@ -105,22 +111,21 @@ export function CreateInvoiceForm({ clients, invoice, onClose, onCreate }: Props
 
   const totals = calculateTotals();
 
-  const handleSubmit = () => {
+  const handleSaveDraft = () => {
     if (!selectedClient || conceptos.length === 0) {
       alert('Por favor completa todos los campos requeridos');
       return;
     }
 
     const invoiceData: Omit<Invoice, 'id'> = {
-      folio: '', // Se asigna en el padre
-      uuid: formData.estado === 'vigente' ? '12345678-1234-1234-1234-123456789012' : undefined,
+      folio: '',
       cliente: selectedClient.nombre,
       rfc: selectedClient.rfc,
       fechaEmision: new Date().toISOString(),
       total: totals.total,
       subtotal: totals.subtotal,
       iva: totals.iva,
-      estado: formData.estado,
+      estado: 'pendiente_timbrado',
       metodoPago: formData.metodoPago,
       formaPago: formData.formaPago,
       usoCFDI: selectedClient.usoCFDI,
@@ -132,6 +137,89 @@ export function CreateInvoiceForm({ clients, invoice, onClose, onCreate }: Props
     };
 
     onCreate(invoiceData);
+  };
+
+  const handleTimbrar = async () => {
+    if (!selectedClient || conceptos.length === 0) {
+      alert('Por favor completa todos los campos requeridos');
+      return;
+    }
+
+    setTimbradoState('timbrado');
+    setTimbradoMessage('Conectando con el PAC...');
+
+    try {
+      // Simular proceso de timbrado
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setTimbradoMessage('Validando estructura del CFDI...');
+      
+      await new Promise(resolve => setTimeout(resolve, 600));
+      setTimbradoMessage('Enviando al SAT...');
+      
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setTimbradoMessage('Recibiendo respuesta del SAT...');
+      
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setTimbradoMessage('Generando sello digital...');
+      
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
+      // Crear factura temporal para timbrar
+      const tempInvoice: Invoice = {
+        id: 'temp',
+        folio: '',
+        cliente: selectedClient.nombre,
+        rfc: selectedClient.rfc,
+        fechaEmision: new Date().toISOString(),
+        total: totals.total,
+        subtotal: totals.subtotal,
+        iva: totals.iva,
+        estado: 'pendiente_timbrado',
+        metodoPago: formData.metodoPago,
+        formaPago: formData.formaPago,
+        usoCFDI: selectedClient.usoCFDI,
+        tipoCFDI: formData.tipoCFDI,
+        moneda: formData.moneda,
+        conceptos: conceptos,
+        lugarExpedicion: formData.lugarExpedicion,
+        regimenFiscal: formData.regimenFiscal
+      };
+
+      // Timbrar factura
+      const timbradaInvoice = await invoiceGeneratorService.timbrarFactura(tempInvoice);
+      
+      setTimbradoState('success');
+      setTimbradoMessage('¡Factura timbrada exitosamente!');
+
+      // Esperar un momento para mostrar el éxito
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Crear la factura con el UUID generado
+      const invoiceData: Omit<Invoice, 'id'> = {
+        folio: '',
+        uuid: timbradaInvoice.uuid,
+        cliente: selectedClient.nombre,
+        rfc: selectedClient.rfc,
+        fechaEmision: new Date().toISOString(),
+        total: totals.total,
+        subtotal: totals.subtotal,
+        iva: totals.iva,
+        estado: 'vigente',
+        metodoPago: formData.metodoPago,
+        formaPago: formData.formaPago,
+        usoCFDI: selectedClient.usoCFDI,
+        tipoCFDI: formData.tipoCFDI,
+        moneda: formData.moneda,
+        conceptos: conceptos,
+        lugarExpedicion: formData.lugarExpedicion,
+        regimenFiscal: formData.regimenFiscal
+      };
+
+      onCreate(invoiceData);
+    } catch (error) {
+      setTimbradoState('error');
+      setTimbradoMessage('Error al timbrar la factura. Intente nuevamente.');
+    }
   };
 
   const formatCurrency = (amount: number) => {
@@ -558,10 +646,30 @@ export function CreateInvoiceForm({ clients, invoice, onClose, onCreate }: Props
           )}
         </div>
 
+        {/* Timbrado Progress */}
+        {timbradoState !== 'idle' && (
+          <div className={`px-6 py-3 flex items-center gap-3 ${
+            timbradoState === 'success' ? 'bg-green-50 border-t border-green-200' :
+            timbradoState === 'error' ? 'bg-red-50 border-t border-red-200' :
+            'bg-blue-50 border-t border-blue-200'
+          }`}>
+            {timbradoState === 'timbrado' && <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />}
+            {timbradoState === 'success' && <CheckCircle className="w-5 h-5 text-green-600" />}
+            {timbradoState === 'error' && <X className="w-5 h-5 text-red-600" />}
+            <span className={`text-sm ${
+              timbradoState === 'success' ? 'text-green-700' :
+              timbradoState === 'error' ? 'text-red-700' :
+              'text-blue-700'
+            }`}>
+              {timbradoMessage}
+            </span>
+          </div>
+        )}
+
         {/* Footer Actions */}
         <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div className="flex gap-2">
-            {activeStep > 1 && (
+            {activeStep > 1 && timbradoState === 'idle' && (
               <button
                 onClick={() => setActiveStep(activeStep - 1)}
                 className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -590,20 +698,26 @@ export function CreateInvoiceForm({ clients, invoice, onClose, onCreate }: Props
             ) : (
               <>
                 <button
-                  onClick={handleSubmit}
-                  disabled={conceptos.length === 0}
+                  onClick={handleSaveDraft}
+                  disabled={conceptos.length === 0 || timbradoState === 'timbrado'}
                   className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save className="w-4 h-4" />
                   Guardar Borrador
                 </button>
                 <button
-                  onClick={handleSubmit}
-                  disabled={conceptos.length === 0}
+                  onClick={handleTimbrar}
+                  disabled={conceptos.length === 0 || timbradoState === 'timbrado'}
                   className="flex items-center gap-2 px-4 py-2 bg-[#D0323A] text-white rounded-lg hover:bg-[#9F2743] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Send className="w-4 h-4" />
-                  Timbrar Factura
+                  {timbradoState === 'timbrado' ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : timbradoState === 'success' ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                  {timbradoState === 'timbrado' ? 'Timbrando...' : timbradoState === 'success' ? 'Timbrado' : 'Timbrar Factura'}
                 </button>
               </>
             )}

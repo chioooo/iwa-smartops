@@ -5,16 +5,18 @@ import {ReportsList} from './ReportsList';
 import {CreateReportModal} from './CreateReportModal';
 import {ReportDetailView} from './ReportDetailView';
 import {FiltersPanel} from './FiltersPanel';
+import { reportGeneratorService } from '../../services/reports/reportGeneratorService';
 
 export type Report = {
     id: string;
     name: string;
-    tipo: 'ventas' | 'inventario' | 'facturacion' | 'servicios' | 'clientes' | 'utilidades';
+    tipo: 'inventario' | 'usuarios' | 'facturacion' | 'finanzas';
     generationDate: string;
     generatedBy: string;
     status: 'disponible' | 'proceso' | 'error';
     format: 'pdf' | 'excel';
     parameters: ReportFilters;
+    blob?: Blob;
 };
 
 export type ReportFilters = {
@@ -42,26 +44,25 @@ export function ReportsScreen() {
     const [reports, setReports] = useState<Report[]>([
         {
             id: '1',
-            name: 'Reporte de Ventas - nov 2024 a dic 2024',
-            tipo: 'ventas',
+            name: 'Reporte de Inventario - nov 2024 a dic 2024',
+            tipo: 'inventario',
             generationDate: '2024-12-10T15:22:00',
             generatedBy: 'Juan Pérez',
             status: 'disponible',
             format: 'pdf',
             parameters: {
                 startDate: '2024-11-10',
-                endDate: '2024-12-10',
-                branch: 'Principal'
+                endDate: '2024-12-10'
             }
         },
         {
             id: '2',
-            name: 'Reporte de Inventario - sep 2024 a oct 2024',
-            tipo: 'inventario',
+            name: 'Reporte de Usuarios - sep 2024 a oct 2024',
+            tipo: 'usuarios',
             generationDate: '2024-10-25T14:15:00',
             generatedBy: 'María González',
             status: 'disponible',
-            format: 'excel',
+            format: 'pdf',
             parameters: {
                 startDate: '2024-09-25',
                 endDate: '2024-10-25'
@@ -73,7 +74,7 @@ export function ReportsScreen() {
             tipo: 'facturacion',
             generationDate: '2024-11-30T09:00:00',
             generatedBy: 'Carlos Ruiz',
-            status: 'proceso',
+            status: 'disponible',
             format: 'pdf',
             parameters: {
                 startDate: '2024-10-30',
@@ -100,23 +101,55 @@ export function ReportsScreen() {
         ]
     };
 
-    const handleCreateReport = (reportData: Omit<Report, 'id' | 'generationDate' | 'status'>) => {
-        const newReport: Report = {
+    const handleCreateReport = async (reportData: Omit<Report, 'id' | 'generationDate' | 'status'>) => {
+        // Crear reporte temporal en estado "proceso"
+        const tempId = crypto.randomUUID();
+        const tempReport: Report = {
             ...reportData,
-            id: String(reports.length + 1),
+            id: tempId,
             generationDate: new Date().toISOString(),
             status: 'proceso'
         };
 
-        setReports([newReport, ...reports]);
+        setReports([tempReport, ...reports]);
         setShowCreateModal(false);
 
-        // Simular proceso de generación
-        setTimeout(() => {
-            setReports(prev => prev.map(r =>
-                r.id === newReport.id ? {...r, status: 'disponible'} : r
-            ));
-        }, 2000);
+        // Verificar si es un tipo de reporte que podemos generar realmente
+        const realReportTypes = ['inventario', 'usuarios', 'facturacion', 'finanzas'];
+        
+        if (realReportTypes.includes(reportData.tipo)) {
+            try {
+                const generatedReport = await reportGeneratorService.generateReport({
+                    tipo: reportData.tipo as 'inventario' | 'usuarios' | 'facturacion' | 'finanzas',
+                    startDate: reportData.parameters.startDate,
+                    endDate: reportData.parameters.endDate,
+                    format: reportData.format,
+                    generatedBy: reportData.generatedBy
+                });
+
+                setReports(prev => prev.map(r =>
+                    r.id === tempId ? {
+                        ...r,
+                        id: generatedReport.id,
+                        name: generatedReport.name,
+                        status: generatedReport.status,
+                        blob: generatedReport.blob
+                    } : r
+                ));
+            } catch (error) {
+                console.error('Error generating report:', error);
+                setReports(prev => prev.map(r =>
+                    r.id === tempId ? {...r, status: 'error'} : r
+                ));
+            }
+        } else {
+            // Para tipos de reporte no implementados, simular generación
+            setTimeout(() => {
+                setReports(prev => prev.map(r =>
+                    r.id === tempId ? {...r, status: 'disponible'} : r
+                ));
+            }, 2000);
+        }
     };
 
     const handleApplyFilters = (newFilters: ReportFilters) => {
