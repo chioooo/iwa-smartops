@@ -51,7 +51,7 @@ function normalizeMexicanPhone(raw: string) {
 }
 
 export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
-  const mapRef = useRef<any>(null);
+  const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
 
   const [legs, setLegs] = useState<RouteLeg[]>([]);
@@ -164,7 +164,7 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
       const icon = createStopIcon(statusColors[stop.status]);
       const marker = L.marker(stop.position, { icon }).addTo(map);
       marker.bindPopup(`<strong>#${index + 1} ${stop.customer}</strong><br/>Estado: ${getStatusLabel(stop.status)}`);
-      bounds.extend(stop.position as any);
+      bounds.extend(stop.position as L.LatLngExpression);
     });
 
     if (stops.length > 0) {
@@ -174,47 +174,61 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
     mapRef.current = map;
 
     const fetchRoutes = async () => {
+      setError(null); // Limpiar cualquier error previo antes de intentar
       try {
         const computedLegs: RouteLeg[] = [];
         let totalDistanceM = 0;
         let totalDurationS = 0;
 
         for (let i = 0; i < stops.length - 1; i += 1) {
-          const origin = stops[i].position;
-          const destination = stops[i + 1].position;
+          try {
+            const origin = stops[i].position;
+            const destination = stops[i + 1].position;
 
-          const url = `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=geojson`;
-          const res = await fetch(url);
-          const data = await res.json();
+            const url = `https://router.project-osrm.org/route/v1/driving/${origin[1]},${origin[0]};${destination[1]},${destination[0]}?overview=full&geometries=geojson`;
+            const res = await fetch(url);
+            const data = await res.json();
 
-          if (data?.routes?.[0]) {
-            const route = data.routes[0];
-            totalDistanceM += route.distance;
-            totalDurationS += route.duration;
+            if (data?.routes?.[0]) {
+              const route = data.routes[0];
+              totalDistanceM += route.distance;
+              totalDurationS += route.duration;
 
-            const coords: [number, number][] = route.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
-            const color = statusColors[stops[i + 1].status];
+              const coords: [number, number][] = route.geometry.coordinates.map((c: [number, number]) => [c[1], c[0]]);
+              const color = statusColors[stops[i + 1].status];
 
-            const leg: RouteLeg = {
-              id: `leg-${i}`,
-              coords,
-              color,
-              distanceKm: (route.distance / 1000).toFixed(2),
-              durationMin: Math.round(route.duration / 60),
-              destination: stops[i + 1].customer,
-            };
+              const leg: RouteLeg = {
+                id: `leg-${i}`,
+                coords,
+                color,
+                distanceKm: (route.distance / 1000).toFixed(2),
+                durationMin: Math.round(route.duration / 60),
+                destination: stops[i + 1].customer,
+              };
 
-            computedLegs.push(leg);
+              computedLegs.push(leg);
 
-            const polyline = L.polyline(coords as any, { color, weight: 5 }).addTo(map);
-            polyline.bindPopup(`<strong>Hacia: ${leg.destination}</strong><br/>${leg.distanceKm} km | ${leg.durationMin} min`);
+              const polyline = L.polyline(coords as L.LatLngExpression[], { color, weight: 5 }).addTo(map);
+              polyline.bindPopup(`<strong>Hacia: ${leg.destination}</strong><br/>${leg.distanceKm} km | ${leg.durationMin} min`);
 
-            coords.forEach((p) => bounds.extend(p as any));
+              coords.forEach((p) => bounds.extend(p as L.LatLngExpression));
+            }
+          } catch {
+            // Si falla una ruta individual, continuar con las demás
+            console.warn(`No se pudo calcular la ruta del tramo ${i + 1}`);
           }
         }
 
         if (computedLegs.length > 0) {
           map.fitBounds(bounds.pad(0.2));
+        }
+
+        // Si se calculó al menos una ruta, limpiar el error
+        if (computedLegs.length > 0) {
+          setError(null);
+        } else if (stops.length > 1) {
+          // Solo mostrar error si había stops para calcular pero no se calculó ninguna ruta
+          setError('No se pudieron calcular las rutas.');
         }
 
         setLegs(computedLegs);
@@ -232,8 +246,9 @@ export function DeliveriesTab({ stops }: { stops: DeliveryStop[] }) {
           });
           return next;
         });
-      } catch (e) {
-        setError('No se pudieron calcular las rutas.');
+      } catch {
+        // Catch global solo para errores inesperados del mapa o la configuración
+        setError('Error inesperado al configurar el mapa.');
       } finally {
         setLoading(false);
       }
