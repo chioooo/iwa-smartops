@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Receipt, Settings as SettingsIcon, BarChart3 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { FileText, Plus, Receipt, BarChart3 } from 'lucide-react';
 import { useChatbot } from '../../contexts/ChatbotContext';
 import { BillingDashboard } from './BillingDashboard';
 import { InvoiceTable } from './InvoiceTable';
@@ -56,7 +56,7 @@ export function BillingScreen({ user }: { user: User }) {
   const { pendingAction, consumeAction, highlightedElement } = useChatbot();
   const [activeTab, setActiveTab] = useState<'invoices' | 'payments' | 'settings' | 'dashboard' | 'reports'>('invoices');
   const [showCreateInvoice, setShowCreateInvoice] = useState(false);
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [, setShowPaymentForm] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [editingInvoice, setEditingInvoice] = useState<Invoice | null>(null);
@@ -213,7 +213,7 @@ export function BillingScreen({ user }: { user: User }) {
     }
   };
 
-  const handleCancelInvoice = (invoiceId: string, motivo: string, folioSustitucion?: string) => {
+  const handleCancelInvoice = (invoiceId: string, _motivo: string, _folioSustitucion?: string) => {
     handleUpdateInvoice(invoiceId, { estado: 'cancelada' });
     setShowCancelModal(false);
     setSelectedInvoice(null);
