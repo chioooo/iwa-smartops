@@ -88,7 +88,7 @@ export function DashboardScreen({ user, onLogout }: { user: any; onLogout: () =>
         <footer className="mt-auto border-t border-gray-200 bg-white py-4">
           <div className="px-8">
             <p className="text-center text-sm text-gray-600">
-              Design & Development by IWA Consolti © 2025
+              Design & Development by IWA Consolti © 2026
             </p>
           </div>
         </footer>
