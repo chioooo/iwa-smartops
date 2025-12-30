@@ -17,3 +17,8 @@ export interface Role {
     usersCount?: number;
     permissions?: string[];
 }
+
+/**
+ * Type for creating a new role (id is optional, will be generated)
+ */
+export type CreateRoleInput = Omit<Role, 'id'> & { id?: string };
