@@ -1,6 +1,5 @@
 import type { User, Role } from '../../data/types/users.types';
-import type { IUserRepository } from './interfaces/IUserRepository';
-import type { IRoleRepository } from './interfaces/IRoleRepository';
+import type { IUserRepository, IRoleRepository } from './interfaces';
 
 /**
  * User Service Interface (ISP - Interface Segregation Principle)
@@ -54,7 +53,7 @@ export class UserService implements IUserService {
   addUser(user: User): void {
     // Find and update role count
     const role = this.findRoleForUser(user);
-    if (role) {
+    if (role?.id) {
       this.roleRepository.incrementUsersCount(role.id);
     }
     this.userRepository.add(user);
@@ -71,7 +70,7 @@ export class UserService implements IUserService {
     const newRole = this.findRoleForUser(updatedUser);
 
     // Update role counts if role changed
-    if (oldRole && newRole && oldRole.id !== newRole.id) {
+    if (oldRole?.id && newRole?.id && oldRole.id !== newRole.id) {
       this.roleRepository.decrementUsersCount(oldRole.id);
       this.roleRepository.incrementUsersCount(newRole.id);
     }
@@ -83,7 +82,7 @@ export class UserService implements IUserService {
     const user = this.userRepository.getById(id);
     if (user) {
       const role = this.findRoleForUser(user);
-      if (role) {
+      if (role?.id) {
         this.roleRepository.decrementUsersCount(role.id);
       }
     }
