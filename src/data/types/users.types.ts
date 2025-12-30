@@ -10,7 +10,7 @@ export interface User {
 }
 
 export interface Role {
-    id?: string;
+    id: string;
     name: string;
     description: string;
     permissionsCount?: number;

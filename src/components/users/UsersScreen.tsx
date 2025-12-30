@@ -90,7 +90,7 @@ export function UsersScreen({ user }: { user: User }) {
 
   //  ROLES
 
-  const handleCreateRole = (roleData: Role) => {
+  const handleCreateRole = (roleData: { name: string; description: string }) => {
     const newRole: Role = {
       id: crypto.randomUUID(),
       name: roleData.name,

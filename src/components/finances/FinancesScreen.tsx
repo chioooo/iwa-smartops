@@ -1,16 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
-  DollarSign, 
   TrendingUp, 
-  TrendingDown, 
   Package, 
   PieChart, 
-  BarChart3,
-  Download,
-  FileText,
-  AlertTriangle,
-  ArrowUpRight,
-  ArrowDownRight
+  FileText
 } from 'lucide-react';
 import { FinancesDashboard } from './FinancesDashboard';
 import { InventoryValuation } from './InventoryValuation';
